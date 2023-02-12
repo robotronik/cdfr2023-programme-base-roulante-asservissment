@@ -4,10 +4,20 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/timer.h>
-#include "pinConfig.h"
+#include "config.h"
+
+
+//Frequency = 84Mhz / TIMERPERIOD
+//The ideal frequancy it's arround 8kHz but it's creat a noise unpleasant to the ear
+//with a periode off 4000, this creat a frequence off 21kHz, that people don't hear
+#define TIMERPERIOD 4000
+#define COEFMULT TIMERPERIOD/100
+
+
 
 
 void motorSetup(void);
+
 
 //set to 0 to go forward. Other to backward
 void motorDirectionL(int direction);

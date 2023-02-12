@@ -59,6 +59,8 @@ void clock_setup(void){
 
 void gpio_setup(void)
 {
+	rcc_periph_clock_enable(RCC_GPIOA);
+
 	/* Setup GPIO pins for USART2 transmit. */
 	gpio_mode_setup(port_TX, GPIO_MODE_AF, GPIO_PUPD_NONE, pin_TX);
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
@@ -99,3 +101,13 @@
 #define port_endstopL            GPIOC
 #define pin_endStopR         GPIO12
 #define port_endStopR            GPIOC
+
+
+//Variable
+
+typedef struct{
+	double teta;
+	double x;
+    double y;
+}position_t;
+

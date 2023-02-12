@@ -1,6 +1,6 @@
 #include "motor.h"
 
-
+//local fonctions
 void setuptimer(void);
 void setupGPIO(void);
 
@@ -11,23 +11,24 @@ void motorSetup(void){
 	setuptimer();
 }
 
+//direction inverted for the left motor
 void motorDirectionL(int direction){
 	if(direction == 0){
-		gpio_clear(port_directionL,pin_directionL);
+		gpio_set(port_directionL,pin_directionL);
 	}
 	else{
-		gpio_set(port_directionL,pin_directionL);
+		gpio_clear(port_directionL,pin_directionL);
 	}
 }
 
 void motorSpeedSignedL(int speed){
 	if(speed<1){
 		motorDirectionL(1);
-		timer_set_oc_value(TIM1, TIM_OC2, -speed*100);
+		timer_set_oc_value(TIM1, TIM_OC2, -speed*COEFMULT);
 	}
 	else{
 		motorDirectionL(0);
-		timer_set_oc_value(TIM1, TIM_OC2, speed*100);
+		timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
 	}
 }
 	
@@ -39,7 +40,7 @@ void motorSpeedUnsignedL(int speed,int direction){
 	else if(direction == 0){
 		motorDirectionL(0);
 	}
-	timer_set_oc_value(TIM1, TIM_OC2, speed*100);
+	timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
 }
 
 
@@ -55,11 +56,11 @@ void motorDirectionR(int direction){
 void motorSpeedSignedR(int speed){
 	if(speed<1){
 		motorDirectionR(1);
-		timer_set_oc_value(TIM1, TIM_OC1, -speed*100);
+		timer_set_oc_value(TIM1, TIM_OC1, -speed*COEFMULT);
 	}
 	else{
 		motorDirectionR(0);
-		timer_set_oc_value(TIM1, TIM_OC1, speed*100);
+		timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
 	}
 }
 	
@@ -71,7 +72,7 @@ void motorSpeedUnsignedR(int speed,int direction){
 	else if(direction == 0){
 		motorDirectionR(0);
 	}
-	timer_set_oc_value(TIM1, TIM_OC1, speed*100);
+	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
 	
 }
 
@@ -94,6 +95,10 @@ void motorBrakeR(int brake){
 }
 
 void setupGPIO(void){
+	rcc_periph_clock_enable(RCC_GPIOA);
+	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_GPIOC);
+	
 	gpio_mode_setup(port_ModeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeL);
 	gpio_mode_setup(port_brakeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_brakeL);
 	gpio_mode_setup(port_directionL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_directionL);
@@ -167,16 +172,7 @@ void setuptimer(void){
 	timer_continuous_mode(TIM1);
 
 	//depend of the value of the compnents on the PCB
-	timer_set_period(TIM1, 10000);
-
-	/* Configure break and deadtime. */
-	timer_set_deadtime(TIM1, 0);
-	timer_set_enabled_off_state_in_idle_mode(TIM1);
-	timer_set_enabled_off_state_in_run_mode(TIM1);
-	timer_disable_break(TIM1);
-	timer_set_break_polarity_high(TIM1);
-	timer_disable_break_automatic_output(TIM1);
-	timer_set_break_lock(TIM1, TIM_BDTR_LOCK_OFF);
+	timer_set_period(TIM1, TIMERPERIOD);
 
 	/* -- OC3 configuration -- */
 	/* Disable outputs. */
