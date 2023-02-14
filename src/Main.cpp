@@ -7,6 +7,7 @@
 #include "motor.h"
 #include "uart.h"
 #include "odometrie.h"
+#include "clock.h"
 
 
 static void ledSetup(void)
@@ -21,12 +22,6 @@ static void ledSetup(void)
 }
 
 
-static void clock_setup(void)
-{
-	//Swap clock to 84MHZ internal
-	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
-
-}
 
 
 int main(void)
@@ -49,9 +44,6 @@ int main(void)
 	motorBrakeR(0);
 	motorBrakeL(0);
 
-	//TEST UART
-	uartSendln(1);
-
 	//TEST MOTOR
 		//motorSpeedSignedL(-100);
 		//motorSpeedSignedR(100);
@@ -60,9 +52,12 @@ int main(void)
 	while (1) {
 		
 
-		for (int i = 0; i < 300000; i++) {	/* Wait a bit. */
-			__asm__("NOP");
-		}
+		// delay_ms(1000);
+		// double f = 5.5;
+		// int test = get_uptime_ms();
+		// usartprintf("%d\n",test/1000);
+		odometrieLoop();
+		printPosition();
 		
 		
 	}

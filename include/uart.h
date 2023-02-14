@@ -6,6 +6,8 @@
 #include "config.h"
 
 void usartSetup(void);
-void uartSend(uint16_t data);
-void uartSendln(uint16_t data);
-void usart_send_int(int Message);
+
+//Send information on uart2
+//1000 char max
+void usartprintf(const char* format,...);
+

@@ -1,13 +1,14 @@
 
 #include "uart.h"
 #include <stdio.h>
+#include <stdarg.h>
 
-void clock_setup(void);
+void _uartClock_setup(void);
 void gpio_setup(void);
 
 void usartSetup(void){
 
-    clock_setup();
+    _uartClock_setup();
 	gpio_setup();
 
 	/* Setup USART2 parameters. */
@@ -22,34 +23,25 @@ void usartSetup(void){
 	usart_enable(USART2);
 }
 
-void uartSend(uint16_t data){
-    usart_send_blocking(USART2, data + '0');
-}
-
-void uartSendln(uint16_t data){
-    usart_send_blocking(USART2, data + '0');
-    usart_send_blocking(USART2, '\r');
-	usart_send_blocking(USART2, '\n');
-}
-
-void uartSendMessage(char* Message){
+void usartSendMessage(uint32_t usart, char* Message){
 	int i = 0;
-	while (Message[i] != 0 && i <20)	{
-		usart_send_blocking(USART2,Message[i]);
+	while (Message[i] != 0)	{
+		usart_send_blocking(usart,Message[i]);
 		i++;
 	}	
 }
 
-void usart_send_int(int Message){
-	char Buffer[20];
-	sprintf(Buffer,"%d",Message);
-	uartSendMessage(Buffer);
-	usart_send_blocking(USART2, '\r');
-	usart_send_blocking(USART2, '\n');
+void usartprintf(const char* format, ...) {
+    char buffer[1000];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, 1000, format, args);
+    usartSendMessage(USART2,buffer);
+    va_end(args);
 }
 
 
-void clock_setup(void){
+void _uartClock_setup(void){
 	/* Enable GPIOD clock for LED & USARTs. */
 	rcc_periph_clock_enable(RCC_GPIOA);
 
