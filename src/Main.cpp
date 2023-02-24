@@ -8,6 +8,7 @@
 #include "uart.h"
 #include "odometrie.h"
 #include "clock.h"
+#include "I2C.h"
 
 
 static void ledSetup(void)
@@ -17,8 +18,6 @@ static void ledSetup(void)
 	gpio_mode_setup(port_led2, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_led2);
 
 	//gpio_mode_setup(GPIOA,GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,GPIO5);
-	
-
 }
 
 
@@ -33,12 +32,15 @@ int main(void)
 	motorSetup();
 	usartSetup();
 	odometrieSetup();
+	i2c_setup();
+
 
 
 	//WAIT
 	for (int i = 0; i < 100000000; i++) {	/* Wait a bit. */
 		__asm__("nop");
 	}
+	usartprintf("Start\n");
 
 	//UNBRAKE MOTOR
 	motorBrakeR(0);
@@ -56,9 +58,18 @@ int main(void)
 		// double f = 5.5;
 		// int test = get_uptime_ms();
 		// usartprintf("%d\n",test/1000);
-		odometrieLoop();
-		printPosition();
-		
+		//odometrieLoop();
+		//printPosition();
+		//printBuffer();
+		//I2CLoop();
+		// while(I2CAvaillable()){
+		// 	uint8_t data[10];
+		// 	I2CGetCommand(data);
+		// 	//usartprintf("test\n");
+		// 	usartprintf("%s\n",data);
+		// }
+		//delay_ms(2000);
+		//delay_ms(500);
 		
 	}
 

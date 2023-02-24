@@ -90,7 +90,7 @@
 #define pin_RX              GPIO3
 #define port_RX                 GPIOA
 
-//PIN and PORT for I2C
+//PIN and PORT for programming
 #define pin_SWDIO           GPIO13
 #define port_SWDIO              GPIOA
 #define pin_SWCLK           GPIO14
@@ -101,6 +101,12 @@
 #define port_endstopL            GPIOC
 #define pin_endStopR         GPIO12
 #define port_endStopR            GPIOC
+
+//PIN and PORT for I2C
+#define pin_I2CClk			GPIO6
+#define port_I2CClk				GPIOB
+#define pin_I2CSda			GPIO7
+#define port_I2CSda				GPIOB
 
 
 //Variable
