@@ -112,8 +112,21 @@
 //Variable
 
 typedef struct{
-	double teta;
 	double x;
     double y;
+	double teta;
 }position_t;
+
+typedef struct{
+	uint16_t x;
+    uint16_t y;
+	uint16_t teta;
+}positionint_t;
+
+union position_u
+{
+	positionint_t position;
+	uint8_t tab[6];
+};
+
 

@@ -21,6 +21,30 @@ static void ledSetup(void)
 }
 
 
+void I2CRecieveData(uint8_t* data, int size){
+	if(data[0]==10){
+		gpio_set(port_led1,pin_led1);
+	}
+	else if (data[0]==11){
+		gpio_clear(port_led1,pin_led1);
+	}
+	if(data[0]==12){
+		gpio_set(port_led2,pin_led2);
+	}
+	else if (data[0]==13){
+		gpio_clear(port_led2,pin_led2);
+	}
+	else if (data[0]==20){
+		position_u posi = odometrieGetPosition();
+		I2CSetBuffer(posi.tab,6);
+	}
+	else if( data[0]==21 && size == 7){
+		position_u posi;
+		memcpy(posi.tab, data+1, 6);
+		odometrieSetPosition(posi);
+	}
+	
+}
 
 
 int main(void)
@@ -32,7 +56,8 @@ int main(void)
 	motorSetup();
 	usartSetup();
 	odometrieSetup();
-	i2c_setup();
+	i2c_setup();	
+	setCallbackReceive(I2CRecieveData);
 
 
 
@@ -49,11 +74,11 @@ int main(void)
 	//TEST MOTOR
 		//motorSpeedSignedL(-100);
 		//motorSpeedSignedR(100);
-
+	
 	//LOOP
 	while (1) {
-		
-
+		odometrieLoop();
+		//printPosition();
 		// delay_ms(1000);
 		// double f = 5.5;
 		// int test = get_uptime_ms();

@@ -2,13 +2,16 @@
 
 #include "clock.h"
 
-void (*callbacki2cRec)(void);
-bool callbackinitialise;
+void (*callbacki2cRec)(uint8_t* data, int size);
+bool callbackinitialiseRec = false;
+void (*callbacki2cTrans)(void);
+bool callbackinitialiseTrans =  false;
 
-uint8_t buf[BUFFERCIRCULARSIZE][BUFFERSIZE];
+uint8_t bufrec[BUFFERSIZE];
+uint8_t bufsend[BUFFERSIZE];
 int reading;
-int bufferStart = 0;
-int bufferend = 0;
+int sending;
+commnucationDirection_t communicationType;
 
 //https://github.com/amitesh-singh/i2c-slave-stm32f1/blob/master/main.cpp
 
@@ -44,6 +47,7 @@ void i2c1_er_isr(void){
 	uint32_t sr1, sr2;
 	sr1 = I2C1_SR1;
 	sr2 = I2C1_SR2;
+	(void)sr2;
 	if(sr1 & I2C_SR1_SMBALERT){
 		usartprintf("I2C ERROR SMBALERT\n");
 		sr1 |= I2C_SR1_SMBALERT;
@@ -74,27 +78,33 @@ void i2c1_ev_isr(void){
 	uint32_t sr1, sr2;
 	sr1 = I2C1_SR1;
 	sr2 = I2C1_SR2;
+	(void)sr2;
 
 	if(sr1 & I2C_SR1_ADDR){
 		reading = 0;
+		sending = 0;
 		if(I2C1_SR2 & I2C_SR2_TRA){
-			usartprintf("Tx");
-			// //I2C1_CR1 |= I2C_CR1_STOP;
-			// i2c_send_data(I2C1,'S');
-			// i2c_send_data(I2C1,'T');
-			// i2c_send_data(I2C1,'R');
+			communicationType = DIRSEND;
+			if(callbackinitialiseTrans){
+				callbacki2cTrans();
+			}			
 		}
 		else{
-			usartprintf("Rx");
+			communicationType = DIRRECEIVE;
 		}
 	}
 	else if(sr1 & I2C_SR1_TxE){
-		i2c_send_data(I2C1,'S');
+		if(sending<BUFFERSIZE){
+			i2c_send_data(I2C1,bufsend[sending]);
+			sending++;
+		}
+		else{
+			i2c_send_data(I2C1,0);
+		}
 	}
 	else if(sr1 & I2C_SR1_RxNE){
-		usartprintf("R");
 		if(reading<BUFFERSIZE){
-			buf[bufferStart][reading] = i2c_get_data(I2C1);
+			bufrec[reading] = i2c_get_data(I2C1);
 			reading++;
 		}
 		else{
@@ -102,41 +112,41 @@ void i2c1_ev_isr(void){
 		}
 	}
 	else if(sr1 & I2C_SR1_STOPF){
-		usartprintf("T\n");
 		i2c_peripheral_enable(I2C1);
-		buf[bufferStart][reading] = 0;
-		bufferStart++;
-		if(bufferStart>=BUFFERCIRCULARSIZE){
-			bufferStart = 0;
+		if(callbackinitialiseRec && communicationType == DIRRECEIVE){
+			callbacki2cRec(bufrec,reading);
 		}
 	}
 }
 
-bool I2CAvaillable(void){
-	return bufferStart != bufferend;
-}
-
-void I2CGetCommand(uint8_t* data){
-	if(bufferStart != bufferend){
-		strcpy((char*)data,(char*)buf[bufferend]);
-		bufferend++;
-		if(bufferend>=BUFFERCIRCULARSIZE){
-			bufferend = 0;
-		}	
-	}	
-}
-
-void setCallback(void (*f)(void)){
-	callbacki2cRec = f;
-	callbackinitialise =  true;
-}
-
-void disableCallback(void){
-	callbackinitialise =  false;
-}
-
-void I2CLoop(void){
-	if(I2C1_SR1==0){
-		usartprintf("%s\n",buf[0]);
+void I2CGetBufffer(uint8_t* data, int size){
+	if(size>BUFFERSIZE){
+		size = BUFFERSIZE;
 	}
+	memcpy(data,bufrec,BUFFERSIZE);
+}
+
+void I2CSetBuffer(uint8_t* data, int size){
+	if(size>BUFFERSIZE){
+		size = BUFFERSIZE;
+	}
+	memcpy(bufsend,data,BUFFERSIZE);
+}
+
+void setCallbackReceive(void (*f)(uint8_t* data, int size)){
+	callbacki2cRec = f;
+	callbackinitialiseRec =  true;
+}
+
+void disableCallbackReceive(void){
+	callbackinitialiseRec =  false;
+}
+
+void setCallbackTransmit(void (*f)(void)){
+	callbacki2cTrans = f;
+	callbackinitialiseTrans =  true;
+}
+
+void disableCallbackTransmit(void){
+	callbackinitialiseTrans =  false;
 }

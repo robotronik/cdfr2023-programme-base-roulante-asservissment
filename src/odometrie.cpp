@@ -129,9 +129,22 @@ void odometrieLoop(void){
 			endBuffer = 0;
 		}	
 	}
-	usartprintf("buffer logueur = %d		",i);
 }
 
 void printPosition(void){
 	usartprintf("x = %lf  y= %lf  teta = %lf\n",position.x,position.y,position.teta);
+}
+
+position_u odometrieGetPosition(void){
+	position_u positionUnion;
+	positionUnion.position.teta = (int)(position.teta);
+	positionUnion.position.y = (int)(position.y);
+	positionUnion.position.x = (int)(position.x);
+	return positionUnion;
+}
+
+void odometrieSetPosition(position_u positionUnion){
+	position.teta = positionUnion.position.teta;
+	position.x = positionUnion.position.x;
+	position.y = positionUnion.position.y;
 }

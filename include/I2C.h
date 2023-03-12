@@ -17,14 +17,15 @@
 #define ADDRI2CBASEROULANTE 42
 
 #define BUFFERSIZE 10
-#define BUFFERCIRCULARSIZE 10
+
+typedef enum{DIRRECEIVE,DIRSEND}commnucationDirection_t;
 
 void i2c_setup(void);
 
-void setCallback(void (*f)(void));
-void disableCallback(void);
+void setCallbackReceive(void (*f)(uint8_t* data, int size));
+void disableCallbackReceive(void);
+void setCallbackSend(void (*f)(void));
+void disableCallbackSend(void);
 
-bool I2CAvaillable(void);
-void I2CGetCommand(uint8_t* data);
-
-void I2CLoop(void);
+void I2CSetBuffer(uint8_t* data, int size);
+void I2CGetBuffer(uint8_t* data, int size);
