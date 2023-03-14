@@ -1,9 +1,14 @@
 #include "motor.h"
 
+//local variables
+int modeL;
+int modeR;
+
 //local fonctions
 void setuptimer(void);
 void setupGPIO(void);
-
+void motorSetSpeedL(int speed);
+void motorSetSpeedR(int speed);
 
 
 void motorSetup(void){
@@ -24,11 +29,11 @@ void motorDirectionL(int direction){
 void motorSpeedSignedL(int speed){
 	if(speed<1){
 		motorDirectionL(1);
-		timer_set_oc_value(TIM1, TIM_OC2, -speed*COEFMULT);
+		motorSetSpeedL(-speed);
 	}
 	else{
 		motorDirectionL(0);
-		timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
+		motorSetSpeedL(speed);
 	}
 }
 	
@@ -40,7 +45,7 @@ void motorSpeedUnsignedL(int speed,int direction){
 	else if(direction == 0){
 		motorDirectionL(0);
 	}
-	timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
+	motorSetSpeedL(speed);
 }
 
 
@@ -56,11 +61,11 @@ void motorDirectionR(int direction){
 void motorSpeedSignedR(int speed){
 	if(speed<1){
 		motorDirectionR(1);
-		timer_set_oc_value(TIM1, TIM_OC1, -speed*COEFMULT);
+		motorSetSpeedR(-speed);
 	}
 	else{
 		motorDirectionR(0);
-		timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
+		motorSetSpeedR(speed);
 	}
 }
 	
@@ -72,7 +77,7 @@ void motorSpeedUnsignedR(int speed,int direction){
 	else if(direction == 0){
 		motorDirectionR(0);
 	}
-	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
+	motorSetSpeedR(speed);
 	
 }
 
@@ -92,6 +97,55 @@ void motorBrakeR(int brake){
 	else{
 		gpio_clear(port_brakeR,pin_brakeR);
 	}
+}
+
+
+void motorSetModeL(int mode){
+	if(mode == 1){
+		gpio_set(port_ModeL,pin_ModeL);
+		modeL = 1;
+	}
+	else{
+		gpio_clear(port_ModeL,pin_ModeL);
+		modeL = 0;
+	}
+}
+void motorSetModeR(int mode){
+	if(mode == 1){
+		gpio_set(port_ModeR,pin_ModeR);
+		modeR = 1;
+	}
+	else{
+		gpio_clear(port_ModeR,pin_ModeR);
+		modeR = 0;
+	}
+}
+
+void motorSetSpeedL(int speed){
+	if(speed<0){
+		speed = 0;
+	}
+	else if(speed>100){
+		speed = 100;
+	}
+	if(modeL==0){
+		speed =	speed/2 + 50;
+	}
+	timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
+}
+void motorSetSpeedR(int speed){
+	{
+	if(speed<0){
+		speed = 0;
+	}
+	else if(speed>100){
+		speed = 100;
+	}
+	if(modeR==0){
+		speed = speed/2 + 50;
+	}
+	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
+}
 }
 
 void setupGPIO(void){
@@ -121,6 +175,8 @@ void setupGPIO(void){
 	//Select the mode
 	gpio_set(port_ModeL,pin_ModeL);
 	gpio_set(port_ModeR,pin_ModeR);
+	modeL = 1;
+	modeR = 1;
 	//Brake disable = 1 (0 by default to brake the robot when booting)
 	gpio_clear(port_brakeL,pin_brakeL);
 	gpio_clear(port_brakeR,pin_brakeR);

@@ -9,6 +9,7 @@
 #include "odometrie.h"
 #include "clock.h"
 #include "I2C.h"
+#include "Asservissement.h"
 
 
 static void ledSetup(void)
@@ -35,7 +36,7 @@ void I2CRecieveData(uint8_t* data, int size){
 		gpio_clear(port_led2,pin_led2);
 	}
 	else if (data[0]==20){
-		position_u posi = odometrieGetPosition();
+		position_u posi = odometrieGetPositionInt();
 		I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
@@ -58,6 +59,7 @@ int main(void)
 	odometrieSetup();
 	i2c_setup();	
 	setCallbackReceive(I2CRecieveData);
+	asservissementSetup();
 
 
 
@@ -71,13 +73,36 @@ int main(void)
 	motorBrakeR(0);
 	motorBrakeL(0);
 
+	motorSetModeR(0);
+	motorSetModeL(0);
+
 	//TEST MOTOR
 		//motorSpeedSignedL(-100);
 		//motorSpeedSignedR(100);
 	
 	//LOOP
+
+	uint32_t asservissementTime =  get_uptime_ms();
+	uint32_t changePointTime =  get_uptime_ms()+5000;
+	
+	
+
+	
+	
+
 	while (1) {
 		odometrieLoop();
+		if(asservissementTime < get_uptime_ms()){
+			//usartprintf("retard : %d		",asservissementTime-get_uptime_ms());
+			asservissementTime = get_uptime_ms() + 50;
+			asservissementLoop();
+			printPosition();
+		}
+
+		if(changePointTime < get_uptime_ms()){
+			//setLinearAsservissement(-1000,-1000);
+			setAngularAsservissement(-90);
+		}
 		//printPosition();
 		// delay_ms(1000);
 		// double f = 5.5;

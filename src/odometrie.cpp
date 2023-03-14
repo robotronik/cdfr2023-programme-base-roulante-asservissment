@@ -1,6 +1,9 @@
 #include "odometrie.h"
 
 
+static double mod_angle(double a);
+
+
 
 position_t position;
 odometrieTrigger_t buffer[_BUFFERSIZE];
@@ -132,12 +135,25 @@ void odometrieLoop(void){
 }
 
 void printPosition(void){
-	usartprintf("x = %lf  y= %lf  teta = %lf\n",position.x,position.y,position.teta);
+	usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",position.x,position.y,position.teta);
 }
 
-position_u odometrieGetPosition(void){
+// odometrieGetPosition(position_t positionSet){
+// 	positionSet.teta = position.teta;
+// 	positionSet.y = position.y;
+// 	positionSet.x = position.x;
+// }
+
+position_t odometrieGetPosition(void){
+	position_t returnPos = position;
+	position.teta = mod_angle(position.teta);
+	return position;
+}
+
+
+position_u odometrieGetPositionInt(void){
 	position_u positionUnion;
-	positionUnion.position.teta = (int)(position.teta);
+	positionUnion.position.teta = (int)(mod_angle(position.teta));
 	positionUnion.position.y = (int)(position.y);
 	positionUnion.position.x = (int)(position.x);
 	return positionUnion;
@@ -147,4 +163,15 @@ void odometrieSetPosition(position_u positionUnion){
 	position.teta = positionUnion.position.teta;
 	position.x = positionUnion.position.x;
 	position.y = positionUnion.position.y;
+}
+
+static double mod_angle(double a){
+	a = fmod(a,360);
+	if(a>180){
+		a -=360;
+	}
+	else if(a<-180){
+		a +=360;
+	}
+	return a;
 }

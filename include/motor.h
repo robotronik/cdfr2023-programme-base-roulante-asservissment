@@ -42,4 +42,7 @@ void motorSpeedUnsignedR(int speed,int direction = -1);
 void motorBrakeL(int brake);
 void motorBrakeR(int brake);
 
+void motorSetModeL(int mode);
+void motorSetModeR(int mode);
+
 

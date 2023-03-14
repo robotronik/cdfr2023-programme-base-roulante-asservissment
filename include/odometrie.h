@@ -35,5 +35,6 @@ void odometrieSetup(void);
 void printBuffer(void);
 void printPosition(void);
 void odometrieLoop(void);
-position_u odometrieGetPosition(void);
+position_t odometrieGetPosition(void);
+position_u odometrieGetPositionInt(void);
 void odometrieSetPosition(position_u positionUnion);
