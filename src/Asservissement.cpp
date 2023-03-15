@@ -1,15 +1,20 @@
 #include "Asservissement.h"
 
+asservissementType_t asservissementType = NONE;
 position_t actualPostion;
 position_t previousPosition;
 double consigneAngle;
+double consigneX;
+double consigneY;
 bool erreur = true;
 
 double filteredValue = 0.0f;
 
 double consignevittesseAngulairePrecedante;
 double intergralAngulaire;
-double erreurvittesseAngulairePrecedante;
+
+double consignevittesseLineairePrecedante;
+double intergralLineaire;
 
 double lowPassFilter(double input);
 double mod_angle(double a);
@@ -20,6 +25,9 @@ void asservissementSetup(void){
     actualPostion = odometrieGetPosition();
     consignevittesseAngulairePrecedante = 0;
     erreur = false;
+    consigneAngle = 0;
+    consigneX = 0;
+    consigneY = 0;
 }
 
 
@@ -27,7 +35,7 @@ static double getAngularSpeed(void){
     //*********************
     //CALCUL VITESSEANGULAIRE en mm seconde
     //*********************
-    return (actualPostion.teta - previousPosition.teta) * FREQUENCE;
+    return (mod_angle(actualPostion.teta - previousPosition.teta)) * FREQUENCE;
 }
 
 static double getLinearSpeed(void){
@@ -74,13 +82,19 @@ void asservissementLoop(void){
    else if(angularSpeed<-VITESSEANGULAIREMAX*2.5){
     erreur = true;
    }
-//    if(linearSpeed>VITESSELINEAIRMAX*2.5){
-//     erreur = true;
-//    }
-//    else if(linearSpeed<-VITESSELINEAIRMAX*2.5){
-//     erreur = true;
-//    }
+   if(linearSpeed>VITESSELINEAIREMAX*2.5){
+    erreur = true;
+   }
+   else if(linearSpeed<-VITESSELINEAIREMAX*2.5){
+    erreur = true;
+   }
+
+   double distanceRobotPoint = sqrt(pow((consigneX - actualPostion.x),2)+pow((consigneY - actualPostion.y),2));
+   if(distanceRobotPoint>DISTANCEMINFINASSERVANGULAIRE && asservissementType == LINEAIRE ){
+        consigneAngle = calculAngle(consigneX,consigneY);
+   }
    double angleErreur = mod_angle(consigneAngle-actualPostion.teta);
+   double erreurPositionLineairePoint = distanceRobotPoint*cos(angleErreur*DEG_TO_RAD);
 //    double ErreurLineaire = consigneLineaire-actualPostion
    previousPosition = actualPostion;
 
@@ -114,46 +128,68 @@ void asservissementLoop(void){
 
     double motorcontrolAngle = erreurvittesseAngulaire * KP_VITESSEANGULAIRE + intergralAngulaire * KI_VITESSEANGULAIRE;
 
-    double motorcontrolAngleFiltered = motorcontrolAngle;
-
-    if(motorcontrolAngleFiltered>100){
-        motorcontrolAngleFiltered = 100;
-    }
-    else if (motorcontrolAngleFiltered<-100){
-        motorcontrolAngleFiltered = -100;
-    }
-    usartprintf("\n>vitesseAngulaire:%lf\n",angularSpeed);
-    usartprintf("\n>intergralAngulaire:%lf\n",intergralAngulaire);
-    usartprintf("\n>erreurvittesseAngulaire:%lf\n",erreurvittesseAngulaire);
-    usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
-    usartprintf("\n>motorcontrolAngleFiltered:%lf\n",motorcontrolAngleFiltered);
-    usartprintf("\n>consignevittesseAngulaire:%lf\n",consignevittesseAngulaire);
+    
+    // usartprintf("\n>vitesseAngulaire:%lf\n",angularSpeed);
+    // usartprintf("\n>intergralAngulaire:%lf\n",intergralAngulaire);
+    // usartprintf("\n>erreurvittesseAngulaire:%lf\n",erreurvittesseAngulaire);
+    // usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
+    // usartprintf("\n>consignevittesseAngulaire:%lf\n",consignevittesseAngulaire);
+    usartprintf("\n>consigneAngle:%lf\n",consigneAngle);
     usartprintf("\n>erreurPosition:%lf\n",angleErreur);
     
 
 
-    // //CALCUL VITESSE ANGULAIRE
+    //CALCUL VITESSE Lineair
 
-    // double consignevittesseLineaire = li * KP_POSITIONANGULAIRE;
-    // if (consignevittesseAngulaire>consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE){
-    //     // consignevittesseAngulaire = consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE;
-    //      usartprintf("1");
-    // }
-    // else if (consignevittesseAngulaire<consignevittesseAngulairePrecedante-ACCELERATIONANGULAIREMAX/FREQUENCE){
-    //     consignevittesseAngulaire = consignevittesseAngulairePrecedante-ACCELERATIONANGULAIREMAX/FREQUENCE;
-    //     usartprintf("2");
-    // }
-    // if(consignevittesseAngulaire>VITESSEANGULAIREMAX){
-    //     consignevittesseAngulaire = VITESSEANGULAIREMAX;
-    //     usartprintf("3");
-    // }
-    // else if (consignevittesseAngulaire<-VITESSEANGULAIREMAX){
-    //     consignevittesseAngulaire = -VITESSEANGULAIREMAX;
-    //     usartprintf("4");
-    // }
-    // consignevittesseAngulairePrecedante = consignevittesseAngulaire;
+    double consignevittesseLineaire = erreurPositionLineairePoint * KP_POSITIONLINEAIRE;
+    if (consignevittesseLineaire>consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE){
+        consignevittesseLineaire = consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE;
+    }
+    else if (consignevittesseLineaire<consignevittesseLineairePrecedante-ACCELERATIONLINEAIREMAX/FREQUENCE){
+        consignevittesseLineaire = consignevittesseLineairePrecedante-ACCELERATIONLINEAIREMAX/FREQUENCE;
+    }
+    if(consignevittesseLineaire>VITESSELINEAIREMAX){
+        consignevittesseLineaire = VITESSELINEAIREMAX;
+    }
+    else if (consignevittesseLineaire<-VITESSELINEAIREMAX){
+        consignevittesseLineaire = -VITESSELINEAIREMAX;
+    }
+    consignevittesseLineairePrecedante = consignevittesseLineaire;
 
 
+    //intergralLineaire
+    double erreurvittesseLineaire = consignevittesseLineaire-linearSpeed;
+    intergralLineaire += erreurvittesseLineaire * (PERIODE);
+
+    double motorcontrolLigne = erreurvittesseLineaire * KP_VITESSELINEAIRE + intergralLineaire * KI_VITESSELINEAIRE;
+
+    motorcontrolLigne;
+
+
+    usartprintf("\n>vitesseLineaire:%lf\n",linearSpeed);
+    usartprintf("\n>intergralLineaire:%lf\n",intergralLineaire);
+    usartprintf("\n>erreurvittesseLineaire:%lf\n",erreurvittesseLineaire);
+    usartprintf("\n>motorcontrolLigne:%lf\n",motorcontrolLigne);
+    usartprintf("\n>consignevittesseLineaire:%lf\n",consignevittesseLineaire);
+    usartprintf("\n>erreurPositionLineairePoint:%lf\n",erreurPositionLineairePoint);
+
+
+
+    double controleMoteurR = -motorcontrolAngle + motorcontrolLigne;
+    double controleMoteurL = motorcontrolAngle + motorcontrolLigne;
+
+    if(controleMoteurR>100){
+        controleMoteurR = 100;
+    }
+    else if (controleMoteurR<-100){
+        controleMoteurR = -100;
+    }
+    if(controleMoteurL>100){
+        controleMoteurL = 100;
+    }
+    else if (controleMoteurL<-100){
+        controleMoteurL = -100;
+    }
 
    if(erreur){
     usartprintf("ERREUR ASSERVISEMENT");
@@ -161,18 +197,21 @@ void asservissementLoop(void){
     motorSpeedSignedR(0);
    }
    else{
-    motorSpeedSignedL(motorcontrolAngleFiltered);
-    motorSpeedSignedR(-motorcontrolAngleFiltered);
+    motorSpeedSignedL(controleMoteurL);
+    motorSpeedSignedR(controleMoteurR);
    }
 }
 
 void setAngularAsservissement(double angle){
     consigneAngle = angle;
+    asservissementType = ANGULAIRE;
 }
 
 void setLinearAsservissement(double x,double y){
     consigneAngle = calculAngle(x,y);
-    usartprintf(">angleClacul:%lf\n",consigneAngle);
+    consigneX = x;
+    consigneY = y;
+    asservissementType = LINEAIRE;
 }
 
 double lowPassFilter(double input){

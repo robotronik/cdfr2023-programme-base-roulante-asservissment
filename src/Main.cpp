@@ -100,8 +100,9 @@ int main(void)
 		}
 
 		if(changePointTime < get_uptime_ms()){
-			//setLinearAsservissement(-1000,-1000);
-			setAngularAsservissement(-90);
+			changePointTime = get_uptime_ms() + 5000000;
+			setLinearAsservissement(1000,0);
+			//setAngularAsservissement(-90);
 		}
 		//printPosition();
 		// delay_ms(1000);

@@ -14,22 +14,27 @@
 
 #define ALPHA 0.001f // coefficient de lissage
 
-#define KP_POSITIONANGULAIRE 8.0
+#define KP_POSITIONANGULAIRE 4.0
 #define KP_VITESSEANGULAIRE 0.1
 #define KI_VITESSEANGULAIRE 2
 #define VITESSEANGULAIREMAX 500.0 //mm/s
 #define ACCELERATIONANGULAIREMAX 1500.0 //mm/s^2
 
 
-#define KP_POSITIONLINEAIR 0
-#define KP_VITESSELINEAIR 0
-#define KI_VITESSELINEAIR 0
-#define VITESSELINEAIRMAX 300 //mm/s
-#define ACCELERATIONLINEAIRMAX 100 //mm/s^2
+#define KP_POSITIONLINEAIRE 0.5
+#define KP_VITESSELINEAIRE 0
+#define KI_VITESSELINEAIRE 0.5
+#define VITESSELINEAIREMAX 1000 //mm/s
+#define ACCELERATIONLINEAIREMAX 100 //mm/s^2
+
+#define DISTANCEMINFINASSERVANGULAIRE 100 //mm
+
+typedef enum{NONE,ANGULAIRE,LINEAIRE}asservissementType_t;
 
 void asservissementSetup(void);
-
 void asservissementLoop(void);
 
 void setAngularAsservissement(double angle);
 void setLinearAsservissement(double x,double y);
+
+
