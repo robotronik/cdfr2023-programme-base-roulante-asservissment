@@ -77,13 +77,36 @@ int main(void)
 	motorSetModeL(0);
 
 	//TEST MOTOR
-		//motorSpeedSignedL(-100);
-		//motorSpeedSignedR(100);
+		// motorSpeedSignedL(5);
+		// motorSpeedSignedR(5);
+		// while (1);
+
+		// for (int i = 0; i < 100; i++){
+		// 	motorSpeedSignedL(i);
+		// 	motorSpeedSignedR(i);
+		// 	delay_ms(50);
+		// }
+		// for (int i = 100; i > -100; i--){
+		// 	motorSpeedSignedL(i);
+		// 	motorSpeedSignedR(i);
+		// 	delay_ms(50);
+		// }
+
+		// for (int i = -100; i < 0; i++){
+		// 	motorSpeedSignedL(i);
+		// 	motorSpeedSignedR(i);
+		// 	delay_ms(50);
+		// }
+
+
+		
 	
 	//LOOP
 
 	uint32_t asservissementTime =  get_uptime_ms();
 	uint32_t changePointTime =  get_uptime_ms()+5000;
+	uint32_t changePointTime2 =  get_uptime_ms()+15000;
+	uint32_t changePointTime3 =  get_uptime_ms()+25000;
 	
 	
 
@@ -97,13 +120,27 @@ int main(void)
 			asservissementTime = get_uptime_ms() + 50;
 			asservissementLoop();
 			printPosition();
+			usartprintf(">infoL1:%d\n>infoL2:%d\n>infoR1:%d\n>infoR2:%d\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L),gpio_get(port_info1R,pin_info1R),gpio_get(port_info2R,pin_info2R));
 		}
 
 		if(changePointTime < get_uptime_ms()){
 			changePointTime = get_uptime_ms() + 5000000;
-			setLinearAsservissement(1000,0);
+			setLinearAsservissement(-1000,500,true);
 			//setAngularAsservissement(-90);
 		}
+		if(changePointTime2 < get_uptime_ms()){
+			changePointTime2 = get_uptime_ms() + 5000000;
+			setLinearAsservissement(0,0,true);
+			//setAngularAsservissement(-90);
+		}
+
+		if(changePointTime3 < get_uptime_ms()){
+			changePointTime3 = get_uptime_ms() + 5000000;
+			//setLinearAsservissement(0,0);
+			setAngularAsservissement(0);
+		}
+
+
 		//printPosition();
 		// delay_ms(1000);
 		// double f = 5.5;
