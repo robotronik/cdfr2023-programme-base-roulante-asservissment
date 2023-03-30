@@ -145,7 +145,6 @@ void printPosition(void){
 // }
 
 position_t odometrieGetPosition(void){
-	position_t returnPos = position;
 	position.teta = mod_angle(position.teta);
 	return position;
 }
@@ -160,9 +159,9 @@ position_u odometrieGetPositionInt(void){
 }
 
 void odometrieSetPosition(position_u positionUnion){
-	position.teta = positionUnion.position.teta;
-	position.x = positionUnion.position.x;
-	position.y = positionUnion.position.y;
+	position.teta = (double)positionUnion.position.teta;
+	position.x = (double)positionUnion.position.x;
+	position.y = (double)positionUnion.position.y;
 }
 
 static double mod_angle(double a){

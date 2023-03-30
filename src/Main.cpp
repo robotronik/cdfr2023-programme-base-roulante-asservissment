@@ -43,6 +43,32 @@ void I2CRecieveData(uint8_t* data, int size){
 		position_u posi;
 		memcpy(posi.tab, data+1, 6);
 		odometrieSetPosition(posi);
+		asservissementSetup();
+	}
+	else if( data[0]==30 && size == 7){
+		uintConv x,y,arriere;
+		x.tab[0] = data[1]; x.tab[1] = data[2];
+		y.tab[0] = data[3]; y.tab[1] = data[4];
+		arriere.tab[0] = data[5]; arriere.tab[1] = data[6];
+		setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
+	}
+	else if( data[0]==31 && size == 3){
+		uintConv teta;
+		teta.tab[0] = data[1]; teta.tab[1] = data[2];
+		setAngularAsservissement((double)teta.num);
+	}
+	else if( data[0]==32){
+		asservissmentStop();
+	}
+	else if( data[0]==33){
+		uintConv error;
+		error.num = (int16_t)getAngularError();
+		I2CSetBuffer(error.tab,2);
+	}
+	else if( data[0]==34){
+		uintConv error;
+		error.num = (int16_t)getLinearError();
+		I2CSetBuffer(error.tab,2);;
 	}
 	
 }
@@ -102,8 +128,7 @@ int main(void)
 		
 	
 	//LOOP
-
-	uint32_t asservissementTime =  get_uptime_ms();
+	uint32_t PrintTime =  get_uptime_ms()+500;
 	uint32_t changePointTime =  get_uptime_ms()+5000;
 	uint32_t changePointTime2 =  get_uptime_ms()+15000;
 	uint32_t changePointTime3 =  get_uptime_ms()+25000;
@@ -115,30 +140,30 @@ int main(void)
 
 	while (1) {
 		odometrieLoop();
-		if(asservissementTime < get_uptime_ms()){
-			//usartprintf("retard : %d		",asservissementTime-get_uptime_ms());
-			asservissementTime = get_uptime_ms() + 50;
-			asservissementLoop();
+		asservissementLoop();
+
+		if(PrintTime<get_uptime_ms()){
+			PrintTime =  get_uptime_ms()+500;
 			printPosition();
-			usartprintf(">infoL1:%d\n>infoL2:%d\n>infoR1:%d\n>infoR2:%d\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L),gpio_get(port_info1R,pin_info1R),gpio_get(port_info2R,pin_info2R));
+			printAllInformation();
 		}
 
-		if(changePointTime < get_uptime_ms()){
-			changePointTime = get_uptime_ms() + 5000000;
-			setLinearAsservissement(-1000,500,true);
-			//setAngularAsservissement(-90);
-		}
-		if(changePointTime2 < get_uptime_ms()){
-			changePointTime2 = get_uptime_ms() + 5000000;
-			setLinearAsservissement(0,0,true);
-			//setAngularAsservissement(-90);
-		}
+		// if(changePointTime < get_uptime_ms()){
+		// 	changePointTime = get_uptime_ms() + 5000000;
+		// 	setLinearAsservissement(-1000,500,true);
+		// 	//setAngularAsservissement(-90);
+		// }
+		// if(changePointTime2 < get_uptime_ms()){
+		// 	changePointTime2 = get_uptime_ms() + 5000000;
+		// 	setLinearAsservissement(0,0,true);
+		// 	//setAngularAsservissement(-90);
+		// }
 
-		if(changePointTime3 < get_uptime_ms()){
-			changePointTime3 = get_uptime_ms() + 5000000;
-			//setLinearAsservissement(0,0);
-			setAngularAsservissement(0);
-		}
+		// if(changePointTime3 < get_uptime_ms()){
+		// 	changePointTime3 = get_uptime_ms() + 5000000;
+		// 	//setLinearAsservissement(0,0);
+		// 	setAngularAsservissement(0);
+		// }
 
 
 		//printPosition();

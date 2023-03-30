@@ -14,6 +14,15 @@ This program is designed for the CDFR 2023 control board. This board supports mo
 | 13 | Turn off LED 2 | |
 | 20 | Get Coordinates | Send 6 bits: (uint16_t) x, (uint16_t) y, (uint16_t) theta |
 | 21 | Set Coordinates | Recieve 6 bits : (uint16_t) x, (uint16_t) y, (uint16_t) theta |
+| 30 | Set Linear controle | Recieve 6 bits : (uint16_t) x, (uint16_t) y, (uint16_t) direction |
+| 31 | Set Angular controle | Recieve 2 bits : (uint16_t) teta
+| 32 | Stop controle
+| 33 | Get Angular error | Send 2 bits: (uint16_t) error|
+| 34 | Get Linear error | Send 2 bits: (uint16_t) error|
+
+Stop controle stop the robot with the brake. After a Stop controle, the servitude restar automatically when a set angular or a Linear controle are realised.
+Linear controle realise first a rotation and then, the robot go to the position
+Angular controle 
 
 ## Installation
 

@@ -9,8 +9,14 @@ double consigneY;
 double consigneangleX;
 double consigneangleY;
 
+uint32_t asservissementTime;
+bool erreurControlMoteur = true;
+bool asservissementRun = false;
+
 double xwait;
 double ywait;
+
+
 
 //variable d'asservissment
 double consignevittesseAngulairePrecedante;
@@ -18,11 +24,27 @@ double intergralAngulaire;
 double consignevittesseLineairePrecedante;
 double intergralLineaire;
 
-bool passageAngulaireLineaire = false;
+double linearSpeed;
+double angularSpeed;
+double distanceRobotPoint;
+double consigneAngleTheorique;
+double angleErreur;
+double angleErreurTheroique;
+double erreurPositionLineairePoint;
+double consignevittesseAngulaire;
+double erreurvittesseAngulaire;
+double motorcontrolAngle;
+double consignevittesseLineaire;
+double erreurvittesseLineaire;
+double motorcontrolLigne;
+double controleMoteurR;
+double controleMoteurL;
 
-bool erreurControlMoteur = true;
+
+
+
+void asservissementLoopTime(void);
 void asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeedSecu, double linearSpeedSecu);
-
 static double getAngularSpeed(void);
 static double getLinearSpeed(void);
 
@@ -32,33 +54,113 @@ void asservissementSetup(void){
     previousPosition = odometrieGetPosition();
     actualPostion = odometrieGetPosition();
     consignevittesseAngulairePrecedante = 0;
+    intergralLineaire = 0;
+    intergralAngulaire = 0;
     erreurControlMoteur = false;
-    consigneAngle = 0;
-    consigneX = 0;
-    consigneY = 0;
-    xwait = 0;
-    ywait = 0;
+    consigneAngle = actualPostion.teta;
+    consigneX = actualPostion.x;
+    consigneY = actualPostion.y;
+    xwait = actualPostion.x;
+    ywait = actualPostion.y;
+    asservissementTime = get_uptime_ms();
+    asservissementRun = true;
 }
 
 void asservissementLoop(void){
+    if(asservissementTime < get_uptime_ms()){
+        asservissementLoopTime();
+        asservissementTime = get_uptime_ms() + 50;
+    }
+}
+
+void asservissmentStop(void){
+    asservissementRun = false;
+    motorBrakeL(1);
+    motorBrakeR(1);
+    asservissementControlMoteur(0,0,0,0);
+}
+
+void setAngularAsservissement(double angle){
+    asservissementRun = true;
+    motorBrakeL(0);
+    motorBrakeR(0);
+    consigneAngle = angle;
+    asservissementType = ANGULAIRE;
+}
+
+void setLinearAsservissement(double x,double y,bool arriere){
+    asservissementRun = true;
+    motorBrakeL(0);
+    motorBrakeR(0);
+    xwait = x;
+    ywait = y;
+	consigneangleX = x;
+	consigneangleY = y;
+    consigneAngle = calculAngle(xwait,ywait,actualPostion);
+    if(arriere){
+        asservissementType = LINEAIREARRIERE;
+        consigneAngle = mod_angle(consigneAngle+180);
+    }
+    else{
+        asservissementType = LINEAIREAVANT;
+    }    
+}
+
+double getLinearError(void){
+    return erreurPositionLineairePoint;
+}
+double getAngularError(void){
+    return angleErreur;
+}
+
+void printAllInformation(void){
+	usartprintf("\n>consigneAngle:%lf\n",consigneAngle);
+    usartprintf("\n>consigneX:%lf\n",consigneX);
+    usartprintf("\n>consigneY:%lf\n",consigneY);
+    usartprintf("\n>consigneangleX:%lf\n",consigneangleX);
+    usartprintf("\n>consigneangleY:%lf\n",consigneangleY);
+    usartprintf("\n>xwait:%lf\n",xwait);
+    usartprintf("\n>ywait:%lf\n",ywait);
+    usartprintf("\n>consignevittesseAngulairePrecedante:%lf\n",consignevittesseAngulairePrecedante);
+    usartprintf("\n>intergralAngulaire:%lf\n",intergralAngulaire);
+    usartprintf("\n>consignevittesseLineairePrecedante:%lf\n",consignevittesseLineairePrecedante);
+    usartprintf("\n>intergralLineaire:%lf\n",intergralLineaire);
+    usartprintf("\n>linearSpeed:%lf\n",linearSpeed);
+    usartprintf("\n>angularSpeed:%lf\n",angularSpeed);
+    usartprintf("\n>angleErreurTheroique:%lf\n",angleErreurTheroique);
+    usartprintf("\n>erreurPositionLineairePoint:%lf\n",erreurPositionLineairePoint);
+    usartprintf("\n>consignevittesseAngulaire:%lf\n",consignevittesseAngulaire);
+    usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
+    usartprintf("\n>consignevittesseLineaire:%lf\n",consignevittesseLineaire);
+    usartprintf("\n>erreurvittesseLineaire:%lf\n",erreurvittesseLineaire);
+    usartprintf("\n>motorcontrolLigne:%lf\n",motorcontrolLigne);
+    usartprintf("\n>controleMoteurR:%lf\n",controleMoteurR);
+    usartprintf("\n>controleMoteurL:%lf\n",controleMoteurL);
+	
+}
+
+
+
+void asservissementLoopTime(void){
+
    actualPostion = odometrieGetPosition();
-   double linearSpeed = getLinearSpeed();
-   double angularSpeed = getAngularSpeed();
+   linearSpeed = getLinearSpeed();
+   angularSpeed = getAngularSpeed();
    previousPosition = actualPostion;
    
 
     //calacul des erreurs d'angle et de position lineaire
-   double distanceRobotPoint = sqrt(pow((consigneX - actualPostion.x),2)+pow((consigneY - actualPostion.y),2));
-   double consigneAngleTheorique = calculAngle(consigneangleX,consigneangleY,actualPostion);
+   distanceRobotPoint = sqrt(pow((consigneX - actualPostion.x),2)+pow((consigneY - actualPostion.y),2));
+   consigneAngleTheorique = calculAngle(consigneangleX,consigneangleY,actualPostion);
    if(asservissementType == LINEAIREARRIERE){
         consigneAngleTheorique = mod_angle(consigneAngleTheorique + 180);
    }
    if(distanceRobotPoint>DISTANCEMINFINASSERVANGULAIRE && (asservissementType == LINEAIREAVANT || asservissementType == LINEAIREARRIERE) ){
         consigneAngle = consigneAngleTheorique;
    }
-   double angleErreur = mod_angle(consigneAngle-actualPostion.teta);
-   double angleErreurTheroique = mod_angle(consigneAngleTheorique-actualPostion.teta);
-   double erreurPositionLineairePoint = distanceRobotPoint*cos(angleErreurTheroique*DEG_TO_RAD);
+   angleErreur = mod_angle(consigneAngle-actualPostion.teta);
+   angleErreurTheroique = mod_angle(consigneAngleTheorique-actualPostion.teta);
+   erreurPositionLineairePoint = distanceRobotPoint*cos(angleErreurTheroique*DEG_TO_RAD);
    if(asservissementType == LINEAIREARRIERE){
         erreurPositionLineairePoint = -erreurPositionLineairePoint;
    }
@@ -76,7 +178,7 @@ void asservissementLoop(void){
     //*********************
 
     //asservismsent de la position angulaire
-    double consignevittesseAngulaire = angleErreur * KP_POSITIONANGULAIRE;
+    consignevittesseAngulaire = angleErreur * KP_POSITIONANGULAIRE;
     if (consignevittesseAngulaire>consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE){
         consignevittesseAngulaire = consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE;
     }
@@ -92,10 +194,10 @@ void asservissementLoop(void){
     consignevittesseAngulairePrecedante = consignevittesseAngulaire;
     
     //asservissemnt de la vitesse angulaire
-    double erreurvittesseAngulaire = consignevittesseAngulaire-angularSpeed;
+    erreurvittesseAngulaire = consignevittesseAngulaire-angularSpeed;
     intergralAngulaire += erreurvittesseAngulaire * (PERIODE);
 
-    double motorcontrolAngle = erreurvittesseAngulaire * KP_VITESSEANGULAIRE + intergralAngulaire * KI_VITESSEANGULAIRE;
+    motorcontrolAngle = erreurvittesseAngulaire * KP_VITESSEANGULAIRE + intergralAngulaire * KI_VITESSEANGULAIRE;
 
 
 
@@ -104,7 +206,7 @@ void asservissementLoop(void){
     //*********************
     
     //asservismsent de la position Lineaire
-    double consignevittesseLineaire = erreurPositionLineairePoint * KP_POSITIONLINEAIRE;
+    consignevittesseLineaire = erreurPositionLineairePoint * KP_POSITIONLINEAIRE;
     if (consignevittesseLineaire>consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE){
         consignevittesseLineaire = consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE;
     }
@@ -121,71 +223,23 @@ void asservissementLoop(void){
 
 
     //asservissemnt de la vitesse Lineaire
-    double erreurvittesseLineaire = consignevittesseLineaire-linearSpeed;
+    erreurvittesseLineaire = consignevittesseLineaire-linearSpeed;
     intergralLineaire += erreurvittesseLineaire * (PERIODE);
 
-    double motorcontrolLigne = erreurvittesseLineaire * KP_VITESSELINEAIRE + intergralLineaire * KI_VITESSELINEAIRE;
+    motorcontrolLigne = erreurvittesseLineaire * KP_VITESSELINEAIRE + intergralLineaire * KI_VITESSELINEAIRE;
 
-
-    //*********************
-    //Debug
-    //*********************
-
-    // usartprintf("\n>vitesseAngulaire:%lf\n",angularSpeed);
-    // usartprintf("\n>intergralAngulaire:%lf\n",intergralAngulaire);
-    // usartprintf("\n>erreurvittesseAngulaire:%lf\n",erreurvittesseAngulaire);
-    // usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
-    // usartprintf("\n>consignevittesseAngulaire:%lf\n",consignevittesseAngulaire);
-	usartprintf("\n>consigneX:%lf\n",consigneX);
-	usartprintf("\n>consigneY:%lf\n",consigneY);
-    usartprintf("\n>consigneAngle:%lf\n",consigneAngle);
-    usartprintf("\n>ErreurAngulaire:%lf\n",angleErreur);
-
-    usartprintf("\n>consignevittesseLineaire:%lf\n",consignevittesseLineaire);
-    usartprintf("\n>vitesseLineaire:%lf\n",linearSpeed);
-    usartprintf("\n>intergralLineaire:%lf\n",intergralLineaire);
-    usartprintf("\n>erreurvittesseLineaire:%lf\n",erreurvittesseLineaire);
-    usartprintf("\n>distanceRobotPoint:%lf\n",distanceRobotPoint);    
-    usartprintf("\n>erreurPositionLineairePoint:%lf\n",erreurPositionLineairePoint);
-
-    usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
-    usartprintf("\n>motorcontrolLigne:%lf\n",motorcontrolLigne);
 
     //*********************
     //Controle des moteurs
     //*********************
 
-    double controleMoteurR = -motorcontrolAngle + motorcontrolLigne;
-    double controleMoteurL = motorcontrolAngle + motorcontrolLigne;
+    controleMoteurR = -motorcontrolAngle + motorcontrolLigne;
+    controleMoteurL = motorcontrolAngle + motorcontrolLigne;
     asservissementControlMoteur(controleMoteurR,controleMoteurL,angularSpeed,linearSpeed);
     
 }
 
-
-
-
-
-void setAngularAsservissement(double angle){
-    consigneAngle = angle;
-    asservissementType = ANGULAIRE;
-}
-
-void setLinearAsservissement(double x,double y,bool arriere){
-    xwait = x;
-    ywait = y;
-	consigneangleX = x;
-	consigneangleY = y;
-    consigneAngle = calculAngle(xwait,ywait,actualPostion);
-    if(arriere){
-        asservissementType = LINEAIREARRIERE;
-        consigneAngle = mod_angle(consigneAngle+180);
-    }
-    else{
-        asservissementType = LINEAIREAVANT;
-    }    
-}
-
-void asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeedSecu, double linearSpeedSecu){
+void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteurL, double angularSpeedSecu, double linearSpeedSecontrol){
 
     if(angularSpeedSecu>VITESSEANGULAIREMAXSECU*2.5){
         erreurControlMoteur = true;
@@ -193,30 +247,25 @@ void asservissementControlMoteur(double controleMoteurR, double controleMoteurL,
     else if(angularSpeedSecu<-VITESSEANGULAIREMAXSECU*2.5){
         erreurControlMoteur = true;
     }
-    if(linearSpeedSecu>VITESSELINEAIREMAXSECU*2.5){
+    if(linearSpeedSecontrol>VITESSELINEAIREMAXSECU*2.5){
         erreurControlMoteur = true;
     }
-    else if(linearSpeedSecu<-VITESSELINEAIREMAXSECU*2.5){
+    else if(linearSpeedSecontrol<-VITESSELINEAIREMAXSECU*2.5){
         erreurControlMoteur = true;
     }
     
-    if(controleMoteurR>100){
-        controleMoteurR = 100;
+    if(fcontroleMoteurR>100){
+        fcontroleMoteurR = 100;
     }
-    else if (controleMoteurR<-100){
-        controleMoteurR = -100;
+    else if (fcontroleMoteurR<-100){
+        fcontroleMoteurR = -100;
     }
-    if(controleMoteurL>100){
-        controleMoteurL = 100;
+    if(fcontroleMoteurL>100){
+        fcontroleMoteurL = 100;
     }
-    else if (controleMoteurL<-100){
-        controleMoteurL = -100;
+    else if (fcontroleMoteurL<-100){
+        fcontroleMoteurL = -100;
     }
-    int controleMoteurL_i = controleMoteurL;
-    int controleMoteurR_i = controleMoteurR;
-
-    usartprintf("\n>controleMoteurL:%d\n",controleMoteurL_i);
-    usartprintf("\n>controleMoteurR:%d\n",controleMoteurR_i);
 
    if(erreurControlMoteur){
     usartprintf("ERREUR ASSERVISEMENT");
@@ -224,8 +273,8 @@ void asservissementControlMoteur(double controleMoteurR, double controleMoteurL,
     motorSpeedSignedR(0);
    }
    else{
-    motorSpeedSignedL(controleMoteurL_i);
-    motorSpeedSignedR(controleMoteurR_i);
+    motorSpeedSignedL((int)fcontroleMoteurL);
+    motorSpeedSignedR((int)fcontroleMoteurR);
    }
 }
 

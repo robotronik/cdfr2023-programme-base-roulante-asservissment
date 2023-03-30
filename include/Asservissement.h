@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include "clock.h"
 #include "uart.h"
 #include "odometrie.h"
 #include "motor.h"
@@ -39,7 +40,12 @@ typedef enum{NONE,ANGULAIRE,LINEAIREAVANT,LINEAIREARRIERE}asservissementType_t;
 void asservissementSetup(void);
 void asservissementLoop(void);
 
+void asservissmentStop(void);
+void printAllInformation(void);
+
 void setAngularAsservissement(double angle);
 void setLinearAsservissement(double x,double y,bool arriere);
+double getLinearError(void);
+double getAngularError(void);
 
 

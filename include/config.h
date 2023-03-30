@@ -118,15 +118,21 @@ typedef struct{
 }position_t;
 
 typedef struct{
-	uint16_t x;
-    uint16_t y;
-	uint16_t teta;
+	int16_t x;
+    int16_t y;
+	int16_t teta;
 }positionint_t;
 
 union position_u
 {
 	positionint_t position;
 	uint8_t tab[6];
+};
+
+union uintConv
+{
+	int16_t num;
+	uint8_t tab[2];
 };
 
 
