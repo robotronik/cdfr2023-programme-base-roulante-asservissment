@@ -29,18 +29,19 @@ double angularSpeed;
 double distanceRobotPoint;
 double consigneAngleTheorique;
 double angleErreur;
+double angleErreurPrecedente;
 double angleErreurTheroique;
 double erreurPositionLineairePoint;
 double consignevittesseAngulaire;
 double erreurvittesseAngulaire;
+double erreurvittesseAngulairePrecedente;
 double motorcontrolAngle;
 double consignevittesseLineaire;
 double erreurvittesseLineaire;
+double erreurvittesseLineaireprecedante;
 double motorcontrolLigne;
 double controleMoteurR;
 double controleMoteurL;
-
-
 
 
 void asservissementLoopTime(void);
@@ -128,6 +129,7 @@ void printAllInformation(void){
     usartprintf("\n>linearSpeed:%lf\n",linearSpeed);
     usartprintf("\n>angularSpeed:%lf\n",angularSpeed);
     usartprintf("\n>angleErreurTheroique:%lf\n",angleErreurTheroique);
+    usartprintf("\n>angleErreur:%lf\n",angleErreur);
     usartprintf("\n>erreurPositionLineairePoint:%lf\n",erreurPositionLineairePoint);
     usartprintf("\n>consignevittesseAngulaire:%lf\n",consignevittesseAngulaire);
     usartprintf("\n>motorcontrolAngle:%lf\n",motorcontrolAngle);
@@ -178,7 +180,8 @@ void asservissementLoopTime(void){
     //*********************
 
     //asservismsent de la position angulaire
-    consignevittesseAngulaire = angleErreur * KP_POSITIONANGULAIRE;
+    consignevittesseAngulaire = angleErreur * KP_POSITIONANGULAIRE + (KD_POSITIONANGULAIRE*FREQUENCE)*(angleErreur - angleErreurPrecedente);
+    angleErreurPrecedente = angleErreur;
     if (consignevittesseAngulaire>consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE){
         consignevittesseAngulaire = consignevittesseAngulairePrecedante+ACCELERATIONANGULAIREMAX/FREQUENCE;
     }
@@ -197,8 +200,8 @@ void asservissementLoopTime(void){
     erreurvittesseAngulaire = consignevittesseAngulaire-angularSpeed;
     intergralAngulaire += erreurvittesseAngulaire * (PERIODE);
 
-    motorcontrolAngle = erreurvittesseAngulaire * KP_VITESSEANGULAIRE + intergralAngulaire * KI_VITESSEANGULAIRE;
-
+    motorcontrolAngle = erreurvittesseAngulaire * KP_VITESSEANGULAIRE + intergralAngulaire * KI_VITESSEANGULAIRE + (KD_VITESSEANGULAIRE/FREQUENCE)*(erreurvittesseAngulaire - erreurvittesseAngulairePrecedente);
+    erreurvittesseAngulairePrecedente = erreurvittesseAngulaire;
 
 
     //*********************
@@ -226,7 +229,8 @@ void asservissementLoopTime(void){
     erreurvittesseLineaire = consignevittesseLineaire-linearSpeed;
     intergralLineaire += erreurvittesseLineaire * (PERIODE);
 
-    motorcontrolLigne = erreurvittesseLineaire * KP_VITESSELINEAIRE + intergralLineaire * KI_VITESSELINEAIRE;
+    motorcontrolLigne = erreurvittesseLineaire * KP_VITESSELINEAIRE + intergralLineaire * KI_VITESSELINEAIRE + (KD_VITESSELINEAIRE/FREQUENCE) * (erreurvittesseLineaire - erreurvittesseLineaireprecedante);
+    erreurvittesseLineaireprecedante = erreurvittesseLineaire;
 
 
     //*********************

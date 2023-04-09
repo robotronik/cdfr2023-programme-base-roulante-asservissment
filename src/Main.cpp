@@ -129,8 +129,8 @@ int main(void)
 	
 	//LOOP
 	uint32_t PrintTime =  get_uptime_ms()+500;
-	uint32_t changePointTime =  get_uptime_ms()+5000;
-	uint32_t changePointTime2 =  get_uptime_ms()+15000;
+	uint32_t changePointTime =  get_uptime_ms()+2000;
+	uint32_t changePointTime2 =  get_uptime_ms()+10000;
 	uint32_t changePointTime3 =  get_uptime_ms()+25000;
 	
 	
@@ -148,16 +148,16 @@ int main(void)
 			printAllInformation();
 		}
 
-		// if(changePointTime < get_uptime_ms()){
-		// 	changePointTime = get_uptime_ms() + 5000000;
-		// 	setLinearAsservissement(-1000,500,true);
-		// 	//setAngularAsservissement(-90);
-		// }
-		// if(changePointTime2 < get_uptime_ms()){
-		// 	changePointTime2 = get_uptime_ms() + 5000000;
-		// 	setLinearAsservissement(0,0,true);
-		// 	//setAngularAsservissement(-90);
-		// }
+		if(changePointTime < get_uptime_ms()){
+			changePointTime = get_uptime_ms() + 5000000;
+			//setLinearAsservissement(-1000,500,true);
+			setAngularAsservissement(-180);
+		}
+		if(changePointTime2 < get_uptime_ms()){
+			changePointTime2 = get_uptime_ms() + 5000000;
+			//setLinearAsservissement(0,0,true);
+			setAngularAsservissement(0);
+		}
 
 		// if(changePointTime3 < get_uptime_ms()){
 		// 	changePointTime3 = get_uptime_ms() + 5000000;
