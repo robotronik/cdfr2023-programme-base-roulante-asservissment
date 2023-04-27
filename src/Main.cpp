@@ -76,7 +76,7 @@ void I2CRecieveData(uint8_t* data, int size){
 
 int main(void)
 {
-
+	
 	//SETUP
 	clock_setup();
 	ledSetup();
@@ -102,7 +102,7 @@ int main(void)
 	motorSetModeR(0);
 	motorSetModeL(0);
 
-	//TEST MOTOR
+		//TEST MOTOR
 		// motorSpeedSignedL(5);
 		// motorSpeedSignedR(5);
 		// while (1);
@@ -130,8 +130,8 @@ int main(void)
 	//LOOP
 	uint32_t PrintTime =  get_uptime_ms()+500;
 	uint32_t changePointTime =  get_uptime_ms()+2000;
-	uint32_t changePointTime2 =  get_uptime_ms()+10000;
-	uint32_t changePointTime3 =  get_uptime_ms()+25000;
+	uint32_t changePointTime2 =  get_uptime_ms()+2000;
+	uint32_t changePointTime3 =  get_uptime_ms()+7000;
 	
 	
 
@@ -142,47 +142,31 @@ int main(void)
 		odometrieLoop();
 		asservissementLoop();
 
+		//PRINT DEBUG
 		if(PrintTime<get_uptime_ms()){
 			PrintTime =  get_uptime_ms()+500;
 			printPosition();
 			printAllInformation();
 		}
 
+		//BLINK LED
 		if(changePointTime < get_uptime_ms()){
-			changePointTime = get_uptime_ms() + 5000000;
-			//setLinearAsservissement(-1000,500,true);
-			setAngularAsservissement(-180);
+			changePointTime = get_uptime_ms() + 1000;
+			gpio_toggle(port_led1,pin_led1);
 		}
-		if(changePointTime2 < get_uptime_ms()){
-			changePointTime2 = get_uptime_ms() + 5000000;
-			//setLinearAsservissement(0,0,true);
-			setAngularAsservissement(0);
-		}
+
+		//TEST ASSERVISSEMENT
+		// if(changePointTime2 < get_uptime_ms()){
+		// 	changePointTime2 = get_uptime_ms() + 5000000;
+		// 	setLinearAsservissement(1000,0,false);
+		// 	//setAngularAsservissement(200);
+		// }
 
 		// if(changePointTime3 < get_uptime_ms()){
 		// 	changePointTime3 = get_uptime_ms() + 5000000;
-		// 	//setLinearAsservissement(0,0);
-		// 	setAngularAsservissement(0);
+		// 	setLinearAsservissement(0,0,true);
+		// 	//setAngularAsservissement(0);
 		// }
-
-
-		//printPosition();
-		// delay_ms(1000);
-		// double f = 5.5;
-		// int test = get_uptime_ms();
-		// usartprintf("%d\n",test/1000);
-		//odometrieLoop();
-		//printPosition();
-		//printBuffer();
-		//I2CLoop();
-		// while(I2CAvaillable()){
-		// 	uint8_t data[10];
-		// 	I2CGetCommand(data);
-		// 	//usartprintf("test\n");
-		// 	usartprintf("%s\n",data);
-		// }
-		//delay_ms(2000);
-		//delay_ms(500);
 		
 	}
 

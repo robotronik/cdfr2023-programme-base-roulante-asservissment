@@ -32,6 +32,7 @@ double angleErreur;
 double angleErreurPrecedente;
 double angleErreurTheroique;
 double erreurPositionLineairePoint;
+double erreurPositionLineairePointPrecedente;
 double consignevittesseAngulaire;
 double erreurvittesseAngulaire;
 double erreurvittesseAngulairePrecedente;
@@ -209,7 +210,8 @@ void asservissementLoopTime(void){
     //*********************
     
     //asservismsent de la position Lineaire
-    consignevittesseLineaire = erreurPositionLineairePoint * KP_POSITIONLINEAIRE;
+    consignevittesseLineaire = erreurPositionLineairePoint * KP_POSITIONLINEAIRE + (KD_POSITIONLINEAIRE*FREQUENCE)*(erreurPositionLineairePoint - erreurPositionLineairePointPrecedente);
+    erreurPositionLineairePointPrecedente = erreurPositionLineairePoint;
     if (consignevittesseLineaire>consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE){
         consignevittesseLineaire = consignevittesseLineairePrecedante+ACCELERATIONLINEAIREMAX/FREQUENCE;
     }
