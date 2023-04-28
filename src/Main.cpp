@@ -50,11 +50,13 @@ void I2CRecieveData(uint8_t* data, int size){
 		x.tab[0] = data[1]; x.tab[1] = data[2];
 		y.tab[0] = data[3]; y.tab[1] = data[4];
 		arriere.tab[0] = data[5]; arriere.tab[1] = data[6];
+		asservissementSetup();
 		setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
 	}
 	else if( data[0]==31 && size == 3){
 		uintConv teta;
 		teta.tab[0] = data[1]; teta.tab[1] = data[2];
+		asservissementSetup();
 		setAngularAsservissement((double)teta.num);
 	}
 	else if( data[0]==32){

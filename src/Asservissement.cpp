@@ -66,6 +66,9 @@ void asservissementSetup(void){
     ywait = actualPostion.y;
     asservissementTime = get_uptime_ms();
     asservissementRun = true;
+    erreurPositionLineairePointPrecedente = 0;
+    erreurvittesseAngulairePrecedente = 0;
+    angleErreurPrecedente = 0;
 }
 
 void asservissementLoop(void){
