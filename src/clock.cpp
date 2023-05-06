@@ -28,7 +28,7 @@ uint32_t get_uptime_ms() {
   return systicks;
 }
 
-uint32_t get_uptime_us() {
+uint64_t get_uptime_us() {
   return systicks*1000 + systick_get_value()/MICROS_SYSTICK_RATIO;
 }
 

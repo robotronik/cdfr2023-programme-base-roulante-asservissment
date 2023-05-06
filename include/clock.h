@@ -14,6 +14,6 @@ static int MICROS_SYSTICK_RATIO = SYSTICK_PERIOD / 1000;
 void clock_setup();
 
 uint32_t get_uptime_ms();
-uint32_t get_uptime_us();
+uint64_t get_uptime_us();
 
 void delay_ms(uint32_t ms);

@@ -9,7 +9,7 @@
 #include "odometrie.h"
 #include "clock.h"
 #include "I2C.h"
-#include "Asservissement.h"
+#include "asservissement.h"
 
 
 static void ledSetup(void)
@@ -61,16 +61,6 @@ void I2CRecieveData(uint8_t* data, int size){
 	}
 	else if( data[0]==32){
 		asservissmentStop();
-	}
-	else if( data[0]==33){
-		uintConv error;
-		error.num = (int16_t)getAngularError();
-		I2CSetBuffer(error.tab,2);
-	}
-	else if( data[0]==34){
-		uintConv error;
-		error.num = (int16_t)getLinearError();
-		I2CSetBuffer(error.tab,2);;
 	}
 	
 }
@@ -132,8 +122,8 @@ int main(void)
 	//LOOP
 	uint32_t PrintTime =  get_uptime_ms()+500;
 	uint32_t changePointTime =  get_uptime_ms()+2000;
-	uint32_t changePointTime2 =  get_uptime_ms()+2000;
-	uint32_t changePointTime3 =  get_uptime_ms()+7000;
+	//uint32_t changePointTime2 =  get_uptime_ms()+2000;
+	//uint32_t changePointTime3 =  get_uptime_ms()+7000;
 	
 	
 

@@ -134,7 +134,6 @@ void motorSetSpeedL(int speed){
 	timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
 }
 void motorSetSpeedR(int speed){
-	{
 	if(speed<0){
 		speed = 0;
 	}
@@ -145,7 +144,6 @@ void motorSetSpeedR(int speed){
 		speed = speed/2 + 50;
 	}
 	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
-}
 }
 
 void setupGPIO(void){
