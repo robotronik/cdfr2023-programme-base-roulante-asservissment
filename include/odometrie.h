@@ -8,7 +8,6 @@
 #include "uart.h"
 
 #define _BUFFERSIZE 512
-#define PI 3.14159265359
 
 // theorical distance between the 2 wheel : 298.765mm
 // theorical diametre of the wheel : 39mm
@@ -17,19 +16,20 @@
 // STEPANGLE = (RayonRoueCodeuse * 360) / (NbDePasRoueCodeuse * LargeurEntraxeDes2RoueCodeuses * 2)
 // STEPAVANCE = (RayonRoueCodeuse * 360)/(NbDePasRoueCodeuse*2)
 
-#define NUMBERSTEPBYROTATION 360
-#define DISTANCEWHEEL 300
-#define DIAMETERWHEELD 41.3
-#define DIAMETERWHEELG 41.2
+const double NUMBERSTEPBYROTATION = 360;
+const double DISTANCEWHEEL = 300;
+const double DIAMETERWHEELD = 41.3;
+const double DIAMETERWHEELG = 41.2;
 
-#define STEPANGLED ((DIAMETERWHEELD*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
-#define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL)) 
-#define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
-#define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
+const double STEPANGLED  = ((DIAMETERWHEELD*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL));
+const double STEPANGLEG  = ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL));
+const double STEPAVANCED = ((DIAMETERWHEELD*M_PI)/(NUMBERSTEPBYROTATION*2));
+const double STEPAVANCEG = ((DIAMETERWHEELG*M_PI)/(NUMBERSTEPBYROTATION*2));
 
-#define COEFCONVDEGRETORADIAN PI/180
+const double DEG2RAD = M_PI/180.0;
+const double RAD2DEG = 180.0/M_PI;
 
-typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
+enum class odometrieTrigger : char {fordwardL,backwardL,fordwardR,backwardR};
 
 void odometrieSetup(void);
 void printBuffer(void);

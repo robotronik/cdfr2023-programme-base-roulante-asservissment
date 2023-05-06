@@ -1,14 +1,15 @@
 #include "odometrie.h"
-
+#define _GNU_SOURCE
+#include "math.h"
 
 static double mod_angle(double a);
 
 
 
 position_t position;
-odometrieTrigger_t buffer[_BUFFERSIZE];
-int endBuffer = 0;
-int startBuffer =0;
+static odometrieTrigger buffer[_BUFFERSIZE];
+static int ReadBuffer = 0;
+static int WriteBuffer = 0;
 
 
 void odometrieSetup(void){
@@ -54,18 +55,18 @@ void exti2_isr(void)
     exti_reset_request(EXTI2);
 	gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (GPIOB,GPIO3)){
-		buffer[startBuffer]=backwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[WriteBuffer]=odometrieTrigger::backwardR;
+		WriteBuffer++;
+		if(WriteBuffer>=_BUFFERSIZE){
+			WriteBuffer = 0;
 		}
 	}
 	else{
 		//Vers l'avant
-		buffer[startBuffer]=fordwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[WriteBuffer]=odometrieTrigger::fordwardR;
+		WriteBuffer++;
+		if(WriteBuffer>=_BUFFERSIZE){
+			WriteBuffer = 0;
 		}
 	}
 }
@@ -76,17 +77,17 @@ void exti4_isr(void)
     gpio_toggle(port_led2,pin_led2);
 	if(gpio_get (GPIOB,GPIO5)){
 		//Vers l'avant
-		buffer[startBuffer]=fordwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[WriteBuffer]=odometrieTrigger::fordwardL;
+		WriteBuffer++;
+		if(WriteBuffer>=_BUFFERSIZE){
+			WriteBuffer = 0;
 		}
 	}
 	else{
-		buffer[startBuffer]=backwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[WriteBuffer]=odometrieTrigger::backwardL;
+		WriteBuffer++;
+		if(WriteBuffer>=_BUFFERSIZE){
+			WriteBuffer = 0;
 		}
 	}
 }
@@ -100,36 +101,41 @@ void printBuffer(void){
 
 void odometrieLoop(void){
 	int i =0;
-	while (endBuffer != startBuffer){
-		switch (buffer[endBuffer])
+	while (ReadBuffer != WriteBuffer){
+		double sv, cv;
+		double anglerad = position.teta*DEG2RAD;
+		sv = sin(anglerad);
+		cv = cos(anglerad);
+		//sincos(position.teta*DEG2RAD, &sv, &cv);
+		switch (buffer[ReadBuffer])
 		{
-		case fordwardL:
-				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+		case odometrieTrigger::fordwardL:
+				position.y -= STEPAVANCEG * sv;
+				position.x += STEPAVANCEG * cv;
 				position.teta += STEPANGLEG;
 			break;
-		case backwardL:
-				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+		case odometrieTrigger::backwardL:
+				position.y += STEPAVANCEG * sv;
+				position.x -= STEPAVANCEG * cv;
 				position.teta -= STEPANGLEG;
 			break;
-		case fordwardR:
-				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+		case odometrieTrigger::fordwardR:
+				position.y -= STEPAVANCED * sv;
+				position.x += STEPAVANCED * cv;
 				position.teta -= STEPANGLED;
 			break;
-		case backwardR:
-				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+		case odometrieTrigger::backwardR:
+				position.y += STEPAVANCED * sv;
+				position.x -= STEPAVANCED * cv;
 				position.teta += STEPANGLED;
 			break;
 		default:
 			break;
 		}
 		i++;
-		endBuffer++;
-		if(endBuffer>=_BUFFERSIZE){
-			endBuffer = 0;
+		ReadBuffer++;
+		if(ReadBuffer>=_BUFFERSIZE){
+			ReadBuffer = 0;
 		}	
 	}
 }
