@@ -4,23 +4,9 @@
 
 
 double calculAngle(double x, double y, position_t actualPostion){
-    double angleTournerPoint;
-    if((x - actualPostion.x) == 0){
-        if((y - actualPostion.y)<0){
-                angleTournerPoint = 90;
-            }
-            else{
-                angleTournerPoint = -90;
-            }
-    }
-    else{
-        angleTournerPoint = -(atan((y - actualPostion.y)/(x - actualPostion.x))*RAD_TO_DEG);
-        if((x - actualPostion.x)<0){
-            angleTournerPoint -= 180;
-        }
-        //Gestion de la marche arrière
-    }
-    angleTournerPoint = mod_angle(angleTournerPoint);
+    double dx = x - actualPostion.x;
+    double dy = y - actualPostion.y;
+    double angleTournerPoint = -atan2(dy,dx)*RAD_TO_DEG;
     return angleTournerPoint;
 }
 
