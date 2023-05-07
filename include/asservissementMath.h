@@ -22,3 +22,13 @@ T clamp(T x, T lower, T upper)
 	}
 	return x;
 }
+
+template<class T>
+T max(T a,T b)
+{
+	if (a>b)
+	{
+		return a;
+	}
+	return b;
+}

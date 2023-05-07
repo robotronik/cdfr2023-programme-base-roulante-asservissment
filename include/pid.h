@@ -40,4 +40,10 @@ public:
 		T loopOutput = kP*error+kD*derror+kI*integral;		
 		return loopOutput;
 	}
+
+	void Reset()
+	{
+		lastError = 0;
+		integral = 0;
+	}
 };

@@ -29,20 +29,30 @@ double controleMoteurL, controleMoteurR;
 
 
 void asservissementLoopTime(void);
-void asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeed, double linearSpeedSecu);
+void asservissementControlMoteur(double controleMoteurR, double controleMoteurL);
 static double getAngularSpeed(double DeltaTime);
 static double getLinearSpeed(double DeltaTime);
 
 
 
 void asservissementSetup(void){
-	previousPosition = odometrieGetPosition();
-	actualPosition = odometrieGetPosition();
-	erreurControlMoteur = false;
-	consigneAngle = actualPosition.teta;
-	consigneX = actualPosition.x;
-	consigneY = actualPosition.y;
-	asservissementRun = true;
+	if (erreurControlMoteur)
+	{
+		VitesseLineairePID.Reset();
+		PositionLineairePID.Reset();
+		VitesseAngulairePID.Reset();
+		PositionAngulairePID.Reset();
+		erreurControlMoteur = false;
+	}
+	if (!asservissementRun)
+	{
+		previousPosition = odometrieGetPosition();
+		actualPosition = odometrieGetPosition();
+		consigneAngle = actualPosition.teta;
+		consigneX = actualPosition.x;
+		consigneY = actualPosition.y;
+		asservissementRun = true;
+	}
 }
 
 void asservissementLoop(void){
@@ -54,9 +64,10 @@ void asservissementLoop(void){
 
 void asservissmentStop(void){
 	asservissementRun = false;
+	asservissementState = asservissementType::NONE;
 	motorBrakeL(1);
 	motorBrakeR(1);
-	asservissementControlMoteur(0,0,0,0);
+	asservissementControlMoteur(0,0);
 }
 
 void setAngularAsservissement(double angle){
@@ -64,6 +75,8 @@ void setAngularAsservissement(double angle){
 	motorBrakeL(0);
 	motorBrakeR(0);
 	consigneAngle = angle;
+	consigneX = actualPosition.x;
+	consigneY = actualPosition.y;
 	asservissementState = asservissementType::ANGULAIRE;
 }
 
@@ -106,8 +119,7 @@ void asservissementLoopTime(void){
 	linearSpeed = getLinearSpeed(deltaTime);
 	angularSpeed = getAngularSpeed(deltaTime);
 	previousPosition = actualPosition;
-   
-
+	
 	//calacul des erreurs d'angle et de position lineaire
 	double dx = consigneX - actualPosition.x;
 	double dy = consigneY - actualPosition.y;
@@ -117,6 +129,7 @@ void asservissementLoopTime(void){
 	{
 	case asservissementType::LINEAIREARRIERE :
 		consigneAngleTheorique = mod_angle(consigneAngleTheorique + 180);
+		[[fallthrough]];
 	case asservissementType::LINEAIREAVANT : 
 		consigneAngle = consigneAngleTheorique; //override angle target
 		break;
@@ -128,6 +141,27 @@ void asservissementLoopTime(void){
 	double angleErreur = mod_angle(consigneAngle-actualPosition.teta);
 	double angleErreurTheorique = mod_angle(consigneAngleTheorique-actualPosition.teta);
 	
+   
+	
+
+	//*********************
+	//CALCUL ANGULAIRE
+	//*********************
+
+
+	//asservismsent de la position angulaire
+	PositionAngulairePID.target = consigneAngle;
+	double consigneVitesseAngulaire = PositionAngulairePID.Tick(deltaTime, actualPosition.teta);
+	consigneVitesseAngulaire = clamp<double>(consigneVitesseAngulaire, VitesseAngulairePID.target-ACCELERATIONANGULAIREMAX*deltaTime, 
+		VitesseAngulairePID.target+ACCELERATIONANGULAIREMAX*deltaTime);
+	VitesseAngulairePID.target = clamp<double>(consigneVitesseAngulaire, -VITESSEANGULAIREMAX, VITESSEANGULAIREMAX);
+
+	motorcontrolAngle = VitesseAngulairePID.Tick(deltaTime, angularSpeed);
+
+
+	//*********************
+	//CALCUL LINEAIRE
+	//*********************
 
 	double consigneVitesseLineaire = 0;
 	switch (asservissementState)
@@ -152,35 +186,12 @@ void asservissementLoopTime(void){
 				break;
 			}
 		}
-	
+		[[fallthrough]];
 	default: //don't move
 		PositionLineairePID.target = 0;
 		consigneVitesseLineaire = PositionLineairePID.Tick(deltaTime, 0.0);
 		break;
 	}
-	
-   
-	
-
-	//*********************
-	//CALCUL ANGULAIRE
-	//*********************
-
-
-	//asservismsent de la position angulaire
-	PositionAngulairePID.target = consigneAngle;
-	double consigneVitesseAngulaire = PositionAngulairePID.Tick(deltaTime, actualPosition.teta);
-	consigneVitesseAngulaire = clamp<double>(consigneVitesseAngulaire, VitesseAngulairePID.target-ACCELERATIONANGULAIREMAX*deltaTime, 
-		VitesseAngulairePID.target+ACCELERATIONANGULAIREMAX*deltaTime);
-	VitesseAngulairePID.target = clamp<double>(consigneVitesseAngulaire, -VITESSEANGULAIREMAX, VITESSEANGULAIREMAX);
-
-	motorcontrolAngle = VitesseAngulairePID.Tick(deltaTime, angularSpeed);
-
-
-	//*********************
-	//CALCUL LINEAIRE
-	//*********************
-	
 	//asservismsent de la position Lineaire
 	consigneVitesseLineaire = clamp<double>(consigneVitesseLineaire, 
 		VitesseLineairePID.target-ACCELERATIONLINEAIREMAX*deltaTime, 
@@ -201,20 +212,23 @@ void asservissementLoopTime(void){
 
 	controleMoteurR = -motorcontrolAngle + motorcontrolLigne;
 	controleMoteurL = motorcontrolAngle + motorcontrolLigne;
-	asservissementControlMoteur(controleMoteurR,controleMoteurL,angularSpeed,linearSpeed);
+	asservissementControlMoteur(controleMoteurR,controleMoteurL);
 	
 }
 
-void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteurL, double angularSpeed, double linearSpeed){
+void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteurL){
 
-	if(abs(angularSpeed)>VITESSEANGULAIREMAXSECU*2.5){
+	if(abs(angularSpeed)>VITESSEANGULAIREMAXSECU){
 		erreurControlMoteur = true;
 	}
-	if(abs(linearSpeed)>VITESSELINEAIREMAXSECU*2.5){
+	if(abs(linearSpeed)>VITESSELINEAIREMAXSECU){
 		erreurControlMoteur = true;
 	}
-	fcontroleMoteurR = clamp<double>(fcontroleMoteurR, -100, 100);
-	fcontroleMoteurL = clamp<double>(fcontroleMoteurL, -100, 100);
+	double desatval = max(abs(fcontroleMoteurL), abs(fcontroleMoteurR)); //desaturate motors proportionnally
+	desatval = max(desatval, 100.0)/100.0;
+	
+	fcontroleMoteurR = fcontroleMoteurR/desatval;
+	fcontroleMoteurL = fcontroleMoteurL/desatval;
 
 	if(erreurControlMoteur){
 		usartprintf("ERREUR ASSERVISEMENT");
@@ -222,8 +236,8 @@ void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteur
 		motorSpeedSignedR(0);
 	}
 	else{
-		motorSpeedSignedL((int)fcontroleMoteurL);
-		motorSpeedSignedR((int)fcontroleMoteurR);
+		motorSpeedSignedL(fcontroleMoteurL);
+		motorSpeedSignedR(fcontroleMoteurR);
 	}
 }
 
