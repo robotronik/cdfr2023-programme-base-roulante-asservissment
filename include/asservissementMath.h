@@ -8,7 +8,7 @@ const double DEG_TO_RAD = M_PI/180.0;
 
 
 double mod_angle(double a);
-double calculAngle(double x, double y, position_t actualPostion);
+double calculAngle(double x, double y, positionD actualPostion);
 template<class T> 
 T clamp(T x, T lower, T upper)
 {

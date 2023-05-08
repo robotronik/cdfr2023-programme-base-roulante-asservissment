@@ -56,51 +56,51 @@
 
 
 //PIN and PORT for the odometrie. Each pin are on different vector interrupt.
-#define pin_odometrie1R     GPIO2
-#define port_odometrie1R         GPIOD
-#define pin_odometrie2R     GPIO3
-#define port_odometrie2R         GPIOB
-#define pin_odometrie1L     GPIO4
-#define port_odometrie1L         GPIOB
-#define pin_odometrie2L     GPIO5
-#define port_odometrie2L         GPIOB
+#define pin_odometrie1R	 		GPIO2
+#define port_odometrie1R		GPIOD
+#define pin_odometrie2R			GPIO3
+#define port_odometrie2R		GPIOB
+#define pin_odometrie1L			GPIO4
+#define port_odometrie1L		GPIOB
+#define pin_odometrie2L			GPIO5
+#define port_odometrie2L		GPIOB
 
 //PIN and PORT free
-#define pin_free0           GPIO9
-#define port_free0              GPIOB
-#define pin_free1           GPIO13
-#define port_free1              GPIOC
-#define pin_free2           GPIO14
-#define port_free2              GPIOC
-#define pin_free3           GPIO15
-#define port_free3              GPIOC
-#define pin_free4           GPIO0
-#define port_free4              GPIOC
-#define pin_free5           GPIO1
-#define port_free5              GPIOC
-#define pin_free6           GPIO2
-#define port_free6              GPIOC
-#define pin_free7           GPIO3
-#define port_free7              GPIOC
+#define pin_free0			GPIO9
+#define port_free0			GPIOB
+#define pin_free1			GPIO13
+#define port_free1			GPIOC
+#define pin_free2			GPIO14
+#define port_free2			GPIOC
+#define pin_free3			GPIO15
+#define port_free3			GPIOC
+#define pin_free4			GPIO0
+#define port_free4			GPIOC
+#define pin_free5			GPIO1
+#define port_free5			GPIOC
+#define pin_free6			GPIO2
+#define port_free6			GPIOC
+#define pin_free7			GPIO3
+#define port_free7			GPIOC
 
 
 //PIN and PORT for the TX and RX pin. Use for debug
-#define pin_TX              GPIO2
-#define port_TX                 GPIOA
-#define pin_RX              GPIO3
-#define port_RX                 GPIOA
+#define pin_TX			  GPIO2
+#define port_TX				 GPIOA
+#define pin_RX			  GPIO3
+#define port_RX				 GPIOA
 
 //PIN and PORT for programming
-#define pin_SWDIO           GPIO13
-#define port_SWDIO              GPIOA
-#define pin_SWCLK           GPIO14
-#define port_SWCLK              GPIOA
+#define pin_SWDIO		   GPIO13
+#define port_SWDIO			  GPIOA
+#define pin_SWCLK		   GPIO14
+#define port_SWCLK			  GPIOA
 
 //PIN and PORT for the endstop. Use the end stop to calibrate the odometrie. 
-#define pin_endStopL         GPIO11
-#define port_endstopL            GPIOC
-#define pin_endStopR         GPIO12
-#define port_endStopR            GPIOC
+#define pin_endStopL		 GPIO11
+#define port_endstopL			GPIOC
+#define pin_endStopR		 GPIO12
+#define port_endStopR			GPIOC
 
 //PIN and PORT for I2C
 #define pin_I2CClk			GPIO6
@@ -110,29 +110,13 @@
 
 
 //Variable
-
-typedef struct{
-	double x;
-    double y;
-	double teta;
-}position_t;
-
-typedef struct{
-	int16_t x;
-    int16_t y;
-	int16_t teta;
-}positionint_t;
-
-union position_u
+template<class T>
+struct _position
 {
-	positionint_t position;
-	uint8_t tab[6];
+	T x;
+	T y;
+	T theta;
 };
 
-union uintConv
-{
-	int16_t num;
-	uint8_t tab[2];
-};
-
-
+typedef _position<double> positionD;
+typedef _position<int16_t> positionSI;

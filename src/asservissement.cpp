@@ -2,12 +2,12 @@
 #include "pid.h"
 
 asservissementType asservissementState = asservissementType::NONE;
-position_t actualPosition;
-position_t previousPosition;
+positionD actualPosition;
+positionD previousPosition;
 
 uint64_t lastPIDus = 0;
 			//kP, kI, kD, maxWindup (limit I value before kI), output min, output max
-pid<double, false> VitesseLineairePID(KP_VITESSELINEAIRE, KI_VITESSELINEAIRE, KD_VITESSELINEAIRE, VITESSELINEAIREMAX/2);
+pid<double, false> VitesseLineairePID(KP_VITESSELINEAIRE, KI_VITESSELINEAIRE, KD_VITESSELINEAIRE, VITESSELINEAIREMAXAVANT/2);
 pid<double, false> PositionLineairePID(KP_POSITIONLINEAIRE, 0, KD_POSITIONLINEAIRE, 50);
 pid<double, true> VitesseAngulairePID(KP_VITESSEANGULAIRE, KI_VITESSEANGULAIRE, KD_VITESSEANGULAIRE, VITESSEANGULAIREMAX/2);
 pid<double, true> PositionAngulairePID(KP_POSITIONANGULAIRE, 0, KD_POSITIONANGULAIRE, 45);
@@ -17,7 +17,9 @@ double consigneX;
 double consigneY;
 
 uint32_t asservissementTime;
+//Control if there was an error in the motor control values
 bool erreurControlMoteur = true;
+//Control if the loop is running
 bool asservissementRun = false;
 
 double linearSpeed;
@@ -33,7 +35,30 @@ void asservissementControlMoteur(double controleMoteurR, double controleMoteurL)
 static double getAngularSpeed(double DeltaTime);
 static double getLinearSpeed(double DeltaTime);
 
-
+void SetPIDValues(int index, double kP, double kI, double kD)
+{
+	pid<double, false>* selected = nullptr;
+	switch (index)
+	{
+	case 0:
+		selected = &PositionLineairePID;
+		break;
+	case 1: 
+		selected = &VitesseLineairePID;
+		break;
+	case 2:
+		selected = (pid<double, false>*)&PositionAngulairePID;
+		break;
+	case 3:
+		selected = (pid<double, false>*)&VitesseAngulairePID;
+		break;
+	default:
+		return;
+	}
+	selected->kP = kP;
+	selected->kI = kI;
+	selected->kD = kD;
+}
 
 void asservissementSetup(void){
 	if (erreurControlMoteur)
@@ -48,7 +73,7 @@ void asservissementSetup(void){
 	{
 		previousPosition = odometrieGetPosition();
 		actualPosition = odometrieGetPosition();
-		consigneAngle = actualPosition.teta;
+		consigneAngle = actualPosition.theta;
 		consigneX = actualPosition.x;
 		consigneY = actualPosition.y;
 		asservissementRun = true;
@@ -56,9 +81,8 @@ void asservissementSetup(void){
 }
 
 void asservissementLoop(void){
-	if(asservissementTime < get_uptime_ms()){
+	if(lastPIDus + 20000 < get_uptime_us()){
 		asservissementLoopTime();
-		asservissementTime = get_uptime_ms() + 20;
 	}
 }
 
@@ -93,7 +117,7 @@ void setLinearAsservissement(double x,double y,bool arriere){
 	}
 	else{
 		asservissementState = asservissementType::LINEAIREAVANT;
-	}    
+	}	
 }
 
 void printAllInformation(void){
@@ -119,6 +143,13 @@ void asservissementLoopTime(void){
 	linearSpeed = getLinearSpeed(deltaTime);
 	angularSpeed = getAngularSpeed(deltaTime);
 	previousPosition = actualPosition;
+
+	if (!asservissementRun)
+	{
+		asservissementControlMoteur(0,0);
+		return;
+	}
+	
 	
 	//calacul des erreurs d'angle et de position lineaire
 	double dx = consigneX - actualPosition.x;
@@ -131,15 +162,18 @@ void asservissementLoopTime(void){
 		consigneAngleTheorique = mod_angle(consigneAngleTheorique + 180);
 		[[fallthrough]];
 	case asservissementType::LINEAIREAVANT : 
-		consigneAngle = consigneAngleTheorique; //override angle target
+		if (distanceRobotPoint > 10) //far enough from target to justify rotating
+		{
+			consigneAngle = consigneAngleTheorique; //override angle target
+		}
 		break;
 	
 	default:
 		break;
 	}
 
-	double angleErreur = mod_angle(consigneAngle-actualPosition.teta);
-	double angleErreurTheorique = mod_angle(consigneAngleTheorique-actualPosition.teta);
+	double angleErreur = mod_angle(consigneAngle-actualPosition.theta);
+	double angleErreurTheorique = mod_angle(consigneAngleTheorique-actualPosition.theta);
 	
    
 	
@@ -151,7 +185,7 @@ void asservissementLoopTime(void){
 
 	//asservismsent de la position angulaire
 	PositionAngulairePID.target = consigneAngle;
-	double consigneVitesseAngulaire = PositionAngulairePID.Tick(deltaTime, actualPosition.teta);
+	double consigneVitesseAngulaire = PositionAngulairePID.Tick(deltaTime, actualPosition.theta);
 	consigneVitesseAngulaire = clamp<double>(consigneVitesseAngulaire, VitesseAngulairePID.target-ACCELERATIONANGULAIREMAX*deltaTime, 
 		VitesseAngulairePID.target+ACCELERATIONANGULAIREMAX*deltaTime);
 	VitesseAngulairePID.target = clamp<double>(consigneVitesseAngulaire, -VITESSEANGULAIREMAX, VITESSEANGULAIREMAX);
@@ -194,11 +228,11 @@ void asservissementLoopTime(void){
 	}
 	//asservismsent de la position Lineaire
 	consigneVitesseLineaire = clamp<double>(consigneVitesseLineaire, 
-		VitesseLineairePID.target-ACCELERATIONLINEAIREMAX*deltaTime, 
-		VitesseLineairePID.target+ACCELERATIONLINEAIREMAX*deltaTime);
+		VitesseLineairePID.target-ACCELERATIONLINEAIREMAXARRIERE*deltaTime, 
+		VitesseLineairePID.target+ACCELERATIONLINEAIREMAXAVANT*deltaTime);
 	VitesseLineairePID.target = clamp<double>(consigneVitesseLineaire,
-		-VITESSELINEAIREMAX,
-		VITESSELINEAIREMAX);
+		-VITESSELINEAIREMAXARRIERE,
+		VITESSELINEAIREMAXAVANT);
 
 
 	//asservissemnt de la vitesse Lineaire
@@ -246,7 +280,7 @@ static double getAngularSpeed(double deltaTime){
 	//*********************
 	//CALCUL VITESSEANGULAIRE en deg/seconde
 	//*********************
-	return (mod_angle(actualPosition.teta - previousPosition.teta))/deltaTime;
+	return (mod_angle(actualPosition.theta - previousPosition.theta))/deltaTime;
 }
 
 static double getLinearSpeed(double deltaTime){
@@ -261,7 +295,7 @@ static double getLinearSpeed(double deltaTime){
 
 	//Gestion de la distance
 	usartprintf("\n>anglevitesse:%lf\n",anglevitesse);
-	double deltaangle = anglevitesse-actualPosition.teta;
+	double deltaangle = anglevitesse-actualPosition.theta;
 	deltaangle = mod_angle(deltaangle);
 	if(abs(deltaangle) > 90){
 		return -longueurDeplacement;

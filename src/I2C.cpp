@@ -16,7 +16,7 @@ commnucationDirection_t communicationType;
 //https://github.com/amitesh-singh/i2c-slave-stm32f1/blob/master/main.cpp
 
 void i2c_setup(void){
-    rcc_periph_clock_enable(RCC_I2C1);
+	rcc_periph_clock_enable(RCC_I2C1);
 	rcc_periph_clock_enable(RCC_GPIOB);
 
 	//rcc_periph_reset_pulse(RST_I2C1);
@@ -37,7 +37,7 @@ void i2c_setup(void){
 	//I2C1_CR1 |= I2C_CR1_NOSTRETCH;
 
 	//addressing mode	
-    i2c_set_own_7bit_slave_address(I2C1,ADDRI2CBASEROULANTE);
+	i2c_set_own_7bit_slave_address(I2C1,ADDRI2CBASEROULANTE);
 
 	i2c_peripheral_enable(I2C1);
 	i2c_enable_ack(I2C1);

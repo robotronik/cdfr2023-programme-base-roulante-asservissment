@@ -8,7 +8,7 @@ void gpio_setup(void);
 
 void usartSetup(void){
 
-    _uartClock_setup();
+	_uartClock_setup();
 	gpio_setup();
 
 	/* Setup USART2 parameters. */
@@ -32,12 +32,12 @@ void usartSendMessage(uint32_t usart, char* Message){
 }
 
 void usartprintf(const char* format, ...) {
-    char buffer[1000];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, 1000, format, args);
-    usartSendMessage(USART2,buffer);
-    va_end(args);
+	char buffer[1000];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, 1000, format, args);
+	usartSendMessage(USART2,buffer);
+	va_end(args);
 }
 
 

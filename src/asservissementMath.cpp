@@ -3,11 +3,11 @@
 
 
 
-double calculAngle(double x, double y, position_t actualPostion){
-    double dx = x - actualPostion.x;
-    double dy = y - actualPostion.y;
-    double angleTournerPoint = -atan2(dy,dx)*RAD_TO_DEG;
-    return angleTournerPoint;
+double calculAngle(double x, double y, positionD actualPostion){
+	double dx = x - actualPostion.x;
+	double dy = y - actualPostion.y;
+	double angleTournerPoint = -atan2(dy,dx)*RAD_TO_DEG;
+	return angleTournerPoint;
 }
 
 

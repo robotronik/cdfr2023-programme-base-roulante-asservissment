@@ -6,22 +6,22 @@ static double mod_angle(double a);
 
 
 
-position_t position;
+positionD position;
 static odometrieTrigger buffer[_BUFFERSIZE];
 static int ReadBuffer = 0;
 static int WriteBuffer = 0;
 
 
 void odometrieSetup(void){
-    position.x = 0;
-    position.y = 0;
-    position.teta = 0;
+	position.x = 0;
+	position.y = 0;
+	position.theta = 0;
 
-    rcc_periph_clock_enable(RCC_GPIOD);
-    rcc_periph_clock_enable(RCC_GPIOB);
-    rcc_periph_clock_enable(RCC_SYSCFG);
+	rcc_periph_clock_enable(RCC_GPIOD);
+	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_SYSCFG);
 
-    /* Enable EXTI0 interrupt. */
+	/* Enable EXTI0 interrupt. */
 	nvic_enable_irq(NVIC_EXTI2_IRQ);
 	nvic_set_priority(NVIC_EXTI2_IRQ, 0);
 
@@ -36,7 +36,7 @@ void odometrieSetup(void){
 
 
 
-    /* Enable EXTI0 interrupt. */
+	/* Enable EXTI0 interrupt. */
 	nvic_enable_irq(NVIC_EXTI4_IRQ);
 	nvic_set_priority(NVIC_EXTI4_IRQ, 1);
 
@@ -52,8 +52,8 @@ void odometrieSetup(void){
 
 void exti2_isr(void)
 {
-    exti_reset_request(EXTI2);
-	gpio_toggle(port_led1,pin_led1);
+	exti_reset_request(EXTI2);
+	//gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (GPIOB,GPIO3)){
 		buffer[WriteBuffer]=odometrieTrigger::backwardR;
 		WriteBuffer++;
@@ -74,7 +74,7 @@ void exti2_isr(void)
 void exti4_isr(void)
 {
 	exti_reset_request(EXTI4);
-    gpio_toggle(port_led2,pin_led2);
+	//gpio_toggle(port_led2,pin_led2);
 	if(gpio_get (GPIOB,GPIO5)){
 		//Vers l'avant
 		buffer[WriteBuffer]=odometrieTrigger::fordwardL;
@@ -103,31 +103,31 @@ void odometrieLoop(void){
 	int i =0;
 	while (ReadBuffer != WriteBuffer){
 		double sv, cv;
-		double anglerad = position.teta*DEG2RAD;
+		double anglerad = position.theta*DEG2RAD;
 		sv = sin(anglerad);
 		cv = cos(anglerad);
-		//sincos(position.teta*DEG2RAD, &sv, &cv);
+		//sincos(position.theta*DEG2RAD, &sv, &cv);
 		switch (buffer[ReadBuffer])
 		{
 		case odometrieTrigger::fordwardL:
 				position.y -= STEPAVANCEG * sv;
 				position.x += STEPAVANCEG * cv;
-				position.teta += STEPANGLEG;
+				position.theta += STEPANGLEG;
 			break;
 		case odometrieTrigger::backwardL:
 				position.y += STEPAVANCEG * sv;
 				position.x -= STEPAVANCEG * cv;
-				position.teta -= STEPANGLEG;
+				position.theta -= STEPANGLEG;
 			break;
 		case odometrieTrigger::fordwardR:
 				position.y -= STEPAVANCED * sv;
 				position.x += STEPAVANCED * cv;
-				position.teta -= STEPANGLED;
+				position.theta -= STEPANGLED;
 			break;
 		case odometrieTrigger::backwardR:
 				position.y += STEPAVANCED * sv;
 				position.x -= STEPAVANCED * cv;
-				position.teta += STEPANGLED;
+				position.theta += STEPANGLED;
 			break;
 		default:
 			break;
@@ -141,33 +141,33 @@ void odometrieLoop(void){
 }
 
 void printPosition(void){
-	usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",position.x,position.y,position.teta);
+	usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",position.x,position.y,position.theta);
 }
 
-// odometrieGetPosition(position_t positionSet){
-// 	positionSet.teta = position.teta;
+// odometrieGetPosition(positionD positionSet){
+// 	positionSet.theta = position.theta;
 // 	positionSet.y = position.y;
 // 	positionSet.x = position.x;
 // }
 
-position_t odometrieGetPosition(void){
-	position.teta = mod_angle(position.teta);
+positionD odometrieGetPosition(void){
+	position.theta = mod_angle(position.theta);
 	return position;
 }
 
 
-position_u odometrieGetPositionInt(void){
-	position_u positionUnion;
-	positionUnion.position.teta = (int)(mod_angle(position.teta));
-	positionUnion.position.y = (int)(position.y);
-	positionUnion.position.x = (int)(position.x);
-	return positionUnion;
+positionSI odometrieGetPositionInt(void){
+	positionSI positioni;
+	positioni.theta = (int)(mod_angle(position.theta));
+	positioni.y = (int)(position.y);
+	positioni.x = (int)(position.x);
+	return positioni;
 }
 
-void odometrieSetPosition(position_u positionUnion){
-	position.teta = (double)positionUnion.position.teta;
-	position.x = (double)positionUnion.position.x;
-	position.y = (double)positionUnion.position.y;
+void odometrieSetPosition(positionSI positioni){
+	position.theta = (double)positioni.theta;
+	position.x = (double)positioni.x;
+	position.y = (double)positioni.y;
 }
 
 static double mod_angle(double a){

@@ -21,48 +21,97 @@ static void ledSetup(void)
 	//gpio_mode_setup(GPIOA,GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,GPIO5);
 }
 
+enum class I2CCommands : uint8_t
+{
+	LED1ON=10,
+	LED1OFF,
+	LED2ON,
+	LED2OFF,
+
+	GetPositionInt=20,
+	SetPositionInt,
+
+	SetTargetPosition=30,
+	SetTargetAngle,
+	StopAsservissement,
+
+	SetPIDLinearPos=40,
+	SetPIDLinearVel,
+	SetPIDAngularPos,
+	SetPIDAngularVel
+};
+
 
 void I2CRecieveData(uint8_t* data, int size){
-	if(data[0]==10){
+	switch (data[0])
+	{
+	case (uint8_t)I2CCommands::LED1ON :
 		gpio_set(port_led1,pin_led1);
-	}
-	else if (data[0]==11){
+		break;
+	case (uint8_t)I2CCommands::LED1OFF :
 		gpio_clear(port_led1,pin_led1);
-	}
-	if(data[0]==12){
+		break;
+	case (uint8_t)I2CCommands::LED2ON :
 		gpio_set(port_led2,pin_led2);
-	}
-	else if (data[0]==13){
+		break;
+	case (uint8_t)I2CCommands::LED2OFF :
 		gpio_clear(port_led2,pin_led2);
-	}
-	else if (data[0]==20){
-		position_u posi = odometrieGetPositionInt();
-		I2CSetBuffer(posi.tab,6);
-	}
-	else if( data[0]==21 && size == 7){
-		position_u posi;
-		memcpy(posi.tab, data+1, 6);
-		odometrieSetPosition(posi);
-		asservissementSetup();
-	}
-	else if( data[0]==30 && size == 7){
-		uintConv x,y,arriere;
-		x.tab[0] = data[1]; x.tab[1] = data[2];
-		y.tab[0] = data[3]; y.tab[1] = data[4];
-		arriere.tab[0] = data[5]; arriere.tab[1] = data[6];
-		asservissementSetup();
-		setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
-	}
-	else if( data[0]==31 && size == 3){
-		uintConv teta;
-		teta.tab[0] = data[1]; teta.tab[1] = data[2];
-		asservissementSetup();
-		setAngularAsservissement((double)teta.num);
-	}
-	else if( data[0]==32){
+		break;
+	case (uint8_t)I2CCommands::GetPositionInt :
+		{
+			positionSI posi = odometrieGetPositionInt();
+			I2CSetBuffer((uint8_t*)&posi,sizeof(posi));
+		}
+		break;
+	case (uint8_t)I2CCommands::SetPositionInt :
+		if (size >= sizeof(positionSI)+1)
+		{
+			positionSI *posi = (positionSI*) &data[1];
+			odometrieSetPosition(*posi);
+			asservissementSetup();
+		}
+		break;
+	case (uint8_t)I2CCommands::SetTargetPosition :
+		if (size >= sizeof(positionSI)+1)
+		{
+			struct posconv
+			{
+				int16_t x, y, arriere;
+			};
+			posconv *payload = (posconv*) &data[1];
+			asservissementSetup();
+			setLinearAsservissement(payload->x, payload->y, payload->arriere);
+		}
+		break;
+	case (uint8_t)I2CCommands::SetTargetAngle :
+		if (size >= sizeof(int16_t)+1)
+		{
+			int16_t theta = * (int16_t*) &data[1];
+			asservissementSetup();
+			setAngularAsservissement(theta);
+		}
+		break;
+	case (uint8_t)I2CCommands::StopAsservissement :
 		asservissmentStop();
+		break;
+
+	case (uint8_t)I2CCommands::SetPIDLinearPos :
+	case (uint8_t)I2CCommands::SetPIDLinearVel :
+	case (uint8_t)I2CCommands::SetPIDAngularPos :
+	case (uint8_t)I2CCommands::SetPIDAngularVel :
+		if (size >= sizeof(float)*3+1)
+		{
+			struct pidvalues
+			{
+				float kp, ki, kd;
+			};
+			pidvalues* payload = (pidvalues*)&data[1];
+			SetPIDValues(data[0]-(uint8_t)I2CCommands::SetPIDLinearPos, payload->kp, payload->ki, payload->kd);
+		}
+	default:
+		usartprintf("Received unknown command : %d\n", data[0]);
+		break;
 	}
-	
 }
 
 

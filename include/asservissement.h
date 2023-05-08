@@ -23,8 +23,10 @@
 #define KP_VITESSELINEAIRE 0.02
 #define KI_VITESSELINEAIRE 0.375
 #define KD_VITESSELINEAIRE 0.0
-#define VITESSELINEAIREMAX 800 //mm/s
-#define ACCELERATIONLINEAIREMAX 800 //mm/s^2
+#define VITESSELINEAIREMAXAVANT 800 //mm/s
+#define ACCELERATIONLINEAIREMAXAVANT 600 //mm/s^2
+#define VITESSELINEAIREMAXARRIERE 600 //mm/s
+#define ACCELERATIONLINEAIREMAXARRIERE 800 //mm/s^2
 
 
 #define DISTANCEMINFINASSERVANGULAIRE 200 //mm
@@ -32,9 +34,11 @@
 //Vitesse maximal
 //Au dela de cette vitesse, l'asservisssment se bloque
 #define VITESSEANGULAIREMAXSECU  (VITESSEANGULAIREMAX*1.5)
-#define VITESSELINEAIREMAXSECU  (VITESSELINEAIREMAX*1.5)
+#define VITESSELINEAIREMAXSECU  (VITESSELINEAIREMAXAVANT*1.5)
 
 enum class asservissementType {NONE,ANGULAIRE,LINEAIREAVANT,LINEAIREARRIERE};
+
+void SetPIDValues(int index, double kP, double kI, double kD);
 
 void asservissementSetup(void);
 void asservissementLoop(void);
