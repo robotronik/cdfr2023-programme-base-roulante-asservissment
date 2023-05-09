@@ -10,7 +10,7 @@
 
 
 #define KP_POSITIONANGULAIRE 20.0
-#define KD_POSITIONANGULAIRE 0.8
+#define KD_POSITIONANGULAIRE -0.8
 #define KP_VITESSEANGULAIRE 0.10
 #define KI_VITESSEANGULAIRE 0.5
 #define KD_VITESSEANGULAIRE 0.0
@@ -29,7 +29,7 @@
 #define ACCELERATIONLINEAIREMAXARRIERE 800 //mm/s^2
 
 
-#define DISTANCEMINFINASSERVANGULAIRE 200 //mm
+#define DISTANCEMINFINASSERVANGULAIRE 50 //mm
 
 //Vitesse maximal
 //Au dela de cette vitesse, l'asservisssment se bloque
@@ -43,7 +43,8 @@ void SetPIDValues(int index, double kP, double kI, double kD);
 void asservissementSetup(void);
 void asservissementLoop(void);
 
-void asservissmentStop(void);
+void asservissementStop(void);
+void asservissementBrake(void);
 void printAllInformation(void);
 
 void setAngularAsservissement(double angle);

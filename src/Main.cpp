@@ -33,6 +33,7 @@ enum class I2CCommands : uint8_t
 
 	SetTargetPosition=30,
 	SetTargetAngle,
+	Brake,
 	StopAsservissement,
 
 	SetPIDLinearPos=40,
@@ -43,6 +44,7 @@ enum class I2CCommands : uint8_t
 
 
 void I2CRecieveData(uint8_t* data, int size){
+	uint8_t* payloadptr = &data[1];
 	switch (data[0])
 	{
 	case (uint8_t)I2CCommands::LED1ON :
@@ -66,8 +68,9 @@ void I2CRecieveData(uint8_t* data, int size){
 	case (uint8_t)I2CCommands::SetPositionInt :
 		if (size >= sizeof(positionSI)+1)
 		{
-			positionSI *posi = (positionSI*) &data[1];
-			odometrieSetPosition(*posi);
+			positionSI payload;
+			memcpy(&payload, payloadptr, sizeof(payload));
+			odometrieSetPosition(payload);
 			asservissementSetup();
 		}
 		break;
@@ -78,21 +81,26 @@ void I2CRecieveData(uint8_t* data, int size){
 			{
 				int16_t x, y, arriere;
 			};
-			posconv *payload = (posconv*) &data[1];
+			posconv payload;
+			memcpy(&payload, payloadptr, sizeof(payload));
 			asservissementSetup();
-			setLinearAsservissement(payload->x, payload->y, payload->arriere);
+			setLinearAsservissement(payload.x, payload.y, payload.arriere);
 		}
 		break;
 	case (uint8_t)I2CCommands::SetTargetAngle :
 		if (size >= sizeof(int16_t)+1)
 		{
-			int16_t theta = * (int16_t*) &data[1];
+			int16_t theta;
+			memcpy(&theta, payloadptr, sizeof(theta));
 			asservissementSetup();
 			setAngularAsservissement(theta);
 		}
 		break;
+	case (uint8_t)I2CCommands::Brake :
+		asservissementBrake();
+		break;
 	case (uint8_t)I2CCommands::StopAsservissement :
-		asservissmentStop();
+		asservissementStop();
 		break;
 
 	case (uint8_t)I2CCommands::SetPIDLinearPos :
@@ -105,8 +113,9 @@ void I2CRecieveData(uint8_t* data, int size){
 			{
 				float kp, ki, kd;
 			};
-			pidvalues* payload = (pidvalues*)&data[1];
-			SetPIDValues(data[0]-(uint8_t)I2CCommands::SetPIDLinearPos, payload->kp, payload->ki, payload->kd);
+			pidvalues payload;
+			memcpy(&payload, payloadptr, sizeof(payload));
+			SetPIDValues(data[0]-(uint8_t)I2CCommands::SetPIDLinearPos, payload.kp, payload.ki, payload.kd);
 		}
 	default:
 		usartprintf("Received unknown command : %d\n", data[0]);
@@ -186,8 +195,8 @@ int main(void)
 		//PRINT DEBUG
 		if(PrintTime<get_uptime_ms()){
 			PrintTime =  get_uptime_ms()+500;
-			printPosition();
-			printAllInformation();
+			//printPosition();
+			//printAllInformation();
 		}
 
 		//BLINK LED
