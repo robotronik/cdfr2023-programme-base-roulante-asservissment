@@ -159,17 +159,17 @@ void asservissementLoopTime(void){
 	switch (asservissementState)
 	{
 	case asservissementType::ANGULAIRE :
-		usartprintf("asserv angle %lf\n", consigneAngle);
+		//usartprintf("asserv angle %lf\n", consigneAngle);
 		break;
 	case asservissementType::LINEAIREAVANT :
-		usartprintf("asserv lin fwd %lf %lf\n", consigneX, consigneY);
+		//usartprintf("asserv lin fwd %lf %lf\n", consigneX, consigneY);
 		break;
 	case asservissementType::LINEAIREARRIERE :
-		usartprintf("asserv lin bwd %lf %lf\n", consigneX, consigneY);
+		//usartprintf("asserv lin bwd %lf %lf\n", consigneX, consigneY);
 		break;
 	
 	default:
-		usartprintf("asserv stop\n");
+		//usartprintf("asserv stop\n");
 		break;
 	}
 
@@ -178,6 +178,7 @@ void asservissementLoopTime(void){
 	double dx = consigneX - actualPosition.x;
 	double dy = consigneY - actualPosition.y;
 	double distanceRobotPoint = sqrt(dx*dx+dy*dy);
+	double forwarderror = dx*cos(actualPosition.theta*DEG_TO_RAD)-dy*sin(actualPosition.theta*DEG_TO_RAD);
 	double consigneAngleTheorique = calculAngle(consigneX,consigneY,actualPosition);
 	switch (asservissementState)
 	{
@@ -188,12 +189,12 @@ void asservissementLoopTime(void){
 		if (distanceRobotPoint > DISTANCEMINFINASSERVANGULAIRE) //far enough from target to justify rotating
 		{
 			consigneAngle = consigneAngleTheorique; //override angle target
-			usartprintf("lin angle trgt\n");
+			//usartprintf("lin angle trgt\n");
 		}
 		break;
 	
 	default:
-		usartprintf("angle hold\n");
+		//usartprintf("angle hold\n");
 		break;
 	}
 
@@ -202,7 +203,7 @@ void asservissementLoopTime(void){
 	
    
 	
-	usartprintf("robot delta x%lf y%lf t%lf\n", dx, dy, angleErreur);
+	//usartprintf("robot delta x%lf y%lf t%lf\n", dx, dy, angleErreur);
 
 	//*********************
 	//CALCUL ANGULAIRE
@@ -222,37 +223,34 @@ void asservissementLoopTime(void){
 	//*********************
 	//CALCUL LINEAIRE
 	//*********************
-	usartprintf("angle error is %lf\n", angleErreur);
+	//usartprintf("angle error is %lf\n", angleErreur);
 	double consigneVitesseLineaire = 0;
 	switch (asservissementState)
 	{
 	case asservissementType::ANGULAIRE : //try to maintain pos
 		{
-			double erreurPositionAngulairePoint = distanceRobotPoint*cos(angleErreur*DEG_TO_RAD);
+			double erreurPositionAngulairePoint = forwarderror;
 			PositionLineairePID.target = erreurPositionAngulairePoint;
-			usartprintf("angle position hold\n");
+			//usartprintf("angle position hold\n");
 		}
 		break;
 	case asservissementType::LINEAIREARRIERE : //move if we're looking in the right-ish direction
 	case asservissementType::LINEAIREAVANT : 
 		{
-			double erreurPositionLineairePoint = distanceRobotPoint*cos(angleErreurTheorique*DEG_TO_RAD);
-			if(asservissementState == asservissementType::LINEAIREARRIERE){
-				erreurPositionLineairePoint = -erreurPositionLineairePoint;
-			}
+			double erreurPositionLineairePoint = forwarderror;
 			if(abs(angleErreur)<10 || distanceRobotPoint < DISTANCEMINFINASSERVANGULAIRE){
 				PositionLineairePID.target = erreurPositionLineairePoint;
-				usartprintf("linear move step\n");
+				//usartprintf("linear move step\n");
 				break;
 			}
 		}
 		[[fallthrough]];
 	default: //don't move
 		PositionLineairePID.target = 0;
-		usartprintf("linear stop\n");
+		//usartprintf("linear stop\n");
 		break;
 	}
-	usartprintf("Linear error is %lf\n", PositionLineairePID.target);
+	//usartprintf("Linear error is %lf\n", PositionLineairePID.target);
 
 	consigneVitesseLineaire = PositionLineairePID.Tick(deltaTime, 0.0);
 	//asservismsent de la position Lineaire

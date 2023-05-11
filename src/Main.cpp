@@ -115,6 +115,7 @@ void I2CRecieveData(uint8_t* data, int size){
 			};
 			pidvalues payload;
 			memcpy(&payload, payloadptr, sizeof(payload));
+			usartprintf("Received PID values for %d: %f %f %f", data[0], payload.kp, payload.ki, payload.kd);
 			SetPIDValues(data[0]-(uint8_t)I2CCommands::SetPIDLinearPos, payload.kp, payload.ki, payload.kd);
 		}
 	default:
