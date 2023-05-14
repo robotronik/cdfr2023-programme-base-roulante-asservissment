@@ -16,7 +16,7 @@
 
 #define ADDRI2CBASEROULANTE 42
 
-#define BUFFERSIZE 10
+#define BUFFERSIZE 32
 
 typedef enum{DIRRECEIVE,DIRSEND}commnucationDirection_t;
 

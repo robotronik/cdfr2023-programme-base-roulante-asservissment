@@ -7,10 +7,10 @@ positionD previousPosition;
 
 uint64_t lastPIDus = 0;
 			//kP, kI, kD, maxWindup (limit I value before kI), output min, output max
-pid<double, false> VitesseLineairePID(KP_VITESSELINEAIRE, KI_VITESSELINEAIRE, KD_VITESSELINEAIRE, VITESSELINEAIREMAXAVANT/2);
-pid<double, false> PositionLineairePID(KP_POSITIONLINEAIRE, 0, KD_POSITIONLINEAIRE, 50);
-pid<double, true> VitesseAngulairePID(KP_VITESSEANGULAIRE, KI_VITESSEANGULAIRE, KD_VITESSEANGULAIRE, VITESSEANGULAIREMAX/2);
-pid<double, true> PositionAngulairePID(KP_POSITIONANGULAIRE, 0, KD_POSITIONANGULAIRE, 45);
+pid<double> PositionAngulairePID(8, 0.4, 0, 45, true);
+pid<double> VitesseAngulairePID(1, 0, 0, VITESSEANGULAIREMAX/2, true);
+pid<double> PositionLineairePID(1, 0, 0, 50);
+pid<double> VitesseLineairePID(1, 0, 0, VITESSELINEAIREMAXAVANT/2);
 
 double consigneAngle;
 double consigneX;
@@ -37,7 +37,7 @@ static double getLinearSpeed(double DeltaTime);
 
 void SetPIDValues(int index, double kP, double kI, double kD)
 {
-	pid<double, false>* selected = nullptr;
+	pid<double>* selected = nullptr;
 	switch (index)
 	{
 	case 0:
@@ -47,10 +47,10 @@ void SetPIDValues(int index, double kP, double kI, double kD)
 		selected = &VitesseLineairePID;
 		break;
 	case 2:
-		selected = (pid<double, false>*)&PositionAngulairePID;
+		selected = &PositionAngulairePID;
 		break;
 	case 3:
-		selected = (pid<double, false>*)&VitesseAngulairePID;
+		selected = &VitesseAngulairePID;
 		break;
 	default:
 		return;
@@ -61,7 +61,7 @@ void SetPIDValues(int index, double kP, double kI, double kD)
 }
 
 void asservissementSetup(void){
-	if (erreurControlMoteur)
+	if (erreurControlMoteur || !asservissementRun)
 	{
 		VitesseLineairePID.Reset();
 		PositionLineairePID.Reset();
@@ -81,7 +81,7 @@ void asservissementSetup(void){
 }
 
 void asservissementLoop(void){
-	if(lastPIDus + 20000 < get_uptime_us()){
+	if(lastPIDus + 20000 <= get_uptime_us()){
 		asservissementLoopTime();
 	}
 }

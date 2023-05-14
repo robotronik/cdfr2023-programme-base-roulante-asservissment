@@ -107,7 +107,7 @@ void I2CRecieveData(uint8_t* data, int size){
 	case (uint8_t)I2CCommands::SetPIDLinearVel :
 	case (uint8_t)I2CCommands::SetPIDAngularPos :
 	case (uint8_t)I2CCommands::SetPIDAngularVel :
-		if (size >= sizeof(float)*3+1)
+		if (size == sizeof(float)*3+1)
 		{
 			struct pidvalues
 			{
@@ -115,9 +115,15 @@ void I2CRecieveData(uint8_t* data, int size){
 			};
 			pidvalues payload;
 			memcpy(&payload, payloadptr, sizeof(payload));
-			usartprintf("Received PID values for %d: %f %f %f", data[0], payload.kp, payload.ki, payload.kd);
+			usartprintf("Received PID values for %d: %f %f %f\n", data[0], payload.kp, payload.ki, payload.kd);
 			SetPIDValues(data[0]-(uint8_t)I2CCommands::SetPIDLinearPos, payload.kp, payload.ki, payload.kd);
 		}
+		else
+		{
+			usartprintf("Payload is not the correct size to contain PID values : %d\n", size);
+		}
+		
+		break;
 	default:
 		usartprintf("Received unknown command : %d\n", data[0]);
 		break;

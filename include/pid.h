@@ -2,7 +2,7 @@
 
 #include "asservissementMath.h"
 
-template<class T, bool angular>
+template<class T>
 class pid
 {
 public:
@@ -13,8 +13,10 @@ public:
 	T lastError=0;
 	T maxWindup=1;
 
-	pid(T inkP=1, T inkI=0, T inkD=0, T inMaxWindup=1)
-		:kP(inkP), kI(inkI), kD(inkD), maxWindup(inMaxWindup)
+	bool angular=false;
+
+	pid(T inkP=1, T inkI=0, T inkD=0, T inMaxWindup=1, bool InAngular = false)
+		:kP(inkP), kI(inkI), kD(inkD), maxWindup(inMaxWindup), angular(InAngular)
 	{}
 
 	T Tick(T deltaTime, T newPosition)

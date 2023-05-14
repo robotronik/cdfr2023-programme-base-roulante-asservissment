@@ -9,6 +9,8 @@ from matplotlib.figure import Figure
 import struct
 import serial
 import math
+import time
+import datetime
 
 comport:serial.Serial = None
 rcvbuff:bytes = b""
@@ -17,7 +19,11 @@ asservState = None
 
 def ConnectCOM(port:str):
 	global comport
-	comport = serial.Serial(port, baudrate=115200, bytesize=8, stopbits=1)
+	comport = serial.Serial(port, baudrate=115200)
+	comport.close()
+	time.sleep(1)
+	comport.open()
+	time.sleep(1)
 	print(f"comport open ? :{comport.is_open}")
 	
 #0: linear pos
@@ -30,17 +36,20 @@ def SendPID(pidindex, kP, kI, kD):
 		return
 	sendstr = "!I2CS32:" + str(pidindex+40) + ","
 	paramsbin = struct.pack("<fff", kP, kI, kD)
-	bink = struct.unpack("<iii", paramsbin)
+	bink = struct.unpack("<III", paramsbin)
 	print(paramsbin, bink, hex(0))
 	for i in range(len(bink)):
 		sendstr += hex(bink[i])[2:] + ("\n" if i == len(bink)-1 else ",")
 	print(sendstr.encode("ascii"))
 	comport.write(sendstr.encode("ascii"))
+	comport.flush()
 
 def ResetPos():
 	if comport is None:
 		return
 	comport.write("!I2CSend:21,0,0,0\n".encode("ascii"))
+	comport.flush()
+	time.sleep(0.01)
 
 def RequestPos():
 	if comport is None:
@@ -48,11 +57,16 @@ def RequestPos():
 	sendstr = "!I2CRequest:6\n!I2CSend:20\n"
 	#print(sendstr.encode("ascii"))
 	comport.write(sendstr.encode("ascii"))
+	comport.flush()
 
 def StopRobot():
+	global asservState
 	if comport is None:
 		return
+	asservState = None
 	comport.write("!I2CSend:33\n".encode("ascii"))
+	comport.flush()
+	time.sleep(0.01)
 
 def SetTargetPos(tx, ty, bwd:bool):
 	global asservState
@@ -60,7 +74,8 @@ def SetTargetPos(tx, ty, bwd:bool):
 		return
 	sendstr = "!I2CSend:30,"+str(int(tx))+","+str(int(ty))+","+str(int(bwd))+"\n"
 	comport.write(sendstr.encode("ascii"))
-	asservState = (1, tx, ty, bwd)
+	asservState = (1, tx, ty, bwd, datetime.datetime.now())
+	comport.flush()
 
 def SetTargetRot(rot):
 	global asservState
@@ -68,7 +83,8 @@ def SetTargetRot(rot):
 		return
 	sendstr = "!I2CSend:31,"+str(int(rot))+"\n"
 	comport.write(sendstr.encode("ascii"))
-	asservState = (2, rot)
+	asservState = (2, rot, datetime.datetime.now())
+	comport.flush()
 
 def computeErr():
 	if asservState is None:
@@ -82,7 +98,7 @@ def computeErr():
 			return -dist
 		else:
 			return dist
-	if asservState[1] == 2:
+	if asservState[0] == 2:
 		drot = (asservState[1]-rot) %360
 		if drot > 180:
 			drot -= 360
@@ -97,13 +113,16 @@ def processReceived():
 		rcvbuff = b""
 		return
 	
-	rcvbuff += comport.read_all()
+	if comport.in_waiting > 0:
+		rcvbuff += comport.read(comport.in_waiting)
+		#print(rcvbuff.decode("ascii"))
 	commandstartidx = 0
 	for i in range(len(rcvbuff)):
-		if rcvbuff[i] == '\n':
-			commandstring = (rcvbuff[commandstartidx:i+1]).decode("ascii")
+		if rcvbuff[i] == ord('\n'):
+			commandbytes = rcvbuff[commandstartidx:i+1]
+			commandstring = (commandbytes).decode("ascii")
 			commandstring = commandstring.rstrip("\r\n\0").lstrip("!")
-			print(commandstring)
+			#print(commandstring)
 			commandstartidx = i+1
 			commandparts = commandstring.split(":")
 			if commandparts[0] == "I2C":
@@ -115,6 +134,11 @@ def processReceived():
 				posX = int(positions[0])
 				posY = int(positions[1])
 				rot = int(positions[2])
+				#print("got position")
+			elif commandparts[0] == "keepalive":
+				print("alive")
+			else:
+				print(f"unknown command {commandbytes}")
 	rcvbuff = rcvbuff[commandstartidx:]
 
 
@@ -173,7 +197,7 @@ contexttoindex = {"linpos":0, "linvel":1, "angpos":2, "angvel":3}
 def apply_pid_tunning(context: str, kp_str: str, ki_str: str, kd_str: str):
 	#try:
 		kp, ki, kd = float(kp_str), float(ki_str), float(kd_str)
-		messagebox.showinfo("Apply PID tunning", f"Application de KP={kp}, KI={ki}, KD={kd} on {context}")
+		#messagebox.showinfo("Apply PID tunning", f"Application de KP={kp}, KI={ki}, KD={kd} on {context}")
 		SendPID(contexttoindex[context], kp, ki, kd)
 	#except:
 	#	messagebox.showinfo("Apply PID tunning", f"Invalid params type for {context}")
@@ -295,7 +319,7 @@ def test_angle():
 	global line 
 	line.set_xdata([0])
 	line.set_ydata([0])
-	SetTargetRot(90)
+	SetTargetRot(-45)
 	#messagebox.showinfo("Control", f"Zig zoug")
 
 
@@ -337,7 +361,8 @@ def update_data():
 	RequestPos()
 	processReceived()
 	if asservState is not None :
-		xdata = np.append(xdata, xdata[-1] + 1)
+		xval = datetime.datetime.now() - asservState[-1]
+		xdata = np.append(xdata, xval.total_seconds())
 		error = computeErr()
 		if asservState[0] == 1:
 			#prevent the robot from turning around
