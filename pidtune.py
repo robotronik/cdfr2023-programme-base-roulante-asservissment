@@ -319,7 +319,7 @@ def test_angle():
 	global line 
 	line.set_xdata([0])
 	line.set_ydata([0])
-	SetTargetRot(-45)
+	SetTargetRot(-90)
 	#messagebox.showinfo("Control", f"Zig zoug")
 
 
@@ -328,7 +328,7 @@ def test_pos():
 	global line 
 	line.set_xdata([0])
 	line.set_ydata([0])
-	SetTargetPos(100, 0, 0)
+	SetTargetPos(500, 0, 0)
 	#messagebox.showinfo("Control", f"Zig zag")
 
 

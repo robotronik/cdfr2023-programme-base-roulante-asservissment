@@ -1,5 +1,6 @@
 #include "asservissement.h"
 #include "pid.h"
+#include "rampgen.h"
 
 asservissementType asservissementState = asservissementType::NONE;
 positionD actualPosition;
@@ -7,10 +8,12 @@ positionD previousPosition;
 
 uint64_t lastPIDus = 0;
 			//kP, kI, kD, maxWindup (limit I value before kI), output min, output max
-pid<double> PositionAngulairePID(8, 0.4, 0, 45, true);
-pid<double> VitesseAngulairePID(1, 0, 0, VITESSEANGULAIREMAX/2, true);
-pid<double> PositionLineairePID(1, 0, 0, 50);
-pid<double> VitesseLineairePID(1, 0, 0, VITESSELINEAIREMAXAVANT/2);
+pid<double, 5> PositionAngulairePID(20, 0, 0.8, 45, true);
+pid<double, 5> VitesseAngulairePID(1, 0.5, -0.03, VITESSEANGULAIREMAX*1.2, true);
+pid<double, 5> PositionLineairePID(4, 0, 0, 50);
+pid<double, 5> VitesseLineairePID(0.5, 0.1, 0, VITESSELINEAIREMAXAVANT*1.2);
+positionasserv<double> PosLin(10, 10, VITESSELINEAIREMAXAVANT, ACCELERATIONLINEAIREMAXAVANT, ACCELERATIONLINEAIREMAXAVANT*1.2);
+positionasserv<double> PosAng(1, 0.2, VITESSEANGULAIREMAX, ACCELERATIONANGULAIREMAX, ACCELERATIONANGULAIREMAX*1.2);
 
 double consigneAngle;
 double consigneX;
@@ -37,7 +40,7 @@ static double getLinearSpeed(double DeltaTime);
 
 void SetPIDValues(int index, double kP, double kI, double kD)
 {
-	pid<double>* selected = nullptr;
+	pid<double, 5>* selected = nullptr;
 	switch (index)
 	{
 	case 0:
@@ -81,7 +84,7 @@ void asservissementSetup(void){
 }
 
 void asservissementLoop(void){
-	if(lastPIDus + 20000 <= get_uptime_us()){
+	if(lastPIDus + 20 <= get_uptime_ms()){
 		asservissementLoopTime();
 	}
 }
@@ -142,15 +145,15 @@ void printAllInformation(void){
 
 
 void asservissementLoopTime(void){
-	uint64_t usNow = get_uptime_us();
-	double deltaTime = (usNow-lastPIDus)/1e6;
+	uint64_t usNow = get_uptime_ms();
+	double deltaTime = (usNow-lastPIDus)/1e3;
 	lastPIDus = usNow;
 	actualPosition = odometrieGetPosition();
 	linearSpeed = getLinearSpeed(deltaTime);
 	angularSpeed = getAngularSpeed(deltaTime);
 	previousPosition = actualPosition;
 
-	if (!asservissementRun)
+	if (!asservissementRun || erreurControlMoteur)
 	{
 		asservissementControlMoteur(0,0);
 		return;
@@ -211,26 +214,29 @@ void asservissementLoopTime(void){
 
 
 	//asservismsent de la position angulaire
-	PositionAngulairePID.target = consigneAngle;
+	/*PositionAngulairePID.target = consigneAngle;
 	double consigneVitesseAngulaire = PositionAngulairePID.Tick(deltaTime, actualPosition.theta);
 	consigneVitesseAngulaire = clamp<double>(consigneVitesseAngulaire, VitesseAngulairePID.target-ACCELERATIONANGULAIREMAX*deltaTime, 
 		VitesseAngulairePID.target+ACCELERATIONANGULAIREMAX*deltaTime);
-	VitesseAngulairePID.target = clamp<double>(consigneVitesseAngulaire, -VITESSEANGULAIREMAX, VITESSEANGULAIREMAX);
+	VitesseAngulairePID.target = clamp<double>(consigneVitesseAngulaire, -VITESSEANGULAIREMAX, VITESSEANGULAIREMAX);*/
 
+	VitesseAngulairePID.target = PosAng.Tick(deltaTime, angleErreur, angularSpeed);
+	usartprintf("Target angular speed is %lf, current %lf, error %lf\n", VitesseAngulairePID.target, angularSpeed, angleErreur);
 	motorcontrolAngle = VitesseAngulairePID.Tick(deltaTime, angularSpeed);
-
+	//motorcontrolAngle = 0;
 
 	//*********************
 	//CALCUL LINEAIRE
 	//*********************
 	//usartprintf("angle error is %lf\n", angleErreur);
-	double consigneVitesseLineaire = 0;
+	//double consigneVitesseLineaire = 0;
+	double ErreurLin = 0.0;
 	switch (asservissementState)
 	{
 	case asservissementType::ANGULAIRE : //try to maintain pos
 		{
 			double erreurPositionAngulairePoint = forwarderror;
-			PositionLineairePID.target = erreurPositionAngulairePoint;
+			ErreurLin = erreurPositionAngulairePoint;
 			//usartprintf("angle position hold\n");
 		}
 		break;
@@ -239,19 +245,19 @@ void asservissementLoopTime(void){
 		{
 			double erreurPositionLineairePoint = forwarderror;
 			if(abs(angleErreur)<10 || distanceRobotPoint < DISTANCEMINFINASSERVANGULAIRE){
-				PositionLineairePID.target = erreurPositionLineairePoint;
+				ErreurLin = erreurPositionLineairePoint;
 				//usartprintf("linear move step\n");
 				break;
 			}
 		}
 		[[fallthrough]];
 	default: //don't move
-		PositionLineairePID.target = 0;
+		ErreurLin = 0;
 		//usartprintf("linear stop\n");
 		break;
 	}
 	//usartprintf("Linear error is %lf\n", PositionLineairePID.target);
-
+	/*PositionLineairePID.target = ErreurLin;
 	consigneVitesseLineaire = PositionLineairePID.Tick(deltaTime, 0.0);
 	//asservismsent de la position Lineaire
 	consigneVitesseLineaire = clamp<double>(consigneVitesseLineaire, 
@@ -259,13 +265,15 @@ void asservissementLoopTime(void){
 		VitesseLineairePID.target+ACCELERATIONLINEAIREMAXAVANT*deltaTime);
 	VitesseLineairePID.target = clamp<double>(consigneVitesseLineaire,
 		-VITESSELINEAIREMAXARRIERE,
-		VITESSELINEAIREMAXAVANT);
+		VITESSELINEAIREMAXAVANT);*/
+	
+	VitesseLineairePID.target = PosLin.Tick(deltaTime, ErreurLin, linearSpeed);
 
 
 	//asservissemnt de la vitesse Lineaire
 
 	motorcontrolLigne = VitesseLineairePID.Tick(deltaTime, linearSpeed);
-
+	//motorcontrolLigne = 0;
 
 	//*********************
 	//Controle des moteurs
