@@ -236,7 +236,16 @@ void asservissementLoopTime(void){
 	case asservissementType::ANGULAIRE : //try to maintain pos
 		{
 			double erreurPositionAngulairePoint = forwarderror;
-			ErreurLin = erreurPositionAngulairePoint;
+
+			//test random
+			if(erreurPositionAngulairePoint < TOLERANCE*erreurPositionAngulairePoint)
+			{
+				ErreurLin=0;
+			}
+			else
+			{
+				ErreurLin = erreurPositionAngulairePoint;
+			}
 			//usartprintf("angle position hold\n");
 		}
 		break;

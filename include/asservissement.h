@@ -26,6 +26,8 @@
 #define VITESSEANGULAIREMAXSECU  (VITESSEANGULAIREMAX*1.5)
 #define VITESSELINEAIREMAXSECU  (VITESSELINEAIREMAXAVANT*1.5)
 
+#define TOLERANCE 0.05 //on met une tolerance de 5% sur asservissemtn odometrie
+
 enum class asservissementType {NONE,ANGULAIRE,LINEAIREAVANT,LINEAIREARRIERE};
 
 void SetPIDValues(int index, double kP, double kI, double kD);
