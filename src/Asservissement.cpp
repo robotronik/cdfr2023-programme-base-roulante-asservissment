@@ -56,6 +56,7 @@ void asservissementSetup(void){
     previousPosition = odometrieGetPosition();
     actualPostion = odometrieGetPosition();
     consignevittesseAngulairePrecedante = 0;
+    consignevittesseLineairePrecedante = 0;
     intergralLineaire = 0;
     intergralAngulaire = 0;
     erreurControlMoteur = false;
@@ -68,11 +69,14 @@ void asservissementSetup(void){
     asservissementRun = true;
     erreurPositionLineairePointPrecedente = 0;
     erreurvittesseAngulairePrecedente = 0;
+    erreurvittesseLineaireprecedante =0;
     angleErreurPrecedente = 0;
+    motorBrakeL(0);
+    motorBrakeR(0);
 }
 
 void asservissementLoop(void){
-    if(asservissementTime < get_uptime_ms()){
+    if(asservissementTime < get_uptime_ms() && asservissementRun == true){
         asservissementLoopTime();
         asservissementTime = get_uptime_ms() + 50;
     }
@@ -221,11 +225,17 @@ void asservissementLoopTime(void){
     else if (consignevittesseLineaire<consignevittesseLineairePrecedante-ACCELERATIONLINEAIREMAX/FREQUENCE){
         consignevittesseLineaire = consignevittesseLineairePrecedante-ACCELERATIONLINEAIREMAX/FREQUENCE;
     }
-    if(consignevittesseLineaire>VITESSELINEAIREMAX){
+    if(consignevittesseLineaire>VITESSELINEAIREMAX && asservissementType == LINEAIREAVANT){
         consignevittesseLineaire = VITESSELINEAIREMAX;
     }
-    else if (consignevittesseLineaire<-VITESSELINEAIREMAX){
+    else if (consignevittesseLineaire<-VITESSELINEAIREMAX && asservissementType == LINEAIREAVANT){
         consignevittesseLineaire = -VITESSELINEAIREMAX;
+    }
+    if(consignevittesseLineaire> VITESSELINEAIREMAXARR && asservissementType == LINEAIREARRIERE){
+        consignevittesseLineaire = VITESSELINEAIREMAXARR;
+    }
+    else if (consignevittesseLineaire<-VITESSELINEAIREMAXARR && asservissementType == LINEAIREARRIERE){
+        consignevittesseLineaire = -VITESSELINEAIREMAXARR;
     }
     consignevittesseLineairePrecedante = consignevittesseLineaire;
 

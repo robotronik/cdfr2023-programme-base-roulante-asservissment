@@ -145,11 +145,11 @@ int main(void)
 		asservissementLoop();
 
 		//PRINT DEBUG
-		if(PrintTime<get_uptime_ms()){
-			PrintTime =  get_uptime_ms()+500;
-			printPosition();
-			printAllInformation();
-		}
+		// if(PrintTime<get_uptime_ms()){
+		// 	PrintTime =  get_uptime_ms()+500;
+		// 	printPosition();
+		// 	printAllInformation();
+		// }
 
 		//BLINK LED
 		if(changePointTime < get_uptime_ms()){
@@ -161,13 +161,13 @@ int main(void)
 		// if(changePointTime2 < get_uptime_ms()){
 		// 	changePointTime2 = get_uptime_ms() + 5000000;
 		// 	setLinearAsservissement(1000,0,false);
-		// 	//setAngularAsservissement(200);
+		// 	// setAngularAsservissement(90);
 		// }
 
 		// if(changePointTime3 < get_uptime_ms()){
 		// 	changePointTime3 = get_uptime_ms() + 5000000;
-		// 	setLinearAsservissement(0,0,true);
-		// 	//setAngularAsservissement(0);
+			// setLinearAsservissement(0,0,true);
+		// 	// setAngularAsservissement(0);
 		// }
 		
 	}
