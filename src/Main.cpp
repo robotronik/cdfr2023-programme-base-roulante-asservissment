@@ -10,16 +10,13 @@
 #include "clock.h"
 #include "I2C.h"
 #include "Asservissement.h"
+#include "led.h"
+#include "sequence.h"
 
 
-static void ledSetup(void)
-{
-	rcc_periph_clock_enable(RCC_GPIOA);
-	gpio_mode_setup(port_led1, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_led1);
-	gpio_mode_setup(port_led2, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_led2);
-
-	//gpio_mode_setup(GPIOA,GPIO_MODE_OUTPUT, GPIO_PUPD_NONE,GPIO5);
-}
+#define TESTROBOT
+//#define TESTMOTOR
+uint32_t changePointTime2;
 
 
 void I2CRecieveData(uint8_t* data, int size){
@@ -71,14 +68,39 @@ void I2CRecieveData(uint8_t* data, int size){
 		uintConv error;
 		error.num = (int16_t)getLinearError();
 		I2CSetBuffer(error.tab,2);;
-	}
-	
+	}	
 }
 
+void testloop(sequence* seq){
+	seq->start();
+	seq->delay([](){
+		setLinearAsservissement(1000,0,false);
+	},7000);
+
+	seq->delay([](){
+		setLinearAsservissement(-1000,0,true);
+		led2_clear();
+	},7000);
+
+	seq->delay([](){
+		setLinearAsservissement(0,0,false);
+	},7000);
+
+	seq->delay([](){
+		setAngularAsservissement(90);
+	},7000);
+
+	seq->delay([](){
+		setAngularAsservissement(-90);
+	},7000);
+
+	seq->delay([](){
+		setAngularAsservissement(0);
+	},7000);
+}
 
 int main(void)
 {
-	
 	//SETUP
 	clock_setup();
 	ledSetup();
@@ -90,87 +112,78 @@ int main(void)
 	asservissementSetup();
 
 
-
 	//WAIT
-	for (int i = 0; i < 100000000; i++) {	/* Wait a bit. */
-		__asm__("nop");
-	}
+	delay_ms(3000);
 	usartprintf("Start\n");
+
 
 	//UNBRAKE MOTOR
 	motorBrakeR(0);
 	motorBrakeL(0);
-
 	motorSetModeR(0);
 	motorSetModeL(0);
 
-		//TEST MOTOR
-		// motorSpeedSignedL(5);
-		// motorSpeedSignedR(5);
-		// while (1);
 
-		// for (int i = 0; i < 100; i++){
-		// 	motorSpeedSignedL(i);
-		// 	motorSpeedSignedR(i);
-		// 	delay_ms(50);
-		// }
-		// for (int i = 100; i > -100; i--){
-		// 	motorSpeedSignedL(i);
-		// 	motorSpeedSignedR(i);
-		// 	delay_ms(50);
-		// }
-
-		// for (int i = -100; i < 0; i++){
-		// 	motorSpeedSignedL(i);
-		// 	motorSpeedSignedR(i);
-		// 	delay_ms(50);
-		// }
-
-
-		
-	
-	//LOOP
-	uint32_t PrintTime =  get_uptime_ms()+500;
-	uint32_t changePointTime =  get_uptime_ms()+2000;
-	uint32_t changePointTime2 =  get_uptime_ms()+2000;
-	uint32_t changePointTime3 =  get_uptime_ms()+7000;
-	
-	
-
-	
-	
-
-	while (1) {
-		odometrieLoop();
-		asservissementLoop();
-
-		//PRINT DEBUG
-		// if(PrintTime<get_uptime_ms()){
-		// 	PrintTime =  get_uptime_ms()+500;
-		// 	printPosition();
-		// 	printAllInformation();
-		// }
-
-		//BLINK LED
-		if(changePointTime < get_uptime_ms()){
-			changePointTime = get_uptime_ms() + 1000;
-			gpio_toggle(port_led1,pin_led1);
+//
+// Test motor
+// Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward 
+//	
+	#ifdef TESTMOTOR
+		for (int i = 0; i < 100; i++){
+			motorSpeedSignedL(i);
+			motorSpeedSignedR(i);
+			delay_ms(50);
+		}
+		for (int i = 100; i > -100; i--){
+			motorSpeedSignedL(i);
+			motorSpeedSignedR(i);
+			delay_ms(50);
 		}
 
-		//TEST ASSERVISSEMENT
-		// if(changePointTime2 < get_uptime_ms()){
-		// 	changePointTime2 = get_uptime_ms() + 5000000;
-		// 	setLinearAsservissement(1000,0,false);
-		// 	// setAngularAsservissement(90);
-		// }
+		for (int i = -100; i < 0; i++){
+			motorSpeedSignedL(i);
+			motorSpeedSignedR(i);
+			delay_ms(50);
+		}
+		while (1);		
+	#endif
+	
+#ifdef TESTROBOT
+//
+// Test move on the robot
+// Forwarde backwadr and rotation
+//	
+	sequence mySeq;
+	sequence ledToggleSeq;
+	changePointTime2 =  get_uptime_ms()+2000;
+	while (1){
+		odometrieLoop();
+		asservissementLoop();
+		testloop(&mySeq);
 
-		// if(changePointTime3 < get_uptime_ms()){
-		// 	changePointTime3 = get_uptime_ms() + 5000000;
-			// setLinearAsservissement(0,0,true);
-		// 	// setAngularAsservissement(0);
-		// }
-		
+
+		//BLINK LED
+		ledToggleSeq.interval([](){
+			led1_toggle();
+		},1000);
 	}
+#endif
 
+
+#ifndef TESTROBOT
+//
+//	Main Loop off the robot
+//	
+	sequence ledToggleSeq;
+	while (1) {
+		//odometrieLoop();
+		//asservissementLoop();
+
+		//BLINK LED
+		ledToggleSeq.interval([](){
+			led1_toggle();
+		},100);	
+	}
 	return 0;
+#endif
 }
