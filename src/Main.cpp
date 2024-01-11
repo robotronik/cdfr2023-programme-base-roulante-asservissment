@@ -12,12 +12,13 @@
 #include "Asservissement.h"
 #include "led.h"
 #include "sequence.h"
+#include "robot.h"
 
 
 #define TESTROBOT
 //#define TESTMOTOR
-uint32_t changePointTime2;
 
+robot* robotCDFR = new robot();
 
 void I2CRecieveData(uint8_t* data, int size){
 	if(data[0]==10){
@@ -33,14 +34,14 @@ void I2CRecieveData(uint8_t* data, int size){
 		gpio_clear(port_led2,pin_led2);
 	}
 	else if (data[0]==20){
-		position_u posi = odometrieGetPositionInt();
-		I2CSetBuffer(posi.tab,6);
+		//position_u posi = odometrieGetPositionInt();
+		//I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
-		position_u posi;
-		memcpy(posi.tab, data+1, 6);
-		odometrieSetPosition(posi);
-		asservissementSetup();
+		// position_u posi;
+		// memcpy(posi.tab, data+1, 6);
+		// robotCDFR.setPostion(posi);
+		// asservissementSetup();
 	}
 	else if( data[0]==30 && size == 7){
 		uintConv x,y,arriere;
@@ -86,21 +87,22 @@ void testloop(sequence* seq){
 		setLinearAsservissement(0,0,false);
 	},7000);
 
-	seq->delay([](){
-		setAngularAsservissement(90);
-	},7000);
+	// seq->delay([](){
+	// 	setAngularAsservissement(90);
+	// },7000);
 
-	seq->delay([](){
-		setAngularAsservissement(-90);
-	},7000);
+	// seq->delay([](){
+	// 	setAngularAsservissement(-90);
+	// },7000);
 
-	seq->delay([](){
-		setAngularAsservissement(0);
-	},7000);
+	// seq->delay([](){
+	// 	setAngularAsservissement(0);
+	// },7000);
 }
 
 int main(void)
 {
+
 	//SETUP
 	clock_setup();
 	ledSetup();
@@ -155,10 +157,11 @@ int main(void)
 //	
 	sequence mySeq;
 	sequence ledToggleSeq;
-	changePointTime2 =  get_uptime_ms()+2000;
 	while (1){
-		odometrieLoop();
-		asservissementLoop();
+		odometrieLoop(robotCDFR);
+		position_t robotPosition = robotCDFR->getPosition();
+		usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",robotPosition.x,robotPosition.y,robotPosition.teta);
+		asservissementLoop(robotCDFR);
 		testloop(&mySeq);
 
 

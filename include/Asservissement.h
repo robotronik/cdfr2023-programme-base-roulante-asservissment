@@ -4,9 +4,9 @@
 
 #include "clock.h"
 #include "uart.h"
-#include "odometrie.h"
 #include "motor.h"
 #include "AsservissementMath.h"
+#include "robot.h"
 
 #define FREQUENCE 50.0
 #define PERIODE (1/(double)FREQUENCE)
@@ -44,7 +44,7 @@
 typedef enum{NONE,ANGULAIRE,LINEAIREAVANT,LINEAIREARRIERE}asservissementType_t;
 
 void asservissementSetup(void);
-void asservissementLoop(void);
+void asservissementLoop(robot* robot);
 
 void asservissmentStop(void);
 void printAllInformation(void);

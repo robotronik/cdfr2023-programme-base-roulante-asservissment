@@ -45,7 +45,7 @@ double controleMoteurR;
 double controleMoteurL;
 
 
-void asservissementLoopTime(void);
+void asservissementLoopTime(robot* robot);
 void asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeedSecu, double linearSpeedSecu);
 static double getAngularSpeed(void);
 static double getLinearSpeed(void);
@@ -53,8 +53,8 @@ static double getLinearSpeed(void);
 
 
 void asservissementSetup(void){
-    previousPosition = odometrieGetPosition();
-    actualPostion = odometrieGetPosition();
+    previousPosition.teta = 0 ;previousPosition.x = 0; previousPosition.y = 0;
+    actualPostion.teta = 0; actualPostion.x = 0; actualPostion.y=0;
     consignevittesseAngulairePrecedante = 0;
     consignevittesseLineairePrecedante = 0;
     intergralLineaire = 0;
@@ -75,9 +75,9 @@ void asservissementSetup(void){
     motorBrakeR(0);
 }
 
-void asservissementLoop(void){
+void asservissementLoop(robot* robot){
     if(asservissementTime < get_uptime_ms() && asservissementRun == true){
-        asservissementLoopTime();
+        asservissementLoopTime(robot);
         asservissementTime = get_uptime_ms() + 50;
     }
 }
@@ -151,9 +151,9 @@ void printAllInformation(void){
 
 
 
-void asservissementLoopTime(void){
+void asservissementLoopTime(robot* robot){
 
-   actualPostion = odometrieGetPosition();
+   actualPostion = robot->getPosition();
    linearSpeed = getLinearSpeed();
    angularSpeed = getAngularSpeed();
    previousPosition = actualPostion;
@@ -327,7 +327,6 @@ static double getLinearSpeed(void){
         //erreurPositionAngulairePoint = mod_angle(angleAsserv-actualPostion.teta);  
     }
     //Gestion de la distance
-	usartprintf("\n>anglevitesse:%lf\n",anglevitesse);
     if(anglevitesse-actualPostion.teta<-90 || anglevitesse-actualPostion.teta>90){
         return -longueurDeplacement;
     }

@@ -1,20 +1,12 @@
 #include "odometrie.h"
 
 
-static double mod_angle(double a);
-
-
-
-position_t position;
 odometrieTrigger_t buffer[_BUFFERSIZE];
 int endBuffer = 0;
 int startBuffer =0;
 
 
 void odometrieSetup(void){
-    position.x = 0;
-    position.y = 0;
-    position.teta = 0;
 
     rcc_periph_clock_enable(RCC_GPIOD);
     rcc_periph_clock_enable(RCC_GPIOB);
@@ -98,8 +90,9 @@ void printBuffer(void){
 	usartprintf("\n");
 }
 
-void odometrieLoop(void){
+void odometrieLoop(robot* robot){
 	int i =0;
+	position_t position = robot->getPosition();
 	while (endBuffer != startBuffer){
 		switch (buffer[endBuffer])
 		{
@@ -132,45 +125,6 @@ void odometrieLoop(void){
 			endBuffer = 0;
 		}	
 	}
+	robot->updatePostion(position);
 }
 
-void printPosition(void){
-	usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",position.x,position.y,position.teta);
-}
-
-// odometrieGetPosition(position_t positionSet){
-// 	positionSet.teta = position.teta;
-// 	positionSet.y = position.y;
-// 	positionSet.x = position.x;
-// }
-
-position_t odometrieGetPosition(void){
-	position.teta = mod_angle(position.teta);
-	return position;
-}
-
-
-position_u odometrieGetPositionInt(void){
-	position_u positionUnion;
-	positionUnion.position.teta = (int)(mod_angle(position.teta));
-	positionUnion.position.y = (int)(position.y);
-	positionUnion.position.x = (int)(position.x);
-	return positionUnion;
-}
-
-void odometrieSetPosition(position_u positionUnion){
-	position.teta = (double)positionUnion.position.teta;
-	position.x = (double)positionUnion.position.x;
-	position.y = (double)positionUnion.position.y;
-}
-
-static double mod_angle(double a){
-	a = fmod(a,360);
-	if(a>180){
-		a -=360;
-	}
-	else if(a<-180){
-		a +=360;
-	}
-	return a;
-}

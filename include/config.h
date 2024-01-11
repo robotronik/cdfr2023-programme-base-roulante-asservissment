@@ -112,9 +112,9 @@
 //Variable
 
 typedef struct{
-	double x;
-    double y;
-	double teta;
+	double x = 0;
+    double y = 0;
+	double teta = 0;
 }position_t;
 
 typedef struct{
