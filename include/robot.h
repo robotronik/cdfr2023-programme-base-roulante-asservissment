@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "clock.h"
 #include "AsservissementMath.h"
 
 class robot
@@ -7,7 +8,9 @@ class robot
 private:
     /* data */
     position_t position = {0.0, 0.0, 0.0};
+    uint32_t captureTimepostion;
     position_t oldPosition = {0.0, 0.0, 0.0};
+    uint32_t captureTimeoldPosition;
 public:
     robot();
 
@@ -21,6 +24,9 @@ public:
     double getPosition_X();
     double getPosition_Y();
     double getPosition_Teta();
+
+    double getAngularSpeed(void);
+    double getLinearSpeed(void);
 
     ~robot();
 };

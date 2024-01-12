@@ -45,8 +45,8 @@ double controleMoteurR;
 double controleMoteurL;
 
 
-void asservissementLoopTime(robot* robot);
-void asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeedSecu, double linearSpeedSecu);
+motorSpeed_t asservissementLoopTime(robot* robot);
+motorSpeed_t asservissementControlMoteur(double controleMoteurR, double controleMoteurL, double angularSpeedSecu, double linearSpeedSecu);
 static double getAngularSpeed(void);
 static double getLinearSpeed(void);
 
@@ -75,11 +75,13 @@ void asservissementSetup(void){
     motorBrakeR(0);
 }
 
-void asservissementLoop(robot* robot){
+motorSpeed_t asservissementLoop(robot* robot){
+    static motorSpeed_t motorSpeed = {0,0};
     if(asservissementTime < get_uptime_ms() && asservissementRun == true){
-        asservissementLoopTime(robot);
+        motorSpeed = asservissementLoopTime(robot);
         asservissementTime = get_uptime_ms() + 50;
     }
+    return motorSpeed;
 }
 
 void asservissmentStop(void){
@@ -151,7 +153,7 @@ void printAllInformation(void){
 
 
 
-void asservissementLoopTime(robot* robot){
+motorSpeed_t asservissementLoopTime(robot* robot){
 
    actualPostion = robot->getPosition();
    linearSpeed = getLinearSpeed();
@@ -254,11 +256,12 @@ void asservissementLoopTime(robot* robot){
 
     controleMoteurR = -motorcontrolAngle + motorcontrolLigne;
     controleMoteurL = motorcontrolAngle + motorcontrolLigne;
-    asservissementControlMoteur(controleMoteurR,controleMoteurL,angularSpeed,linearSpeed);
+    return asservissementControlMoteur(controleMoteurR,controleMoteurL,angularSpeed,linearSpeed);
     
 }
 
-void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteurL, double angularSpeedSecu, double linearSpeedSecontrol){
+motorSpeed_t asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteurL, double angularSpeedSecu, double linearSpeedSecontrol){
+    motorSpeed_t motorSpeed;
 
     if(angularSpeedSecu>VITESSEANGULAIREMAXSECU*2.5){
         erreurControlMoteur = true;
@@ -288,13 +291,14 @@ void asservissementControlMoteur(double fcontroleMoteurR, double fcontroleMoteur
 
    if(erreurControlMoteur){
     usartprintf("ERREUR ASSERVISEMENT");
-    motorSpeedSignedL(0);
-    motorSpeedSignedR(0);
+    motorSpeed.L = 0;
+    motorSpeed.R = 0;
    }
    else{
-    motorSpeedSignedL((int)fcontroleMoteurL);
-    motorSpeedSignedR((int)fcontroleMoteurR);
+    motorSpeed.L = (int)fcontroleMoteurL;
+    motorSpeed.R = (int)fcontroleMoteurR;
    }
+   return motorSpeed;
 }
 
 

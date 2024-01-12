@@ -44,7 +44,7 @@
 typedef enum{NONE,ANGULAIRE,LINEAIREAVANT,LINEAIREARRIERE}asservissementType_t;
 
 void asservissementSetup(void);
-void asservissementLoop(robot* robot);
+motorSpeed_t asservissementLoop(robot* robot);
 
 void asservissmentStop(void);
 void printAllInformation(void);

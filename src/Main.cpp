@@ -161,7 +161,10 @@ int main(void)
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
 		usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",robotPosition.x,robotPosition.y,robotPosition.teta);
-		asservissementLoop(robotCDFR);
+		motorSpeed_t speed = asservissementLoop(robotCDFR);
+		motorSpeedSignedL(speed.L);
+		motorSpeedSignedR(speed.R);
+
 		testloop(&mySeq);
 
 
