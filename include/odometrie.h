@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "config.h"
+#include "clock.h"
 #include "uart.h"
 #include "robot.h"
 

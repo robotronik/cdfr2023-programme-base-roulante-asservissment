@@ -48,26 +48,26 @@ void I2CRecieveData(uint8_t* data, int size){
 		x.tab[0] = data[1]; x.tab[1] = data[2];
 		y.tab[0] = data[3]; y.tab[1] = data[4];
 		arriere.tab[0] = data[5]; arriere.tab[1] = data[6];
-		asservissementSetup();
-		setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
+		//asservissementSetup();
+		//setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
 	}
 	else if( data[0]==31 && size == 3){
 		uintConv teta;
 		teta.tab[0] = data[1]; teta.tab[1] = data[2];
-		asservissementSetup();
-		setAngularAsservissement((double)teta.num);
+		//asservissementSetup();
+		//setAngularAsservissement((double)teta.num);
 	}
 	else if( data[0]==32){
-		asservissmentStop();
+		//asservissmentStop();
 	}
 	else if( data[0]==33){
 		uintConv error;
-		error.num = (int16_t)getAngularError();
+		//error.num = (int16_t)getAngularError();
 		I2CSetBuffer(error.tab,2);
 	}
 	else if( data[0]==34){
 		uintConv error;
-		error.num = (int16_t)getLinearError();
+		//error.num = (int16_t)getLinearError();
 		I2CSetBuffer(error.tab,2);;
 	}	
 }
@@ -75,16 +75,16 @@ void I2CRecieveData(uint8_t* data, int size){
 void testloop(sequence* seq){
 	seq->start();
 	seq->delay([](){
-		setLinearAsservissement(1000,0,false);
+		//setLinearAsservissement(1000,0,false);
 	},7000);
 
 	seq->delay([](){
-		setLinearAsservissement(-1000,0,true);
+		//setLinearAsservissement(-1000,0,true);
 		led2_clear();
 	},7000);
 
 	seq->delay([](){
-		setLinearAsservissement(0,0,false);
+		//setLinearAsservissement(0,0,false);
 	},7000);
 
 	// seq->delay([](){
@@ -102,20 +102,24 @@ void testloop(sequence* seq){
 
 int main(void)
 {
+	clock_setup();
+	//WAIT
+	delay_ms(3000);
+	
 
 	//SETUP
-	clock_setup();
+	
 	ledSetup();
 	motorSetup();
 	usartSetup();
 	odometrieSetup();
 	i2c_setup();	
 	setCallbackReceive(I2CRecieveData);
-	asservissementSetup();
+	Asservissement robotAsservisement(robotCDFR);
 
 
 	//WAIT
-	delay_ms(3000);
+
 	usartprintf("Start\n");
 
 
@@ -161,7 +165,7 @@ int main(void)
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
 		usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",robotPosition.x,robotPosition.y,robotPosition.teta);
-		motorSpeed_t speed = asservissementLoop(robotCDFR);
+		motorSpeed_t speed = robotAsservisement.asservissementLoop(robotCDFR);
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
 

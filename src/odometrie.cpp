@@ -125,6 +125,7 @@ void odometrieLoop(robot* robot){
 			endBuffer = 0;
 		}	
 	}
+	position.time = get_uptime_ms();
 	robot->updatePostion(position);
 }
 

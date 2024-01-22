@@ -8,22 +8,21 @@ class robot
 private:
     /* data */
     position_t position = {0.0, 0.0, 0.0};
-    uint32_t captureTimepostion;
     position_t oldPosition = {0.0, 0.0, 0.0};
-    uint32_t captureTimeoldPosition;
 public:
     robot();
 
     void updatePostion(position_t inCommingposition);
-    void updatePostion(double x, double y, double teta);
+    void updatePostion(double x, double y, double teta, uint64_t time);
 
-    void setPostion(position_t inCommingposition);
-    void setPostion(double x, double y, double teta);
+    void setPosition(position_t inCommingposition);
+    void setPostion(double x, double y, double teta, uint64_t time);
 
     position_t getPosition();
     double getPosition_X();
     double getPosition_Y();
     double getPosition_Teta();
+    double getPosition_Time();
 
     double getAngularSpeed(void);
     double getLinearSpeed(void);

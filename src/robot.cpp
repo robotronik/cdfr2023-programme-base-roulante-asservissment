@@ -8,31 +8,29 @@ robot::robot(){
 
 
 void robot::updatePostion(position_t inCommingposition){
-    captureTimeoldPosition = captureTimepostion;
-    captureTimepostion = get_uptime_us();
     oldPosition = position;
     position = inCommingposition;
     position.teta = mod_angle(position.teta);
 }
-void robot::updatePostion(double x, double y, double teta){
-    captureTimeoldPosition = captureTimepostion;
-    captureTimepostion = get_uptime_us();
+void robot::updatePostion(double x, double y, double teta, uint64_t time){
     oldPosition = position;
     position.x = x;
     position.y = y;
     position.teta = mod_angle(teta);
+    position.time = time;
 }
 
-void robot::setPostion(position_t inCommingposition){
+void robot::setPosition(position_t inCommingposition){
     position = inCommingposition;
     position.teta = mod_angle(position.teta);
     oldPosition = position;
 }
-void robot::setPostion(double x, double y, double teta){
+void robot::setPostion(double x, double y, double teta, uint64_t time){
     position.x = x;
     position.y = y;
     position.teta =  mod_angle(teta);
     oldPosition = position;
+    position.time = time;
 }
 
 position_t robot::getPosition(){
@@ -47,15 +45,18 @@ double robot::getPosition_Y(){
 double robot::getPosition_Teta(){
     return position.teta;
 }
+double robot::getPosition_Time(){
+    return position.time;
+}
 
 
 double robot::getAngularSpeed(void){
-    return (mod_angle(position.teta - oldPosition.teta))/(captureTimepostion - captureTimeoldPosition);
+    return (mod_angle(position.teta - oldPosition.teta))/(position.time - oldPosition.time);
 }
 
 double robot::getLinearSpeed(void){
     double anglevitesse;
-    double longueurDeplacement = sqrt(pow(position.y - oldPosition.y,2)+pow(position.x - oldPosition.x,2))/(captureTimepostion - captureTimeoldPosition);
+    double longueurDeplacement = sqrt(pow(position.y - oldPosition.y,2)+pow(position.x - oldPosition.x,2))/(position.time - oldPosition.time);
     if((position.x - oldPosition.x) == 0){
         if((position.y - oldPosition.y)<0){
                 anglevitesse = 90;
