@@ -9,7 +9,7 @@
 #include "odometrie.h"
 #include "clock.h"
 #include "I2C.h"
-#include "Asservissement.h"
+#include "ControlePositionAsservissement.h"
 #include "led.h"
 #include "sequence.h"
 #include "robot.h"
@@ -19,6 +19,7 @@
 //#define TESTMOTOR
 
 robot* robotCDFR = new robot();
+ControlePositionAsservissement* robotAsservisement = new ControlePositionAsservissement(robotCDFR);
 
 void I2CRecieveData(uint8_t* data, int size){
 	if(data[0]==10){
@@ -75,13 +76,12 @@ void I2CRecieveData(uint8_t* data, int size){
 void testloop(sequence* seq){
 	seq->start();
 	seq->delay([](){
-		//setLinearAsservissement(1000,0,false);
-	},7000);
+		robotAsservisement->setConsigneLineaire(1000,0);
+	},1500);
 
 	seq->delay([](){
-		//setLinearAsservissement(-1000,0,true);
-		led2_clear();
-	},7000);
+		robotAsservisement->setConsigneLineaire(0,0);
+	},1500);
 
 	seq->delay([](){
 		//setLinearAsservissement(0,0,false);
@@ -102,24 +102,20 @@ void testloop(sequence* seq){
 
 int main(void)
 {
-	clock_setup();
-	//WAIT
-	delay_ms(3000);
-	
 
 	//SETUP
-	
+	clock_setup();
 	ledSetup();
 	motorSetup();
 	usartSetup();
 	odometrieSetup();
 	i2c_setup();	
 	setCallbackReceive(I2CRecieveData);
-	Asservissement robotAsservisement(robotCDFR);
+	
 
 
 	//WAIT
-
+	delay_ms(3000);
 	usartprintf("Start\n");
 
 
@@ -165,7 +161,7 @@ int main(void)
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
 		usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",robotPosition.x,robotPosition.y,robotPosition.teta);
-		motorSpeed_t speed = robotAsservisement.asservissementLoop(robotCDFR);
+		motorSpeed_t speed = robotAsservisement->ControlePositionAsservissementLoop();
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
 

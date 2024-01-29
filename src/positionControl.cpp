@@ -7,6 +7,10 @@ positionControl::positionControl(double initialValue){
     vitesse = 0.0;
 }
 
+void positionControl::initialisePosition(double initialValue){
+    position = initialValue;
+}
+
 
 void positionControl::setPostion(double setConsigne){
     consigne = setConsigne;
@@ -25,7 +29,8 @@ double positionControl::getPostion(){
     }
 
     calculVitesse();
-
+    usartprintf(">vitesse:%lf\n",vitesse);
+    usartprintf(">position:%lf\n",position);
     return position;
 }
 
@@ -71,7 +76,7 @@ void positionControl::calculVitesse(){
     }
 }
 
-bool positionControl::servoMove(){
+bool positionControl::getMove(){
     return (consigne != position);
 }
 

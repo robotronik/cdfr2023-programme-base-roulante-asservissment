@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <math.h>
+#include "uart.h"
 #include "clock.h"
 
 class positionControl{
@@ -22,9 +23,10 @@ public:
 
 public:
     positionControl(double positionDepart  = 0.0);
+    void initialisePosition(double initialValue);
     void setPostion(double setConsigne);
     double getPostion();
-    bool servoMove();
+    bool getMove();
     ~positionControl();
 private:
     void calculVitesse();

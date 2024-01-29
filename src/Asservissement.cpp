@@ -1,26 +1,12 @@
 #include "Asservissement.h"
 
-double ValeDepart;
 
 Asservissement::Asservissement(robot* bot):
     pidLineaire(1,0.0001,0),
-pidAngulaire(1,0.0001,0),
+    pidAngulaire(1,0.0001,0),
     robotAsservi(bot)
 {
-    //Réglage
-    positionControlLineaire.vitesseMaxAv =  500;
-    positionControlLineaire.accelerationMaxAv = 250; 
-    positionControlLineaire.decelerationMaxAv = 250;
-    positionControlLineaire.vitesseMaxAr = 500;
-    positionControlLineaire.accelerationMaxAr = 250; 
-    positionControlLineaire.decelerationMaxAr = 250;
 
-
-    positionControlAngulaire.setPostion(0);
-    consigne.x = 1000;
-    consigne.y = 0;
-    positionControlLineaire.setPostion(getLinearError());
-    ValeDepart = getLinearError();
 }
 
 Asservissement::~Asservissement()
@@ -28,27 +14,24 @@ Asservissement::~Asservissement()
 }
 
 
-motorSpeed_t Asservissement::asservissementLoop(robot* robot){
+motorSpeed_t Asservissement::asservissementLoop(double AttenuationErrorLineaire, double AttenuationErrorAngulaire){
 
-    consigne.teta = positionControlAngulaire.getPostion();
-    double diminutionErreurLineaire = positionControlLineaire.getPostion();
-
-    double valPidLineaire = pidLineaire.update(getLinearError()-ValeDepart+diminutionErreurLineaire,robotAsservi->getPosition_Time());
+    double valPidLineaire = pidLineaire.update(getLinearError()-AttenuationErrorLineaire,robotAsservi->getPosition_Time());
     double valPidAngulaire = pidAngulaire.update(getAngularError(),robotAsservi->getPosition_Time());
-
     
     usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularError(),getLinearError());
     usartprintf(">pidLineaire:%lf\n>pidLineaire:%lf\n",valPidLineaire,valPidAngulaire);
     usartprintf(">rotatif:%lf\n",consigne.teta);
     
-    
-    motorSpeed_t speed = {valPidLineaire+valPidAngulaire,valPidLineaire-valPidAngulaire};
+    motorSpeed_t speed = {(int)(valPidLineaire+valPidAngulaire),(int)(valPidLineaire-valPidAngulaire)};
     
     return speed;
 }
 
 
-
+void Asservissement::setConsigne(position_t positionEntrante){
+    consigne = positionEntrante;
+}
 
 
 double Asservissement::getAngularError(void){

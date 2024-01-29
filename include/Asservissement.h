@@ -13,14 +13,14 @@ private:
     /* data */
     PID pidLineaire;
     PID pidAngulaire;
-    positionControl positionControlLineaire;
-    positionControl positionControlAngulaire;
-    position_t consigne;
     robot* robotAsservi;
 public:
+    position_t consigne;
+
     Asservissement(robot* bot);
-    motorSpeed_t asservissementLoop(robot* robot);
-    void test();
+    motorSpeed_t asservissementLoop(double AttenuationErrorLineaire, double AttenuationErrorAngulaire);
+    void setConsigne(position_t positionEntrante);
+   
     double getAngularError(void);
     double getLinearError(void);
     ~Asservissement();
