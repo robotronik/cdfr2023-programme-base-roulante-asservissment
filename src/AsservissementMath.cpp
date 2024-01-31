@@ -1,4 +1,5 @@
 #include "AsservissementMath.h"
+#include "uart.h"
 
 
 
@@ -18,7 +19,6 @@ double calculAngle(double x, double y, position_t actualPostion){
         if((x - actualPostion.x)<0){
             angleTournerPoint -= 180;
         }
-        //Gestion de la marche arrière
     }
     angleTournerPoint = mod_angle(angleTournerPoint);
     return angleTournerPoint;

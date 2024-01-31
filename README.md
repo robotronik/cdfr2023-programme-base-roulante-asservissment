@@ -6,23 +6,28 @@ This program is designed for the CDFR 2023 control board. This board supports mo
 
 ## I2C (Slave mode only)
 
-| Number (8 bits) | Command | Data |
-| --- | --- | --- |
-| 10 | Turn on LED 1 | |
-| 11 | Turn off LED 1 | |
-| 12 | Turn on LED 2 | |
-| 13 | Turn off LED 2 | |
-| 20 | Get Coordinates | Send 6 bits: (uint16_t) x, (uint16_t) y, (uint16_t) theta |
-| 21 | Set Coordinates | Recieve 6 bits : (uint16_t) x, (uint16_t) y, (uint16_t) theta |
-| 30 | Set Linear controle | Recieve 6 bits : (uint16_t) x, (uint16_t) y, (uint16_t) direction |
-| 31 | Set Angular controle | Recieve 2 bits : (uint16_t) teta
-| 32 | Stop controle
-| 33 | Get Angular error | Send 2 bits: (uint16_t) error|
-| 34 | Get Linear error | Send 2 bits: (uint16_t) error|
+| Command Num | Command | Master to Slave | Slave to Master |
+| --- | --- | --- |  --- |
+| 10 | Turn on LED 1 | - | - |
+| 11 | Turn off LED 1 | - | - |
+| 12 | Turn on LED 2 | - | - |
+| 13 | Turn off LED 2 | - | - |
+| | | | |
+| 20 | Get Coordinates | -  | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) theta |
+| 21 | Set Coordinates | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) theta | - |
+| | | | |
+| 31 | stop | - | - |
+| 31 | set Consigne Lineaire | (uint16_t) x,<br> (uint16_t) y| - |
+| 32 | set Consigne Angulaire | (uint16_t) angle,<br> (uint16_t) rotation | -
+| 33 | set Consigne LookAt | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) rotation | -
+| | | | |
+| 30 | robot Is Moving | - | (uint16_t) bool |
+| 31 | robot Is Turning | - | (uint16_t) bool |
+| 32 | robot Is Running | - | (uint16_t) bool |
+| 33 | Get Angular error | - | (uint16_t) error |
+| 34 | Get Linear error | - | (uint16_t) error |
 
-Stop controle stop the robot with the brake. After a Stop controle, the servitude restar automatically when a set angular or a Linear controle are realised.
-Linear controle realise first a rotation and then, the robot go to the position
-Angular controle 
+ 
 
 ## Installation
 

@@ -29,8 +29,6 @@ double positionControl::getPostion(){
     }
 
     calculVitesse();
-    usartprintf(">vitesse:%lf\n",vitesse);
-    usartprintf(">position:%lf\n",position);
     return position;
 }
 

@@ -9,17 +9,17 @@
 #include "odometrie.h"
 #include "clock.h"
 #include "I2C.h"
-#include "ControlePositionAsservissement.h"
 #include "led.h"
 #include "sequence.h"
 #include "robot.h"
+#include "Asservissement.h"
 
 
 #define TESTROBOT
 //#define TESTMOTOR
 
 robot* robotCDFR = new robot();
-ControlePositionAsservissement* robotAsservisement = new ControlePositionAsservissement(robotCDFR);
+Asservissement* robotAsservisement = new Asservissement(robotCDFR);
 
 void I2CRecieveData(uint8_t* data, int size){
 	if(data[0]==10){
@@ -74,30 +74,32 @@ void I2CRecieveData(uint8_t* data, int size){
 }
 
 void testloop(sequence* seq){
+	
 	seq->start();
+
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
+	},7000);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(0,ROTATION_TRIGO);
+	},2000);
+
 	seq->delay([](){
 		robotAsservisement->setConsigneLineaire(1000,0);
-	},1500);
+	},10000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneLineaire(0,0);
 	},1500);
 
 	seq->delay([](){
-		//setLinearAsservissement(0,0,false);
+		robotAsservisement->setConsigneAngulaire(90,ROTATION_TRIGO);
 	},7000);
 
-	// seq->delay([](){
-	// 	setAngularAsservissement(90);
-	// },7000);
-
-	// seq->delay([](){
-	// 	setAngularAsservissement(-90);
-	// },7000);
-
-	// seq->delay([](){
-	// 	setAngularAsservissement(0);
-	// },7000);
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(0,ROTATION_HORRAIRE);
+	},7000);
 }
 
 int main(void)
@@ -158,10 +160,14 @@ int main(void)
 	sequence mySeq;
 	sequence ledToggleSeq;
 	while (1){
+		delay_ms(50);
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
-		usartprintf(">x:%lf\n>y:%lf\n>teta:%lf\n",robotPosition.x,robotPosition.y,robotPosition.teta);
-		motorSpeed_t speed = robotAsservisement->ControlePositionAsservissementLoop();
+		usartprintf(">x:%lf\n",robotPosition.x);
+		usartprintf(">y:%lf\n",robotPosition.y);
+		usartprintf(">teta:%lf\n",robotPosition.teta);
+		usartprintf(">consigney:%lf\n",robotAsservisement->consigne.y);
+		motorSpeed_t speed = robotAsservisement->asservissementLoop();
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
 
