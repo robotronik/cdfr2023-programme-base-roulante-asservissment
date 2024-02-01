@@ -65,7 +65,7 @@ void exti2_isr(void)
 void exti4_isr(void)
 {
 	exti_reset_request(EXTI4);
-    gpio_toggle(port_led2,pin_led2);
+    gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (GPIOB,GPIO5)){
 		//Vers l'avant
 		buffer[startBuffer]=fordwardL;

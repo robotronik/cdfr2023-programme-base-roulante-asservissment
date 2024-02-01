@@ -15,7 +15,7 @@
 #include "Asservissement.h"
 
 
-#define TESTROBOT
+//#define TESTROBOT
 //#define TESTMOTOR
 
 robot* robotCDFR = new robot();
@@ -220,15 +220,18 @@ int main(void)
 //	Main Loop off the robot
 //	
 	sequence ledToggleSeq;
-	while (1) {
-		//odometrieLoop();
-		//asservissementLoop();
+
+	while (1){
+		odometrieLoop(robotCDFR);
+		motorSpeed_t speed = robotAsservisement->asservissementLoop();
+		motorSpeedSignedL(speed.L);
+		motorSpeedSignedR(speed.R);
 
 		//BLINK LED
 		ledToggleSeq.interval([](){
 			led1_toggle();
-		},100);	
+		},1000);
 	}
-	return 0;
 #endif
+	return 0;
 }
