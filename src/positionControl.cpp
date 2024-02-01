@@ -2,19 +2,29 @@
 
 
 positionControl::positionControl(double initialValue){
+    this->reset(initialValue);
+}
+
+void positionControl::reset(double initialValue){
     consigne = initialValue;
     position = initialValue;
     vitesse = 0.0;
+    stopStatus = false;
 }
 
-void positionControl::initialisePosition(double initialValue){
+void positionControl::stop(void){
+    stopStatus = true;
+}
+
+void positionControl::setPosition(double initialValue){
     position = initialValue;
 }
 
 
-void positionControl::setPostion(double setConsigne){
+void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
     PreviousTime = get_uptime_ms();
+    stopStatus = false;
 }
 
 double positionControl::getPostion(){
@@ -36,6 +46,17 @@ void positionControl::calculVitesse(){
     double vitessePrecedente = vitesse;
 
     //genstion du mouvement Avant
+    if(stopStatus){
+        vitesse = 0;
+        if(accelerationMaxAv != -1 && vitesse > vitessePrecedente + accelerationMaxAv*deltaTemps){
+            vitesse = vitessePrecedente + accelerationMaxAv*deltaTemps;
+        }
+         if(accelerationMaxAr != -1 && vitesse < vitessePrecedente - accelerationMaxAr*deltaTemps){
+            vitesse = vitessePrecedente - accelerationMaxAr*deltaTemps;
+        }
+        return;
+    }
+
     if(consigne-position>0){
         if(decelerationMaxAv!=-1){
             vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2));

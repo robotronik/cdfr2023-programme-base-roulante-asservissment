@@ -16,7 +16,7 @@ public:
     void updatePostion(double x, double y, double teta, uint64_t time);
 
     void setPosition(position_t inCommingposition);
-    void setPostion(double x, double y, double teta, uint64_t time);
+    void setPosition(double x, double y, double teta, uint64_t time);
 
     position_t getPosition();
     double getPosition_X();

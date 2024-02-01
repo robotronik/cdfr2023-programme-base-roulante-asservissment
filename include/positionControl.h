@@ -21,10 +21,14 @@ public:
 
     uint32_t PreviousTime;
 
+    bool stopStatus;
+
 public:
     positionControl(double positionDepart  = 0.0);
-    void initialisePosition(double initialValue);
-    void setPostion(double setConsigne);
+    void reset(double initialValue);
+    void stop(void);
+    void setPosition(double initialValue);
+    void setConsigne(double setConsigne);
     double getPostion();
     bool getMove();
     ~positionControl();

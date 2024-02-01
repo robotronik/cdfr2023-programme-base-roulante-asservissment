@@ -25,7 +25,7 @@ void robot::setPosition(position_t inCommingposition){
     position.teta = mod_angle(position.teta);
     oldPosition = position;
 }
-void robot::setPostion(double x, double y, double teta, uint64_t time){
+void robot::setPosition(double x, double y, double teta, uint64_t time){
     position.x = x;
     position.y = y;
     position.teta =  mod_angle(teta);

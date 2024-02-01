@@ -35,41 +35,70 @@ void I2CRecieveData(uint8_t* data, int size){
 		gpio_clear(port_led2,pin_led2);
 	}
 	else if (data[0]==20){
-		//position_u posi = odometrieGetPositionInt();
-		//I2CSetBuffer(posi.tab,6);
+		position_u posi;
+		posi.position.x =  robotCDFR->getPosition_X();
+		posi.position.y =  robotCDFR->getPosition_Y();
+		posi.position.teta =  robotCDFR->getPosition_Teta();
+		I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
-		// position_u posi;
-		// memcpy(posi.tab, data+1, 6);
-		// robotCDFR.setPostion(posi);
-		// asservissementSetup();
+		position_u posi;
+		memcpy(posi.tab, data+1, 6);
+		position_t positionConv;
+		positionConv.x = posi.position.x;
+		positionConv.y = posi.position.y;
+		positionConv.teta = posi.position.teta;
+		robotCDFR->setPosition(positionConv);
+		robotAsservisement->setConsigne(positionConv);
 	}
-	else if( data[0]==30 && size == 7){
-		uintConv x,y,arriere;
+	else if( data[0]==30){
+		robotAsservisement->setConsigneStop();
+	}
+	else if( data[0]==31 && size == 5){
+		uintConv x,y;
 		x.tab[0] = data[1]; x.tab[1] = data[2];
 		y.tab[0] = data[3]; y.tab[1] = data[4];
-		arriere.tab[0] = data[5]; arriere.tab[1] = data[6];
-		//asservissementSetup();
-		//setLinearAsservissement((double)x.num,(double)y.num,(double)arriere.num);
+		robotAsservisement->setConsigneLineaire((double)x.num,(double)y.num);
 	}
-	else if( data[0]==31 && size == 3){
-		uintConv teta;
+	else if( data[0]==32 && size == 5){
+		uintConv teta,rotation;
 		teta.tab[0] = data[1]; teta.tab[1] = data[2];
-		//asservissementSetup();
-		//setAngularAsservissement((double)teta.num);
+		rotation.tab[0] = data[3]; rotation.tab[1] = data[4];
+		robotAsservisement->setConsigneAngulaire((double)teta.num,(sensRotation_t)rotation.num);
 	}
-	else if( data[0]==32){
-		//asservissmentStop();
+	else if( data[0]==33 && size == 7){
+		uintConv x,y,rotation;
+		x.tab[0] = data[1]; x.tab[1] = data[2];
+		y.tab[0] = data[3]; y.tab[1] = data[4];
+		rotation.tab[0] = data[5]; rotation.tab[1] = data[6];
+		robotAsservisement->setConsigneLookAt((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
 	}
-	else if( data[0]==33){
-		uintConv error;
-		//error.num = (int16_t)getAngularError();
-		I2CSetBuffer(error.tab,2);
+	else if( data[0]==40){
+		uintConv boolData;
+		boolData.num = robotAsservisement->robotIsMoving();
+		I2CSetBuffer(boolData.tab,2);
 	}
-	else if( data[0]==34){
-		uintConv error;
-		//error.num = (int16_t)getLinearError();
-		I2CSetBuffer(error.tab,2);;
+	else if( data[0]==41){
+		uintConv boolData;
+		boolData.num = robotAsservisement->robotIsRunning();
+		I2CSetBuffer(boolData.tab,2);
+	}	
+	else if( data[0]==42){
+		uintConv boolData;
+		boolData.num = robotAsservisement->robotIsTurning();
+		I2CSetBuffer(boolData.tab,2);
+	}	
+	else if( data[0]==43){
+		uintConv boolData;
+		//PAS LA BONNE FONCTION
+		boolData.num = robotAsservisement->getLinearError();
+		I2CSetBuffer(boolData.tab,2);
+	}	
+	else if( data[0]==44){
+		uintConv boolData;
+		//PAS LA BONNE FONCTION
+		boolData.num = robotAsservisement->getAngularError();
+		I2CSetBuffer(boolData.tab,2);
 	}	
 }
 
@@ -90,8 +119,12 @@ void testloop(sequence* seq){
 	},10000);
 
 	seq->delay([](){
-		robotAsservisement->setConsigneLineaire(0,0);
+		robotAsservisement->setConsigneStop();
 	},1500);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneLineaire(0,0);
+	},10000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneAngulaire(90,ROTATION_TRIGO);

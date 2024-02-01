@@ -60,20 +60,25 @@ void Asservissement::setConsigneAngulaire(double angle, sensRotation_t rotation)
     double errorBefor = getAngularError()-positionControlAngulaire.getPostion();
     currentState = rotation;
     consigne.teta = mod_angle(angle);
-    positionControlAngulaire.initialisePosition(getAngularError() - errorBefor);
-    positionControlAngulaire.setPostion(0);
+    positionControlAngulaire.setPosition(getAngularError() - errorBefor);
+    positionControlAngulaire.setConsigne(0);
 }
 
 void Asservissement::setConsigneLineaire(double x, double y){
     double errorBefor = getLinearError()-positionControlLineaire.getPostion();
     consigne.x = x;
     consigne.y = y;
-    positionControlLineaire.initialisePosition(getLinearError() - errorBefor);
-    positionControlLineaire.setPostion(0);
+    positionControlLineaire.setPosition(getLinearError() - errorBefor);
+    positionControlLineaire.setConsigne(0);
 }
 
 void Asservissement::setConsigneLookAt(double x, double y, sensRotation_t rotation){
     setConsigneAngulaire(calculAngle(x,y,robotAsservi->getPosition()),rotation);
+}
+
+ void Asservissement::setConsigneStop(void){
+    positionControlLineaire.stop();
+    positionControlAngulaire.stop();
 }
 
 void Asservissement::setConsigne(position_t position){

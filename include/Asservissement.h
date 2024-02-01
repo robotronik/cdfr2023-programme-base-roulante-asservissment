@@ -33,6 +33,7 @@ public:
     void setConsigneAngulaire(double angle,sensRotation_t rotation);
     void setConsigneLineaire(double x, double y);
     void setConsigneLookAt(double x, double y, sensRotation_t rotation);
+    void setConsigneStop(void);
     void setConsigne(position_t position);
    
     double getAngularError(void);
