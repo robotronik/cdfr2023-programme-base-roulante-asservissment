@@ -23,24 +23,29 @@ private:
     positionControl positionControlAngulaire;
     robot* robotAsservi;
     sensRotation_t currentState;
+    position_t consigne;
+
+    double getAngularErrorReel(void);
+    double getLinearErrorReel(void);
 
 public:
-    position_t consigne;
+    
 
     Asservissement(robot* bot);
     motorSpeed_t asservissementLoop(void);
 
     void setConsigneAngulaire(double angle,sensRotation_t rotation);
     void setConsigneLineaire(double x, double y);
-    void setConsigneLookAt(double x, double y, sensRotation_t rotation);
+    void setConsigneLookAtForward(double x, double y, sensRotation_t rotation);
+    void setConsigneLookAtBackward(double x, double y, sensRotation_t rotation);
     void setConsigneStop(void);
     void setConsigne(position_t position);
-   
+
     double getAngularError(void);
     double getLinearError(void);
 
-    bool robotIsMoving(void);
-    bool robotIsTurning(void);
-    bool robotIsRunning(void);
+    bool robotMovingIsFinish(void);
+    bool robotTurningIsFinish(void);
+    bool robotRunningIsFinish(void);
     ~Asservissement();
 };

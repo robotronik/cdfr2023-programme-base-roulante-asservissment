@@ -15,7 +15,7 @@
 #include "Asservissement.h"
 
 
-//#define TESTROBOT
+#define TESTROBOT
 //#define TESTMOTOR
 
 robot* robotCDFR = new robot();
@@ -71,21 +71,28 @@ void I2CRecieveData(uint8_t* data, int size){
 		x.tab[0] = data[1]; x.tab[1] = data[2];
 		y.tab[0] = data[3]; y.tab[1] = data[4];
 		rotation.tab[0] = data[5]; rotation.tab[1] = data[6];
-		robotAsservisement->setConsigneLookAt((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
+		robotAsservisement->setConsigneLookAtForward((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
+	}
+	else if( data[0]==34 && size == 7){
+		uintConv x,y,rotation;
+		x.tab[0] = data[1]; x.tab[1] = data[2];
+		y.tab[0] = data[3]; y.tab[1] = data[4];
+		rotation.tab[0] = data[5]; rotation.tab[1] = data[6];
+		robotAsservisement->setConsigneLookAtBackward((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
 	}
 	else if( data[0]==40){
 		uintConv boolData;
-		boolData.num = robotAsservisement->robotIsMoving();
+		boolData.num = robotAsservisement->robotMovingIsFinish();
 		I2CSetBuffer(boolData.tab,2);
 	}
 	else if( data[0]==41){
 		uintConv boolData;
-		boolData.num = robotAsservisement->robotIsRunning();
+		boolData.num = robotAsservisement->robotRunningIsFinish();
 		I2CSetBuffer(boolData.tab,2);
 	}	
 	else if( data[0]==42){
 		uintConv boolData;
-		boolData.num = robotAsservisement->robotIsTurning();
+		boolData.num = robotAsservisement->robotTurningIsFinish();
 		I2CSetBuffer(boolData.tab,2);
 	}	
 	else if( data[0]==43){
@@ -112,7 +119,19 @@ void testloop(sequence* seq){
 
 	seq->delay([](){
 		robotAsservisement->setConsigneAngulaire(0,ROTATION_TRIGO);
-	},2000);
+	},7000);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneLookAtForward(-1000,1000,ROTATION_DIRECT);
+	},7000);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneLookAtBackward(-1000,1000,ROTATION_HORRAIRE);
+	},7000);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);
+	},7000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneLineaire(1000,0);
@@ -199,7 +218,6 @@ int main(void)
 		usartprintf(">x:%lf\n",robotPosition.x);
 		usartprintf(">y:%lf\n",robotPosition.y);
 		usartprintf(">teta:%lf\n",robotPosition.teta);
-		usartprintf(">consigney:%lf\n",robotAsservisement->consigne.y);
 		motorSpeed_t speed = robotAsservisement->asservissementLoop();
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);

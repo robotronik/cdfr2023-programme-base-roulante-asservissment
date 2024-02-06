@@ -35,14 +35,14 @@ Asservissement::~Asservissement()
 motorSpeed_t Asservissement::asservissementLoop(){
     position_t actualPostion = robotAsservi->getPosition();
     double test = calculAngle(consigne.x,consigne.y,actualPostion);
-    if(getLinearError() >= 300){
+    if(getLinearErrorReel() >= 300){
         setConsigneAngulaire(test,ROTATION_DIRECT);
     }
 
-    double valPidLineaire = pidLineaire.update(getLinearError()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
-    double valPidAngulaire = pidAngulaire.update(getAngularError()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+    double valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
+    double valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
     
-    //usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularError(),getLinearError());
+    //usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularErrorReel(),getLinearErrorReel());
     //usartprintf(">pidLineaire:%lf\n>pidLineaire:%lf\n",valPidLineaire,valPidAngulaire);
     //usartprintf(">rotatif:%lf\n",consigne.teta);
     
@@ -57,26 +57,30 @@ motorSpeed_t Asservissement::asservissementLoop(){
 //******************************************************
 
 void Asservissement::setConsigneAngulaire(double angle, sensRotation_t rotation){
-    double errorBefor = getAngularError()-positionControlAngulaire.getPostion();
+    double errorBefor = getAngularErrorReel()-positionControlAngulaire.getPostion();
     currentState = rotation;
     consigne.teta = mod_angle(angle);
-    positionControlAngulaire.setPosition(getAngularError() - errorBefor);
+    positionControlAngulaire.setPosition(getAngularErrorReel() - errorBefor);
     positionControlAngulaire.setConsigne(0);
 }
 
 void Asservissement::setConsigneLineaire(double x, double y){
-    double errorBefor = getLinearError()-positionControlLineaire.getPostion();
+    double errorBefor = getLinearErrorReel()-positionControlLineaire.getPostion();
     consigne.x = x;
     consigne.y = y;
-    positionControlLineaire.setPosition(getLinearError() - errorBefor);
+    positionControlLineaire.setPosition(getLinearErrorReel() - errorBefor);
     positionControlLineaire.setConsigne(0);
 }
 
-void Asservissement::setConsigneLookAt(double x, double y, sensRotation_t rotation){
+void Asservissement::setConsigneLookAtForward(double x, double y, sensRotation_t rotation){
     setConsigneAngulaire(calculAngle(x,y,robotAsservi->getPosition()),rotation);
 }
 
- void Asservissement::setConsigneStop(void){
+void Asservissement::setConsigneLookAtBackward(double x, double y, sensRotation_t rotation){
+    setConsigneAngulaire(mod_angle(calculAngle(x,y,robotAsservi->getPosition())+180),rotation);
+}
+
+void Asservissement::setConsigneStop(void){
     positionControlLineaire.stop();
     positionControlAngulaire.stop();
 }
@@ -85,12 +89,19 @@ void Asservissement::setConsigne(position_t position){
     consigne = position;
 }
 
-
-//******************************************************
-//Recupération de l'erreur
-//******************************************************
-
 double Asservissement::getAngularError(void){
+    return positionControlLineaire.getPostion();
+}
+
+double Asservissement::getLinearError(void){
+    return positionControlAngulaire.getPostion();
+}
+
+//******************************************************
+//Recupération de l'erreur Réel
+//******************************************************
+
+double Asservissement::getAngularErrorReel(void){
     double angleErreur = mod_angle(consigne.teta-robotAsservi->getPosition_Teta());
     
     if(angleErreur>0 && currentState == ROTATION_TRIGO){
@@ -105,7 +116,7 @@ double Asservissement::getAngularError(void){
     return angleErreur;
 }
 
-double Asservissement::getLinearError(void){
+double Asservissement::getLinearErrorReel(void){
     //Première partie, connaitre l'angle formé entre le robot et le point de la consigne
     double erreurAngulaireSurPoint = calculAngle(consigne.x,consigne.y,robotAsservi->getPosition());
     
@@ -120,12 +131,12 @@ double Asservissement::getLinearError(void){
 //Robot Status
 //******************************************************
 
-bool Asservissement::robotIsMoving(void){
+bool Asservissement::robotMovingIsFinish(void){
     return positionControlAngulaire.getPostion()!=0 || positionControlLineaire.getPostion()!=0;
 }
-bool Asservissement::robotIsTurning(void){
+bool Asservissement::robotTurningIsFinish(void){
     return positionControlAngulaire.getPostion()!=0;
 }
-bool Asservissement::robotIsRunning(void){
+bool Asservissement::robotRunningIsFinish(void){
     return positionControlLineaire.getPostion()!=0;
 }

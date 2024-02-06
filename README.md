@@ -18,12 +18,13 @@ This program is designed for the CDFR 2023 control board. This board supports mo
 | | | | |
 | 30 | stop | - | - |
 | 31 | set Consigne Lineaire | (uint16_t) x,<br> (uint16_t) y| - |
-| 32 | set Consigne Angulaire | (uint16_t) angle,<br> (uint16_t) rotation | -
-| 33 | set Consigne LookAt | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) rotation | -
+| 32 | set Consigne Angulaire | (uint16_t) angle,<br> (uint16_t) ROTATION | -
+| 33 | set Consigne LookAt Forward | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) ROTATION | -
+| 34 | set Consigne LookAt Backward | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) ROTATION | -
 | | | | |
-| 40 | robot Is Moving | - | (uint16_t) bool |
-| 41 | robot Is Running | - | (uint16_t) bool |
-| 42 | robot Is Turning | - | (uint16_t) bool |
+| 40 | robot Moving Is Finish | - | (uint16_t) bool |
+| 41 | robot Running Is Finish | - | (uint16_t) bool |
+| 42 | robot Turning Is Finish | - | (uint16_t) bool |
 | 43 | Get Angular error | - | (uint16_t) error |
 | 44 | Get Linear error | - | (uint16_t) error |
 
