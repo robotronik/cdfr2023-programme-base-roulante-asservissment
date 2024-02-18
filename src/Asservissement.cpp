@@ -18,12 +18,12 @@ Asservissement::Asservissement(robot* bot):
     positionControlLineaire.decelerationMaxAr = 250;
 
     //Réglage
-    positionControlAngulaire.vitesseMaxAv = 90;
-    positionControlAngulaire.accelerationMaxAv = 90; 
-    positionControlAngulaire.decelerationMaxAv = 90;
-    positionControlAngulaire.vitesseMaxAr = 90;
-    positionControlAngulaire.accelerationMaxAr = 90; 
-    positionControlAngulaire.decelerationMaxAr = 90;
+    positionControlAngulaire.vitesseMaxAv = 180;
+    positionControlAngulaire.accelerationMaxAv = 180; 
+    positionControlAngulaire.decelerationMaxAv = 180;
+    positionControlAngulaire.vitesseMaxAr = 180;
+    positionControlAngulaire.accelerationMaxAr = 180; 
+    positionControlAngulaire.decelerationMaxAr = 180;
 
 }
 
