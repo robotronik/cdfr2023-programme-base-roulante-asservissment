@@ -6,6 +6,8 @@ This program is designed for the CDFR 2023 control board. This board supports mo
 
 ## I2C (Slave mode only)
 
+The I2C of this bord is 42 in decimal.
+
 | Command Num | Command | Master to Slave | Slave to Master |
 | --- | --- | --- |  --- |
 | 10 | Turn on LED 1 | - | - |
