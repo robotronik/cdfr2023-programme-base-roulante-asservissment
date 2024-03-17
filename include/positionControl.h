@@ -31,6 +31,7 @@ public:
     void setConsigne(double setConsigne);
     double getPostion();
     bool getMove();
+    int getBrakingDistance();
     ~positionControl();
 private:
     void calculVitesse();
