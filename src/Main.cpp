@@ -15,7 +15,7 @@
 #include "Asservissement.h"
 
 
-#define TESTROBOT
+//#define TESTROBOT
 //#define TESTMOTOR
 
 robot* robotCDFR = new robot();
@@ -94,19 +94,24 @@ void I2CRecieveData(uint8_t* data, int size){
 		uintConv boolData;
 		boolData.num = robotAsservisement->robotTurningIsFinish();
 		I2CSetBuffer(boolData.tab,2);
-	}	
+	}
 	else if( data[0]==43){
 		uintConv boolData;
 		//PAS LA BONNE FONCTION
 		boolData.num = robotAsservisement->getLinearError();
 		I2CSetBuffer(boolData.tab,2);
-	}	
+	}
 	else if( data[0]==44){
 		uintConv boolData;
 		//PAS LA BONNE FONCTION
 		boolData.num = robotAsservisement->getAngularError();
 		I2CSetBuffer(boolData.tab,2);
-	}	
+	}
+	else if( data[0]==45){
+		uintConv data;
+		data.num = robotAsservisement->getBrakingDistance();
+		I2CSetBuffer(data.tab,2);
+	}
 }
 
 void testloop(sequence* seq){
@@ -240,6 +245,7 @@ int main(void)
 	sequence ledToggleSeq;
 
 	while (1){
+		delay_ms(50);
 		odometrieLoop(robotCDFR);
 		motorSpeed_t speed = robotAsservisement->asservissementLoop();
 		motorSpeedSignedL(speed.L);

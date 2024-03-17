@@ -47,5 +47,6 @@ public:
     bool robotMovingIsFinish(void);
     bool robotTurningIsFinish(void);
     bool robotRunningIsFinish(void);
+    int getBrakingDistance(void);
     ~Asservissement();
 };

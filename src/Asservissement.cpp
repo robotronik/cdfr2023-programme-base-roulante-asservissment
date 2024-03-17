@@ -140,3 +140,6 @@ bool Asservissement::robotTurningIsFinish(void){
 bool Asservissement::robotRunningIsFinish(void){
     return positionControlLineaire.getPostion()!=0;
 }
+int Asservissement::getBrakingDistance(void){
+    return positionControlLineaire.getBrakingDistance();
+}
