@@ -56,27 +56,27 @@ void I2CRecieveData(uint8_t* data, int size){
 	}
 	else if( data[0]==31 && size == 5){
 		uintConv x,y;
-		x.tab[0] = data[1]; x.tab[1] = data[2];
-		y.tab[0] = data[3]; y.tab[1] = data[4];
+		x.tab[1] = data[1]; x.tab[0] = data[2];
+		y.tab[1] = data[3]; y.tab[0] = data[4];
 		robotAsservisement->setConsigneLineaire((double)x.num,(double)y.num);
 	}
 	else if( data[0]==32 && size == 5){
 		uintConv teta,rotation;
-		teta.tab[0] = data[1]; teta.tab[1] = data[2];
-		rotation.tab[0] = data[3]; rotation.tab[1] = data[4];
+		teta.tab[1] = data[1]; teta.tab[0] = data[2];
+		rotation.tab[1] = data[3]; rotation.tab[0] = data[4];
 		robotAsservisement->setConsigneAngulaire((double)teta.num,(sensRotation_t)rotation.num);
 	}
 	else if( data[0]==33 && size == 7){
 		uintConv x,y,rotation;
-		x.tab[0] = data[1]; x.tab[1] = data[2];
-		y.tab[0] = data[3]; y.tab[1] = data[4];
+		x.tab[1] = data[1]; x.tab[0] = data[2];
+		y.tab[1] = data[3]; y.tab[0] = data[4];
 		rotation.tab[0] = data[5]; rotation.tab[1] = data[6];
 		robotAsservisement->setConsigneLookAtForward((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
 	}
 	else if( data[0]==34 && size == 7){
 		uintConv x,y,rotation;
-		x.tab[0] = data[1]; x.tab[1] = data[2];
-		y.tab[0] = data[3]; y.tab[1] = data[4];
+		x.tab[1] = data[1]; x.tab[0] = data[2];
+		y.tab[1] = data[3]; y.tab[0] = data[4];
 		rotation.tab[0] = data[5]; rotation.tab[1] = data[6];
 		robotAsservisement->setConsigneLookAtBackward((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
 	}
