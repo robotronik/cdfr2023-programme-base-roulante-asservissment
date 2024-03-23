@@ -8,9 +8,9 @@
 
 
 typedef enum {
-    ROTATION_TRIGO,
-    ROTATION_HORRAIRE,
-    ROTATION_DIRECT
+    ROTATION_DIRECT = 0,
+    ROTATION_TRIGO = 1,
+    ROTATION_HORRAIRE = 2
 } sensRotation_t;
 
 class Asservissement
