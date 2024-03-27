@@ -97,6 +97,16 @@ double Asservissement::getLinearError(void){
     return positionControlAngulaire.getPostion();
 }
 
+void Asservissement::reset(void){
+    consigne.teta = robotAsservi->getPosition_Teta();
+    consigne.x = robotAsservi->getPosition_X();
+    consigne.y = robotAsservi->getPosition_Y();
+    positionControlLineaire.reset(0);
+    positionControlAngulaire.reset(0);
+    pidAngulaire.reset();
+    pidLineaire.reset();
+}
+
 //******************************************************
 //Recupération de l'erreur Réel
 //******************************************************

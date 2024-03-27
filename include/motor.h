@@ -45,4 +45,7 @@ void motorBrakeR(int brake);
 void motorSetModeL(int mode);
 void motorSetModeR(int mode);
 
+void disableMotor(void);
+void enableMotor(void);
+
 

@@ -33,6 +33,7 @@ public:
 
     Asservissement(robot* bot);
     motorSpeed_t asservissementLoop(void);
+    void reset(void);
 
     void setConsigneAngulaire(double angle,sensRotation_t rotation);
     void setConsigneLineaire(double x, double y);

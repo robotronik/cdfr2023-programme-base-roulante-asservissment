@@ -108,9 +108,16 @@ void I2CRecieveData(uint8_t* data, int size){
 		I2CSetBuffer(boolData.tab,2);
 	}
 	else if( data[0]==45){
-		uintConv data;
-		data.num = robotAsservisement->getBrakingDistance();
-		I2CSetBuffer(data.tab,2);
+		uintConv dataConv;
+		dataConv.num = robotAsservisement->getBrakingDistance();
+		I2CSetBuffer(dataConv.tab,2);
+	}
+	else if( data[0]==50){
+		disableMotor();
+	}
+	else if( data[0]==51){
+		robotAsservisement->reset();
+		enableMotor();
 	}
 }
 
