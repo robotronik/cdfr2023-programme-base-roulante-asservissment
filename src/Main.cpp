@@ -42,12 +42,11 @@ void I2CRecieveData(uint8_t* data, int size){
 		I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
-		position_u posi;
-		memcpy(posi.tab, data+1, 6);
 		position_t positionConv;
-		positionConv.x = posi.position.x;
-		positionConv.y = posi.position.y;
-		positionConv.teta = posi.position.teta;
+		positionConv.x = (double)((int16_t) (data[1]<<8 | data[2]));
+		positionConv.y = (double)((int16_t) (data[3]<<8 | data[4]));
+		positionConv.teta = (double)((int16_t) (data[5]<<8 | data[6]));
+		usartprintf("data : %lf %lf %lf\n",positionConv.x,positionConv.y,positionConv.teta);
 		robotCDFR->setPosition(positionConv);
 		robotAsservisement->setConsigne(positionConv);
 	}
