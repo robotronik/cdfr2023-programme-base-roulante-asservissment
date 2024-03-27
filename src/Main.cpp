@@ -18,6 +18,8 @@
 //#define TESTROBOT
 //#define TESTMOTOR
 
+bool benableMotorDebug = true;
+
 robot* robotCDFR = new robot();
 Asservissement* robotAsservisement = new Asservissement(robotCDFR);
 
@@ -113,10 +115,14 @@ void I2CRecieveData(uint8_t* data, int size){
 	}
 	else if( data[0]==50){
 		disableMotor();
+		benableMotorDebug = false;
 	}
 	else if( data[0]==51){
 		robotAsservisement->reset();
+		motorSpeedSignedL(0);
+		motorSpeedSignedR(0);
 		enableMotor();
+		benableMotorDebug = true;
 	}
 }
 
