@@ -6,33 +6,37 @@ PID::PID(double _kp, double _ki, double _kd) {
     kp = _kp;
     ki = _ki;
     kd = _kd;
-    lastError = 0.0;
-    integral = 0.0;
+    reset();
 }
 
+void PID::reset(void){
+    lastError = 0.0;
+    integral = 0.0;
+    oldtime = 0.0;
+}
 
 double PID::update(double error, uint32_t time) {
-
+    double proportional = 0;
+    double integralTerm = 0;
+    double derivative = 0;
     double deltaTime = time - oldtime;
     oldtime = time;
 
     // Calcul du terme proportionnel
-    double proportional = kp * error;
+    proportional = kp * error;
 
     // Calcul du terme intégral
     integral += error * deltaTime;
-    double integralTerm = ki * integral;
+    integralTerm = ki * integral;
 
     // Calcul du terme dérivé
-    double derivative = kd * ((error - lastError)/deltaTime);
+    if(deltaTime>0){
+        derivative = kd * ((error - lastError)/deltaTime);
+    }
 
-    // Mise à jour de la dernière erreur
     lastError = error;
 
-    // Calcul de la sortie du contrôleur PID
-    double output = proportional + integralTerm + derivative;
-
-    return output;
+    return proportional + integralTerm + derivative;
 }
 
 
