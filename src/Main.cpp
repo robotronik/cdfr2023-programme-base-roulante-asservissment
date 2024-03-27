@@ -195,6 +195,7 @@ int main(void)
 	motorBrakeL(0);
 	motorSetModeR(0);
 	motorSetModeL(0);
+	disableMotor();
 
 
 //
@@ -260,6 +261,7 @@ int main(void)
 		delay_ms(50);
 		odometrieLoop(robotCDFR);
 		motorSpeed_t speed = robotAsservisement->asservissementLoop();
+		usartprintf("x : %d\ty : %d\tteta : %d\n",(int)robotCDFR->getPosition_X(),(int)robotCDFR->getPosition_Y(),(int)robotCDFR->getPosition_Teta());
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
 

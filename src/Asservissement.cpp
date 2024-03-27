@@ -2,8 +2,8 @@
 
 
 Asservissement::Asservissement(robot* bot):
-    pidLineaire(0.5,0.0001,0),
-    pidAngulaire(1,0.0001,0),
+    pidLineaire(0.5,0.0005,0),
+    pidAngulaire(1,0.001,0),
     robotAsservi(bot)
 {
 
