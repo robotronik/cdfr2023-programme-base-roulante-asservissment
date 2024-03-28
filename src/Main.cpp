@@ -261,7 +261,7 @@ int main(void)
 		delay_ms(50);
 		odometrieLoop(robotCDFR);
 		motorSpeed_t speed = robotAsservisement->asservissementLoop();
-		usartprintf("x : %d\ty : %d\tteta : %d\n",(int)robotCDFR->getPosition_X(),(int)robotCDFR->getPosition_Y(),(int)robotCDFR->getPosition_Teta());
+		//usartprintf("x : %.3lf\ty : %.3lf\tteta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
 
