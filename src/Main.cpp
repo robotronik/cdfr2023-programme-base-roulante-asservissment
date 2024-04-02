@@ -131,44 +131,44 @@ void testloop(sequence* seq){
 	seq->start();
 
 	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
-	},7000);
-
-	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(0,ROTATION_TRIGO);
-	},7000);
-
-	seq->delay([](){
-		robotAsservisement->setConsigneLookAtForward(-1000,1000,ROTATION_DIRECT);
-	},7000);
-
-	seq->delay([](){
-		robotAsservisement->setConsigneLookAtBackward(-1000,1000,ROTATION_HORRAIRE);
-	},7000);
+		robotAsservisement->setConsigneAngulaire(90,ROTATION_DIRECT);
+	},3000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);
-	},7000);
+	},3000);
 
 	seq->delay([](){
-		robotAsservisement->setConsigneLineaire(1000,0);
-	},10000);
-
-	seq->delay([](){
-		robotAsservisement->setConsigneStop();
-	},1500);
+		robotAsservisement->setConsigneLineaire(1500,0);
+	},3000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneLineaire(0,0);
-	},10000);
-
-	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(90,ROTATION_TRIGO);
 	},7000);
 
-	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(0,ROTATION_HORRAIRE);
-	},7000);
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);
+	// },7000);
+
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneLineaire(1000,0);
+	// },10000);
+
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneStop();
+	// },1500);
+
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneLineaire(0,0);
+	// },10000);
+
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneAngulaire(90,ROTATION_TRIGO);
+	// },7000);
+
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneAngulaire(0,ROTATION_HORRAIRE);
+	// },7000);
 }
 
 int main(void)
@@ -203,21 +203,25 @@ int main(void)
 // Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward 
 //	
 	#ifdef TESTMOTOR
-		for (int i = 0; i < 100; i++){
+		enableMotor();
+		for (int i = 0; i < 10; i++){
+			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(50);
+			delay_ms(1000);
 		}
-		for (int i = 100; i > -100; i--){
+		for (int i = 10; i > -10; i--){
+			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(50);
+			delay_ms(1000);
 		}
 
-		for (int i = -100; i < 0; i++){
+		for (int i = -10; i < 0; i++){
+			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(50);
+			delay_ms(1000);
 		}
 		while (1);		
 	#endif
@@ -229,8 +233,9 @@ int main(void)
 //	
 	sequence mySeq;
 	sequence ledToggleSeq;
+	enableMotor();
 	while (1){
-		delay_ms(50);
+		//delay_ms(50);
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
 		usartprintf(">x:%lf\n",robotPosition.x);

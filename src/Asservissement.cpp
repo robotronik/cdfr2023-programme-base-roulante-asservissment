@@ -2,8 +2,8 @@
 
 
 Asservissement::Asservissement(robot* bot):
-    pidLineaire(0.5,0.0005,0),
-    pidAngulaire(1,0.001,0),
+    pidLineaire(0.5,0.0000,0),
+    pidAngulaire(0.5,0.0002,0),
     robotAsservi(bot)
 {
 
@@ -35,18 +35,27 @@ Asservissement::~Asservissement()
 motorSpeed_t Asservissement::asservissementLoop(){
     position_t actualPostion = robotAsservi->getPosition();
     double test = calculAngle(consigne.x,consigne.y,actualPostion);
-    if(getLinearErrorReel() >= 300){
+    static int iDebug =0;
+    iDebug ++;
+    if(getLinearErrorReel() >= 50){
+        usartprintf("hi : %d\n",iDebug);
         setConsigneAngulaire(test,ROTATION_DIRECT);
+    }
+    else if(getLinearErrorReel() <= -50 ){
+        usartprintf("-hi : %d\n",iDebug);
+        setConsigneAngulaire(test+180,ROTATION_DIRECT);
     }
 
     double valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
     double valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
     
-    //usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularErrorReel(),getLinearErrorReel());
-    //usartprintf(">pidLineaire:%lf\n>pidLineaire:%lf\n",valPidLineaire,valPidAngulaire);
+    usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularErrorReel(),getLinearErrorReel());
+    usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
+    usartprintf(">lineaireTheorique:%lf\n>angulaireTheorique:%lf\n",positionControlLineaire.getPostion(),positionControlAngulaire.getPostion());
     //usartprintf(">rotatif:%lf\n",consigne.teta);
     
     motorSpeed_t speed = {(int)(valPidLineaire+valPidAngulaire),(int)(valPidLineaire-valPidAngulaire)};
+    usartprintf(">speedL:%d\n>speedR:%d\n",speed.R,speed.L);
     
     return speed;
 }
