@@ -1,4 +1,4 @@
-#include "positionControl.h"
+#include "../include/positionControl.h"
 
 
 positionControl::positionControl(double initialValue){
@@ -20,6 +20,25 @@ void positionControl::setPosition(double initialValue){
     position = initialValue;
 }
 
+void positionControl::setConsigne(double setConsigne, int timems){
+    consigne = setConsigne;
+    PreviousTime = timems;
+    stopStatus = false;
+}
+double positionControl::getPostion(int timems){
+    deltaTemps = ((double)(timems-PreviousTime)/1000);
+    if((position<consigne && (position + vitesse*deltaTemps)>consigne) || (position>consigne && (position + vitesse*deltaTemps)<consigne) ){
+        position = consigne;
+        vitesse = 0;
+    }
+    else{
+        position = position + vitesse*deltaTemps;
+        PreviousTime = timems;
+    }
+
+    calculVitesse();
+    return position;
+}
 
 void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
@@ -59,7 +78,12 @@ void positionControl::calculVitesse(){
 
     if(consigne-position>0){
         if(decelerationMaxAv!=-1){
-            vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2));
+            if(decelationLineair){
+                vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2));
+            }
+            else{
+                vitesse = (consigne-position);
+            }            
         }
         else{
             vitesse = consigne-position;
@@ -71,7 +95,12 @@ void positionControl::calculVitesse(){
     //genstion du mouvement Arrière
     else if(consigne-position<0){
         if(decelerationMaxAr != -1){
-            vitesse = -sqrt(4*(consigne-position)*(-decelerationMaxAr/2));
+            if(decelationLineair){
+                vitesse = -sqrt(4*(consigne-position)*(-decelerationMaxAr/2));
+            }
+            else{
+                vitesse = (consigne-position);
+            } 
         }
         else{
             vitesse = consigne-position;
@@ -105,7 +134,7 @@ int positionControl::getBrakingDistance(){
         return (vitesse*vitesse)/(decelerationMaxAv*2);
     }
     //getBrakingDistance Arrière
-    else if(consigne-position<0){
+    else{
         return (vitesse*vitesse)/(decelerationMaxAr*2);
     }
 }

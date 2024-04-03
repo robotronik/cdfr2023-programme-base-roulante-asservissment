@@ -6,3 +6,5 @@
 .vscode/*
 
 teleplot*
+
+bin/
