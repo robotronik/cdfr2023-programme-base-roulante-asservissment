@@ -15,7 +15,7 @@
 #include "Asservissement.h"
 
 
-#define TESTROBOT
+//#define TESTROBOT
 //#define TESTMOTOR
 
 bool benableMotorDebug = true;
@@ -48,7 +48,6 @@ void I2CRecieveData(uint8_t* data, int size){
 		positionConv.x = (double)((int16_t) (data[1]<<8 | data[2]));
 		positionConv.y = (double)((int16_t) (data[3]<<8 | data[4]));
 		positionConv.teta = (double)((int16_t) (data[5]<<8 | data[6]));
-		usartprintf("data : %lf %lf %lf\n",positionConv.x,positionConv.y,positionConv.teta);
 		robotCDFR->setPosition(positionConv);
 		robotAsservisement->setConsigne(positionConv);
 	}
@@ -134,13 +133,13 @@ void testloop(sequence* seq){
 		robotAsservisement->setConsigneAngulaire(90,ROTATION_DIRECT);
 	},0);
 
-	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(-90,ROTATION_TRIGO);
-	},3000);
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneAngulaire(-90,ROTATION_TRIGO);
+	// },3000);
 
-	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
-	},3000);
+	// seq->delay([](){
+	// 	robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
+	// },3000);
 
 	seq->delay([](){
 		robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);

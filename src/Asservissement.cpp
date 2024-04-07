@@ -5,7 +5,7 @@ Asservissement::Asservissement(robot* bot):
     pidLineaire(1,0.000,100),
     pidAngulaire(1,0.0,100),
     pidLineaireBlock(2,0.002,100),
-    pidAngulaireBlock(4,0.004,400),
+    pidAngulaireBlock(3,0.004,300),
     robotAsservi(bot)
 {
 
@@ -68,13 +68,13 @@ motorSpeed_t Asservissement::asservissementLoop(){
         pidAngulaireBlock.reset();
     }
     
-    usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n",getAngularErrorReel(),getLinearErrorReel());
-    usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
-    usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
+    // usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n",getAngularErrorReel(),getLinearErrorReel());
+    // usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
+    // usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
     //usartprintf(">rotatif:%lf\n",consigne.teta);
     
     motorSpeed_t speed = {(int)(valPidLineaire+valPidAngulaire),(int)(valPidLineaire-valPidAngulaire)};
-    usartprintf(">speedL:%d\n>speedR:%d\n",speed.R,speed.L);
+    // usartprintf(">speedL:%d\n>speedR:%d\n",speed.R,speed.L);
     
     return speed;
 }
