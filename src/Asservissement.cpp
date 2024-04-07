@@ -5,7 +5,7 @@ Asservissement::Asservissement(robot* bot):
     pidLineaire(1,0.000,100),
     pidAngulaire(1,0.0,100),
     pidLineaireBlock(2,0.002,100),
-    pidAngulaireBlock(3,0.004,300),
+    pidAngulaireBlock(1,0.004,200),
     robotAsservi(bot)
 {
 
@@ -173,13 +173,13 @@ double Asservissement::getLinearErrorReel(void){
 //******************************************************
 
 bool Asservissement::robotMovingIsFinish(void){
-    return positionControlAngulaire.getPostion()!=0 || positionControlLineaire.getPostion()!=0;
+    return robotTurningIsFinish() || robotRunningIsFinish();
 }
 bool Asservissement::robotTurningIsFinish(void){
-    return positionControlAngulaire.getPostion()!=0;
+    return positionControlAngulaire.getPostion()!=0 || (getAngularErrorReel()>1 || getAngularErrorReel()<-1);
 }
 bool Asservissement::robotRunningIsFinish(void){
-    return positionControlLineaire.getPostion()!=0;
+    return positionControlLineaire.getPostion()!=0 || (getLinearError()>1 || getLinearError()<-1);
 }
 int Asservissement::getBrakingDistance(void){
     return positionControlLineaire.getBrakingDistance();
