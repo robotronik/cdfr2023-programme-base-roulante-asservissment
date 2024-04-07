@@ -16,27 +16,28 @@ void PID::reset(void){
 }
 
 double PID::update(double error, uint32_t time) {
-    double proportional = 0;
-    double integralTerm = 0;
-    double derivative = 0;
     double deltaTime = time - oldtime;
+    if(oldtime==0){
+        deltaTime = 0;
+    }
     oldtime = time;
 
     // Calcul du terme proportionnel
-    proportional = kp * error;
+    valP = kp * error;
 
     // Calcul du terme intégral
-    integral += error * deltaTime;
-    integralTerm = ki * integral;
+    integral += error * deltaTime;    
+    valI = ki * integral;
 
     // Calcul du terme dérivé
+    valD = 0;
     if(deltaTime>0){
-        derivative = kd * ((error - lastError)/deltaTime);
+        valD = kd * ((error - lastError)/deltaTime);
     }
 
     lastError = error;
 
-    return proportional + integralTerm + derivative;
+    return valP + valI + valD;
 }
 
 

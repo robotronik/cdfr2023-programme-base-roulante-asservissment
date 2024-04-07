@@ -2,29 +2,32 @@
 
 
 Asservissement::Asservissement(robot* bot):
-    pidLineaire(0.5,0.0000,0),
-    pidAngulaire(0.5,0.0002,0),
+    pidLineaire(1,0.000,100),
+    pidAngulaire(1,0.0,100),
+    pidLineaireBlock(2,0.002,100),
+    pidAngulaireBlock(4,0.004,400),
     robotAsservi(bot)
 {
 
     currentState = ROTATION_DIRECT;
 
     //Réglage
-    positionControlLineaire.vitesseMaxAv =  500;
-    positionControlLineaire.accelerationMaxAv = 250; 
-    positionControlLineaire.decelerationMaxAv = 250;
-    positionControlLineaire.vitesseMaxAr = 500;
-    positionControlLineaire.accelerationMaxAr = 250; 
-    positionControlLineaire.decelerationMaxAr = 250;
+    positionControlLineaire.vitesseMaxAv =  10000;
+    positionControlLineaire.accelerationMaxAv = 1000;//acceleration max AR
+    positionControlLineaire.decelerationMaxAv = 300; //decelaration max AR
+    positionControlLineaire.vitesseMaxAr = 10000;
+    positionControlLineaire.accelerationMaxAr = 500; //acceleration max AV
+    positionControlLineaire.decelerationMaxAr = 500; //decelaration max AV
+    positionControlLineaire.decelationLineair = true;
 
     //Réglage
-    positionControlAngulaire.vitesseMaxAv = 180;
-    positionControlAngulaire.accelerationMaxAv = 180; 
-    positionControlAngulaire.decelerationMaxAv = 180;
-    positionControlAngulaire.vitesseMaxAr = 180;
-    positionControlAngulaire.accelerationMaxAr = 180; 
-    positionControlAngulaire.decelerationMaxAr = 180;
-
+    positionControlAngulaire.vitesseMaxAv = 360;
+    positionControlAngulaire.accelerationMaxAv = 600; 
+    positionControlAngulaire.decelerationMaxAv = 600;
+    positionControlAngulaire.vitesseMaxAr = 360;
+    positionControlAngulaire.accelerationMaxAr = 600; 
+    positionControlAngulaire.decelerationMaxAr = 600;
+    positionControlAngulaire.decelationLineair = true;
 }
 
 Asservissement::~Asservissement()
@@ -35,23 +38,39 @@ Asservissement::~Asservissement()
 motorSpeed_t Asservissement::asservissementLoop(){
     position_t actualPostion = robotAsservi->getPosition();
     double test = calculAngle(consigne.x,consigne.y,actualPostion);
-    static int iDebug =0;
-    iDebug ++;
-    if(getLinearErrorReel() >= 50){
-        usartprintf("hi : %d\n",iDebug);
+    double reTargetAngle = false;
+    if(getLinearErrorReel() >= 100){
+        reTargetAngle = true;
         setConsigneAngulaire(test,ROTATION_DIRECT);
     }
-    else if(getLinearErrorReel() <= -50 ){
-        usartprintf("-hi : %d\n",iDebug);
+    else if(getLinearErrorReel() <= -100 ){
+        reTargetAngle = true;
         setConsigneAngulaire(test+180,ROTATION_DIRECT);
     }
 
-    double valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
-    double valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+    double valPidLineaire;
+    double valPidAngulaire;    
+    if(positionControlLineaire.getPostion()==0){
+        valPidLineaire = pidLineaireBlock.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
+        pidLineaire.reset();
+    }
+    else{
+        valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
+        pidLineaireBlock.reset();
+    }
+
+    if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
+        valPidAngulaire = pidAngulaireBlock.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+        pidAngulaire.reset();
+    }
+    else{
+        valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+        pidAngulaireBlock.reset();
+    }
     
-    usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n>teta:%lf\n",getAngularErrorReel(),getLinearErrorReel());
+    usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n",getAngularErrorReel(),getLinearErrorReel());
     usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
-    usartprintf(">lineaireTheorique:%lf\n>angulaireTheorique:%lf\n",positionControlLineaire.getPostion(),positionControlAngulaire.getPostion());
+    usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
     //usartprintf(">rotatif:%lf\n",consigne.teta);
     
     motorSpeed_t speed = {(int)(valPidLineaire+valPidAngulaire),(int)(valPidLineaire-valPidAngulaire)};

@@ -15,7 +15,7 @@
 #include "Asservissement.h"
 
 
-//#define TESTROBOT
+#define TESTROBOT
 //#define TESTMOTOR
 
 bool benableMotorDebug = true;
@@ -132,6 +132,14 @@ void testloop(sequence* seq){
 
 	seq->delay([](){
 		robotAsservisement->setConsigneAngulaire(90,ROTATION_DIRECT);
+	},0);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(-90,ROTATION_TRIGO);
+	},3000);
+
+	seq->delay([](){
+		robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
 	},3000);
 
 	seq->delay([](){
@@ -139,7 +147,7 @@ void testloop(sequence* seq){
 	},3000);
 
 	seq->delay([](){
-		robotAsservisement->setConsigneLineaire(1500,0);
+		robotAsservisement->setConsigneLineaire(1000,0);
 	},3000);
 
 	seq->delay([](){
@@ -233,6 +241,7 @@ int main(void)
 //	
 	sequence mySeq;
 	sequence ledToggleSeq;
+	robotAsservisement->reset();
 	enableMotor();
 	while (1){
 		//delay_ms(50);
@@ -261,6 +270,7 @@ int main(void)
 //	Main Loop off the robot
 //	
 	sequence ledToggleSeq;
+	robotAsservisement->reset();
 
 	while (1){
 		delay_ms(50);

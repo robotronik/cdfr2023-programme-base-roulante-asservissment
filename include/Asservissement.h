@@ -19,6 +19,8 @@ private:
     /* data */
     PID pidLineaire;
     PID pidAngulaire;
+    PID pidLineaireBlock;
+    PID pidAngulaireBlock;
     positionControl positionControlLineaire;
     positionControl positionControlAngulaire;
     robot* robotAsservi;
