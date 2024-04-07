@@ -126,12 +126,15 @@ double Asservissement::getLinearError(void){
 }
 
 void Asservissement::reset(void){
+    currentState = ROTATION_DIRECT;
     consigne.teta = robotAsservi->getPosition_Teta();
     consigne.x = robotAsservi->getPosition_X();
     consigne.y = robotAsservi->getPosition_Y();
     positionControlLineaire.reset(0);
     positionControlAngulaire.reset(0);
     pidAngulaire.reset();
+    pidAngulaireBlock.reset();
+    pidLineaireBlock.reset();
     pidLineaire.reset();
 }
 
