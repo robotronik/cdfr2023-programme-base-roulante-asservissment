@@ -129,13 +129,11 @@ bool positionControl::getMove(){
 }
 
 int positionControl::getBrakingDistance(){
-    //getBrakingDistance Arrière
-     if(consigne-position>0){
+    if(consigne-position>0){
         return (vitesse*vitesse)/(decelerationMaxAv*2);
     }
-    //getBrakingDistance Arrière
     else{
-        return (vitesse*vitesse)/(decelerationMaxAr*2);
+        return -(vitesse*vitesse)/(decelerationMaxAr*2);
     }
 }
 

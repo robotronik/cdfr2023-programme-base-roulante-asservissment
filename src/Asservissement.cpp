@@ -182,5 +182,5 @@ bool Asservissement::robotRunningIsFinish(void){
     return positionControlLineaire.getPostion()!=0 || (getLinearError()>1 || getLinearError()<-1);
 }
 int Asservissement::getBrakingDistance(void){
-    return positionControlLineaire.getBrakingDistance();
+    return -positionControlLineaire.getBrakingDistance();
 }
