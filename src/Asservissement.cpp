@@ -4,8 +4,8 @@
 Asservissement::Asservissement(robot* bot):
     pidLineaire(1,0.000,100),
     pidAngulaire(1,0.0,100),
-    pidLineaireBlock(2,0.002,100),
-    pidAngulaireBlock(1,0.004,200),
+    pidLineaireBlock(1,0.002,100),
+    pidAngulaireBlock(1,0.004,100),
     robotAsservi(bot)
 {
 

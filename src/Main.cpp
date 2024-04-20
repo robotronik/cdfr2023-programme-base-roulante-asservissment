@@ -142,7 +142,7 @@ void testloop(sequence* seq){
 	// },3000);
 
 	seq->delay([](){
-		robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);
+	robotAsservisement->setConsigneAngulaire(0,ROTATION_DIRECT);
 	},3000);
 
 	seq->delay([](){
@@ -211,24 +211,30 @@ int main(void)
 //	
 	#ifdef TESTMOTOR
 		enableMotor();
-		for (int i = 0; i < 10; i++){
+		for (int i = 0; i < 100; i++){
 			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(1000);
+			delay_ms(100);
+			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
 		}
-		for (int i = 10; i > -10; i--){
+		for (int i = 100; i > -100; i--){
 			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(1000);
+			delay_ms(100);
+			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
 		}
 
-		for (int i = -10; i < 0; i++){
+		for (int i = -100; i < 0; i++){
 			usartprintf("%d\n",i);
 			motorSpeedSignedL(i);
 			motorSpeedSignedR(i);
-			delay_ms(1000);
+			delay_ms(100);
+			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
 		}
 		while (1);		
 	#endif
