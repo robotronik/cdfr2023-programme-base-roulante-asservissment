@@ -3,9 +3,9 @@
 
 Asservissement::Asservissement(robot* bot):
     pidLineaire(1,0.000,100),
-    pidAngulaire(1,0.0,100),
-    pidLineaireBlock(1,0.002,100),
-    pidAngulaireBlock(1,0.004,100),
+    pidAngulaire(2,0.0,200),
+    pidLineaireBlock(1,0.001,100),
+    pidAngulaireBlock(2,0.001,200),
     robotAsservi(bot)
 {
 
@@ -13,7 +13,7 @@ Asservissement::Asservissement(robot* bot):
 
     //Réglage
     positionControlLineaire.vitesseMaxAv =  10000;
-    positionControlLineaire.accelerationMaxAv = 1000;//acceleration max AR
+    positionControlLineaire.accelerationMaxAv = 300;//acceleration max AR
     positionControlLineaire.decelerationMaxAv = 300; //decelaration max AR
     positionControlLineaire.vitesseMaxAr = 10000;
     positionControlLineaire.accelerationMaxAr = 500; //acceleration max AV
@@ -38,7 +38,7 @@ Asservissement::~Asservissement()
 motorSpeed_t Asservissement::asservissementLoop(){
     position_t actualPostion = robotAsservi->getPosition();
     double test = calculAngle(consigne.x,consigne.y,actualPostion);
-    double reTargetAngle = false;
+    bool reTargetAngle = false;
     if(getLinearErrorReel() >= 100){
         reTargetAngle = true;
         setConsigneAngulaire(test,ROTATION_DIRECT);

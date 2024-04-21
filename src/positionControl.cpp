@@ -42,7 +42,7 @@ double positionControl::getPostion(int timems){
 
 void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
-    PreviousTime = get_uptime_ms();
+    //PreviousTime = get_uptime_ms();
     stopStatus = false;
 }
 
