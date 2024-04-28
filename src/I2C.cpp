@@ -34,7 +34,7 @@ void i2c_setup(void){
 
 	i2c_enable_interrupt(I2C1, I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN);
 
-	//I2C1_CR1 |= I2C_CR1_NOSTRETCH;
+	///I2C1_CR1 |= I2C_CR1_NOSTRETCH;
 
 	//addressing mode	
     i2c_set_own_7bit_slave_address(I2C1,ADDRI2CBASEROULANTE);
@@ -83,11 +83,19 @@ void i2c1_ev_isr(void){
 	if(sr1 & I2C_SR1_ADDR){
 		reading = 0;
 		sending = 0;
+
+		//TOFIX here a small delay to fix hadware problem on the raspberry pi
+		// https://www.advamation.com/knowhow/raspberrypi/rpi-i2c-bug.html
+		for(int i = 0; i <500; i++){
+			asm("nop");
+		}
+		// end TOFIX
+
 		if(I2C1_SR2 & I2C_SR2_TRA){
 			communicationType = DIRSEND;
 			if(callbackinitialiseTrans){
 				callbacki2cTrans();
-			}			
+			}		
 		}
 		else{
 			communicationType = DIRRECEIVE;
@@ -113,16 +121,14 @@ void i2c1_ev_isr(void){
 	}
 	else if(sr1 & I2C_SR1_STOPF){
 		i2c_peripheral_enable(I2C1);
+		i2c_enable_ack(I2C1);
 		if(callbackinitialiseRec && communicationType == DIRRECEIVE){
 			callbacki2cRec(bufrec,reading);
-
-			//TOFIX here a small delay to fix a problem on the raspberry pi
-			// Can be remove went the problem will be solve
-			for(int i = 0; i <15000; i++){
-				asm("nop");
-			}
-			//
+			sending = 0;
 		}
+	}
+	else{
+		usartprintf("error i2c\n");
 	}
 }
 
