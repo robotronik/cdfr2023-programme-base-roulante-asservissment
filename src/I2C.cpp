@@ -115,6 +115,13 @@ void i2c1_ev_isr(void){
 		i2c_peripheral_enable(I2C1);
 		if(callbackinitialiseRec && communicationType == DIRRECEIVE){
 			callbacki2cRec(bufrec,reading);
+
+			//TOFIX here a small delay to fix a problem on the raspberry pi
+			// Can be remove went the problem will be solve
+			for(int i = 0; i <15000; i++){
+				asm("nop");
+			}
+			//
 		}
 	}
 }
