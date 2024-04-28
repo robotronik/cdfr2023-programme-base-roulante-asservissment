@@ -32,6 +32,10 @@ The I2C of this bord is 42 in decimal.
 | 45 | Get Braking Distance | - | (uint16_t) distance |
 | 50 | Disable motor | - | - |
 | 51 | Enable motor | - | - |
+| 60 | set max speed forward | (uint16_t) speed | - | 
+| 61 | set max speed backward | (uint16_t) speed | - | 
+| 62 | set max speed trigo | (uint16_t) speed | - |
+| 63 | set max speed horloge | (uint16_t) speed | - |
 
  
 

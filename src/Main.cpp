@@ -123,6 +123,30 @@ void I2CRecieveData(uint8_t* data, int size){
 		enableMotor();
 		benableMotorDebug = true;
 	}
+	else if( data[0]==60){
+		uintConv x;
+		x.tab[1] = data[1]; 
+		x.tab[0] = data[2];
+		robotAsservisement->positionControlLineaire.vitesseMaxAv = x.num;
+	}
+	else if( data[0]==61){
+		uintConv x;
+		x.tab[1] = data[1]; 
+		x.tab[0] = data[2];
+		robotAsservisement->positionControlLineaire.vitesseMaxAr = x.num;
+	}
+	else if( data[0]==62){
+		uintConv x;
+		x.tab[1] = data[1]; 
+		x.tab[0] = data[2];
+		robotAsservisement->positionControlAngulaire.vitesseMaxAv = x.num;
+	}
+	else if( data[0]==63){
+		uintConv x;
+		x.tab[1] = data[1]; 
+		x.tab[0] = data[2];
+		robotAsservisement->positionControlAngulaire.vitesseMaxAr = x.num;
+	}
 }
 
 void testloop(sequence* seq){

@@ -21,14 +21,16 @@ private:
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
-    positionControl positionControlLineaire;
-    positionControl positionControlAngulaire;
     robot* robotAsservi;
     sensRotation_t currentState;
     position_t consigne;
 
     double getAngularErrorReel(void);
     double getLinearErrorReel(void);
+
+public :
+    positionControl positionControlLineaire;
+    positionControl positionControlAngulaire;
 
 public:
     
