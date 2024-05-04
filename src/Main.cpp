@@ -300,15 +300,19 @@ int main(void)
 //	
 	sequence ledToggleSeq;
 	robotAsservisement->reset();
+	uint32_t nextTime =  get_uptime_ms();
 
 	while (1){
-		delay_ms(50);
+		
 		odometrieLoop(robotCDFR);
-		motorSpeed_t speed = robotAsservisement->asservissementLoop();
-		//usartprintf(">x : %.3lf\n>y : %.3lf\n>teta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
-		motorSpeedSignedL(speed.L);
-		motorSpeedSignedR(speed.R);
-
+		if(nextTime < get_uptime_ms()){
+			nextTime = get_uptime_ms() + 50;
+			motorSpeed_t speed = robotAsservisement->asservissementLoop();
+			//usartprintf(">x : %.3lf\n>y : %.3lf\n>teta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
+			motorSpeedSignedL(speed.L);
+			motorSpeedSignedR(speed.R);
+		}
+		
 		//BLINK LED
 		ledToggleSeq.interval([](){
 			led1_toggle();
