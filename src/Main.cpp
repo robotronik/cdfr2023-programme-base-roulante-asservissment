@@ -19,6 +19,8 @@
 //#define TESTMOTOR
 
 bool benableMotorDebug = true;
+position_t newPostion;
+bool needChangePos = false;
 
 robot* robotCDFR = new robot();
 Asservissement* robotAsservisement = new Asservissement(robotCDFR);
@@ -44,12 +46,10 @@ void I2CRecieveData(uint8_t* data, int size){
 		I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
-		position_t positionConv;
-		positionConv.x = (double)((int16_t) (data[1]<<8 | data[2]));
-		positionConv.y = (double)((int16_t) (data[3]<<8 | data[4]));
-		positionConv.teta = (double)((int16_t) (data[5]<<8 | data[6]));
-		robotCDFR->setPosition(positionConv);
-		robotAsservisement->setConsigne(positionConv);
+		newPostion.x = (double)((int16_t) (data[1]<<8 | data[2]));
+		newPostion.y = (double)((int16_t) (data[3]<<8 | data[4]));
+		newPostion.teta = (double)((int16_t) (data[5]<<8 | data[6]));
+		needChangePos = true;
 	}
 	else if( data[0]==30){
 		robotAsservisement->setConsigneStop();
@@ -305,6 +305,11 @@ int main(void)
 	while (1){
 		
 		odometrieLoop(robotCDFR);
+		if(needChangePos){
+			needChangePos = false;
+			robotCDFR->setPosition(newPostion);
+			robotAsservisement->setConsigne(newPostion);
+		}
 		if(nextTime < get_uptime_ms()){
 			nextTime = get_uptime_ms() + 50;
 			motorSpeed_t speed = robotAsservisement->asservissementLoop();
@@ -312,7 +317,7 @@ int main(void)
 			motorSpeedSignedL(speed.L);
 			motorSpeedSignedR(speed.R);
 		}
-		
+
 		//BLINK LED
 		ledToggleSeq.interval([](){
 			led1_toggle();
