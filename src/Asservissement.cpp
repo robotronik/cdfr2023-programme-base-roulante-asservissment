@@ -22,11 +22,11 @@ Asservissement::Asservissement(robot* bot):
 
     //Réglage
     positionControlAngulaire.vitesseMaxAv = 360;
-    positionControlAngulaire.accelerationMaxAv = 600; 
-    positionControlAngulaire.decelerationMaxAv = 600;
+    positionControlAngulaire.accelerationMaxAv = 300; 
+    positionControlAngulaire.decelerationMaxAv = 300;
     positionControlAngulaire.vitesseMaxAr = 360;
-    positionControlAngulaire.accelerationMaxAr = 600; 
-    positionControlAngulaire.decelerationMaxAr = 600;
+    positionControlAngulaire.accelerationMaxAr = 300; 
+    positionControlAngulaire.decelerationMaxAr = 300;
     positionControlAngulaire.decelationLineair = true;
 }
 
