@@ -118,11 +118,11 @@ void Asservissement::setConsigne(position_t position){
 }
 
 double Asservissement::getAngularError(void){
-    return positionControlLineaire.getPostion();
+    return positionControlAngulaire.getPostion();
 }
 
 double Asservissement::getLinearError(void){
-    return positionControlAngulaire.getPostion();
+    return positionControlLineaire.getPostion();
 }
 
 void Asservissement::reset(void){
