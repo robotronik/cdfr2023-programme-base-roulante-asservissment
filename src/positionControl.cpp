@@ -54,8 +54,8 @@ double positionControl::getPostion(){
     }
     else{
         position = position + vitesse*deltaTemps;
-        PreviousTime = get_uptime_ms();
     }
+    PreviousTime = get_uptime_ms();
 
     calculVitesse();
     return position;
@@ -135,6 +135,10 @@ int positionControl::getBrakingDistance(){
     else{
         return -(vitesse*vitesse)/(decelerationMaxAr);
     }
+}
+
+bool positionControl::getStatus(void){
+    return stopStatus;
 }
 
 positionControl::~positionControl(){

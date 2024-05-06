@@ -27,8 +27,8 @@ The I2C of this bord is 42 in decimal.
 | 40 | robot Moving Is Finish | - | (uint16_t) bool |
 | 41 | robot Running Is Finish | - | (uint16_t) bool |
 | 42 | robot Turning Is Finish | - | (uint16_t) bool |
-| 43 | Get Angular error | - | (uint16_t) error |
-| 44 | Get Linear error | - | (uint16_t) error |
+| 43 | Get Linear error | - | (uint16_t) error |
+| 44 | Get Angular error | - | (uint16_t) error |
 | 45 | Get Braking Distance | - | (uint16_t) distance |
 | 50 | Disable motor | - | - |
 | 51 | Enable motor | - | - |

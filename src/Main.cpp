@@ -58,13 +58,13 @@ void I2CRecieveData(uint8_t* data, int size){
 		uintConv x,y;
 		x.tab[1] = data[1]; x.tab[0] = data[2];
 		y.tab[1] = data[3]; y.tab[0] = data[4];
-		robotAsservisement->setConsigneLineaire((double)x.num,(double)y.num);
+		robotAsservisement->setProtectedConsigneLineaire((double)x.num,(double)y.num);
 	}
 	else if( data[0]==32 && size == 5){
 		uintConv teta,rotation;
 		teta.tab[1] = data[1]; teta.tab[0] = data[2];
 		rotation.tab[1] = data[3]; rotation.tab[0] = data[4];
-		robotAsservisement->setConsigneAngulaire((double)teta.num,(sensRotation_t)rotation.num);
+		robotAsservisement->setProtectedConsigneAngulaire((double)teta.num,(sensRotation_t)rotation.num);
 	}
 	else if( data[0]==33 && size == 7){
 		uintConv x,y,rotation;

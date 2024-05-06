@@ -50,6 +50,7 @@ public:
     double getPostion(int timems);
     bool getMove();
     int getBrakingDistance();
+    bool getStatus(void);
     ~positionControl();
 private:
     void calculVitesse();

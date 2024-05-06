@@ -43,6 +43,8 @@ public:
     void setConsigneLineaire(double x, double y);
     void setConsigneLookAtForward(double x, double y, sensRotation_t rotation);
     void setConsigneLookAtBackward(double x, double y, sensRotation_t rotation);
+    void setProtectedConsigneAngulaire(double angle, sensRotation_t rotation);
+    void setProtectedConsigneLineaire(double x, double y);
     void setConsigneStop(void);
     void setConsigne(position_t position);
 

@@ -43,7 +43,7 @@ motorSpeed_t Asservissement::asservissementLoop(){
         reTargetAngle = true;
         setConsigneAngulaire(test,ROTATION_DIRECT);
     }
-    else if(getLinearErrorReel() <= -100 ){
+    else if(getLinearErrorReel() <= -100){
         reTargetAngle = true;
         setConsigneAngulaire(test+180,ROTATION_DIRECT);
     }
@@ -84,12 +84,31 @@ motorSpeed_t Asservissement::asservissementLoop(){
 //Set consigne
 //******************************************************
 
+void Asservissement::setProtectedConsigneAngulaire(double angle, sensRotation_t rotation){
+    if(positionControlLineaire.getPostion()!=0){
+        consigne.x = robotAsservi->getPosition_X();
+        consigne.y = robotAsservi->getPosition_Y();
+        positionControlLineaire.setPosition(0);
+        positionControlLineaire.setConsigne(0);
+    }
+    setConsigneAngulaire(angle,rotation);
+}
+
 void Asservissement::setConsigneAngulaire(double angle, sensRotation_t rotation){
     double errorBefor = getAngularErrorReel()-positionControlAngulaire.getPostion();
     currentState = rotation;
     consigne.teta = mod_angle(angle);
     positionControlAngulaire.setPosition(getAngularErrorReel() - errorBefor);
     positionControlAngulaire.setConsigne(0);
+}
+
+void Asservissement::setProtectedConsigneLineaire(double x, double y){
+    if(positionControlAngulaire.getPostion()!=0){
+        consigne.teta = mod_angle(robotAsservi->getPosition_Teta());
+        positionControlAngulaire.setPosition(0);
+        positionControlAngulaire.setConsigne(0);
+    }
+    setConsigneLineaire(x,y);
 }
 
 void Asservissement::setConsigneLineaire(double x, double y){
@@ -101,11 +120,11 @@ void Asservissement::setConsigneLineaire(double x, double y){
 }
 
 void Asservissement::setConsigneLookAtForward(double x, double y, sensRotation_t rotation){
-    setConsigneAngulaire(calculAngle(x,y,robotAsservi->getPosition()),rotation);
+    setProtectedConsigneAngulaire(calculAngle(x,y,robotAsservi->getPosition()),rotation);
 }
 
 void Asservissement::setConsigneLookAtBackward(double x, double y, sensRotation_t rotation){
-    setConsigneAngulaire(mod_angle(calculAngle(x,y,robotAsservi->getPosition())+180),rotation);
+    setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,robotAsservi->getPosition())+180),rotation);
 }
 
 void Asservissement::setConsigneStop(void){
