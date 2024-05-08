@@ -123,6 +123,14 @@ void I2CRecieveData(uint8_t* data, int size){
 		enableMotor();
 		benableMotorDebug = true;
 	}
+	else if( data[0]==52){
+		motorBrakeL(true);
+		motorBrakeR(true);
+	}
+	else if( data[0]==53){
+		motorBrakeL(false);
+		motorBrakeR(false);
+	}
 	else if( data[0]==60){
 		uintConv x;
 		x.tab[1] = data[1]; 

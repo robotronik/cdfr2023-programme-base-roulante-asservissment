@@ -67,11 +67,11 @@ void positionControl::calculVitesse(){
     //genstion du mouvement Avant
     if(stopStatus){
         vitesse = 0;
-        if(accelerationMaxAv != -1 && vitesse > vitessePrecedente + accelerationMaxAv*deltaTemps){
-            vitesse = vitessePrecedente + accelerationMaxAv*deltaTemps;
+        if(decelerationStop != -1 && vitesse > vitessePrecedente + decelerationStop*deltaTemps){
+            vitesse = vitessePrecedente + decelerationStop*deltaTemps;
         }
-         if(accelerationMaxAr != -1 && vitesse < vitessePrecedente - accelerationMaxAr*deltaTemps){
-            vitesse = vitessePrecedente - accelerationMaxAr*deltaTemps;
+         if(decelerationStop != -1 && vitesse < vitessePrecedente - decelerationStop*deltaTemps){
+            vitesse = vitessePrecedente - decelerationStop*deltaTemps;
         }
         return;
     }

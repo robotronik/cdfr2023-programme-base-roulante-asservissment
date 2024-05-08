@@ -34,6 +34,7 @@ public:
     double decelerationMaxAr = 25;
     double deltaTemps = 0;
     bool decelationLineair = true;
+    double decelerationStop = 0;
 
     uint32_t PreviousTime;
 
