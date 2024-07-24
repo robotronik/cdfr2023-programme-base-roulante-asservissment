@@ -17,79 +17,10 @@ void* loop_sys_tick(void* arg) {
 }
 
 void* stm_main_funct(void* arg) {
-    stm_main();    
+    stm_main();
+    return 0;  
 }
 
-void on_resize(GtkWidget *widget, GtkImage *image) {
-    GtkAllocation allocation;
-    gtk_widget_get_allocation(widget, &allocation);
-
-    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
-    if (pixbuf) {
-        int original_width = gdk_pixbuf_get_width(pixbuf);
-        int original_height = gdk_pixbuf_get_height(pixbuf);
-        double aspect_ratio = (double)original_width / original_height;
-
-        int new_width = allocation.width;
-        int new_height = allocation.height;
-
-        // Ajuster les dimensions en maintenant le rapport d'aspect
-        if (new_width / (double)new_height > aspect_ratio) {
-            new_width = (int)(new_height * aspect_ratio);
-        } else {
-            new_height = (int)(new_width / aspect_ratio);
-        }
-
-        // Redimensionner le pixbuf
-        GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
-        gtk_image_set_from_pixbuf(image, scaled_pixbuf);
-        g_object_unref(scaled_pixbuf);
-    } else {
-        g_warning("Failed to get pixbuf from GtkImage");
-    }
-}
-
-// Connecter le signal de redimensionnement
-//g_signal_connect(image_container, "size-allocate", G_CALLBACK(on_resize), image);
-
-
-#define MAX_LINES 1000
-typedef struct {
-    GtkWidget *text_view;
-    GtkTextBuffer *text_buffer;
-    GQueue *lines;
-    int pipe_fd[2]; // Pipe file descriptors
-} ConsoleData;
-
-void append_line_to_console(ConsoleData *console, const char *line) {
-    GtkTextIter end_iter;
-    GtkTextBuffer *buffer = console->text_buffer;
-
-    // Append line to the queue
-    g_queue_push_tail(console->lines, g_strdup(line));
-
-    // If we have more than MAX_LINES, remove the oldest one
-    if (g_queue_get_length(console->lines) > MAX_LINES) {
-        gchar *oldest_line = (gchar *)g_queue_pop_head(console->lines);
-        g_free(oldest_line);
-
-        // Remove the first line from the buffer
-        GtkTextIter start_iter;
-        gtk_text_buffer_get_start_iter(buffer, &start_iter);
-        gtk_text_iter_forward_line(&start_iter);
-        gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
-    }
-
-    // Append the new line to the buffer
-    gtk_text_buffer_get_end_iter(buffer, &end_iter);
-    gtk_text_buffer_insert(buffer, &end_iter, line, -1);
-    gtk_text_buffer_insert(buffer, &end_iter, "\n", -1);
-
-    // Scroll to the end of the buffer
-    GtkTextMark *mark = gtk_text_buffer_create_mark(buffer, NULL, &end_iter, FALSE);
-    gtk_text_view_scroll_mark_onscreen(GTK_TEXT_VIEW(console->text_view), mark);
-    gtk_text_buffer_delete_mark(buffer, mark);
-}
 
 // Fonction pour écrire le texte dans le GtkTextView
 void write_to_text_view(GtkTextBuffer *buffer, const gchar *message) {
@@ -99,12 +30,10 @@ void write_to_text_view(GtkTextBuffer *buffer, const gchar *message) {
 }
 
 gboolean read_from_pipe(GIOChannel *source, GIOCondition condition, gpointer data) {
-    ConsoleData *console = (ConsoleData *)data;
-    GtkTextBuffer *buffer = GTK_TEXT_BUFFER(console->text_buffer);
+    GtkTextBuffer *buffer = GTK_TEXT_BUFFER((GtkTextBuffer *)data);
     //char buf[256];
     gchar message[256];
     gsize bytes_read;
-    gsize length;
     GError *error = NULL;
 
     // Read data from the pipe
@@ -120,48 +49,24 @@ gboolean read_from_pipe(GIOChannel *source, GIOCondition condition, gpointer dat
     return TRUE;
 }
 
-
-// Callback pour le pipe
-gboolean read_stdout(GIOChannel *channel, GIOCondition condition, gpointer data) {
-    GtkTextBuffer *buffer = GTK_TEXT_BUFFER(data);
-    gchar *message;
-    char message2[256];
-    gsize length;
-    GIOStatus status;
-
-    status = g_io_channel_read_line(channel, &message, &length, NULL, NULL);
-    if (status == G_IO_STATUS_NORMAL) {
-        if (length > 0) {
-            message[length - 1] = '\0'; 
-        } else {
-            message[0] = '\0';
-        }
-        write_to_text_view(buffer, message);
-        g_free(message);
-    } else if (status == G_IO_STATUS_ERROR || status == G_IO_STATUS_EOF) {
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-void redirect_stdout_to_console(ConsoleData *console) {
+void redirect_stdout_to_console(GtkTextBuffer *textbuf) {
     // Create a pipe
-    if (pipe(console->pipe_fd) == -1) {
+    int pipe_fd2[2];
+    if (pipe(pipe_fd2) == -1) {
         perror("pipe");
         return;
     }
 
     // Set the pipe to non-blocking mode
-    int flags = fcntl(console->pipe_fd[0], F_GETFL, 0);
-    fcntl(console->pipe_fd[0], F_SETFL, flags | O_NONBLOCK);
+    int flags = fcntl(pipe_fd2[0], F_GETFL, 0);
+    fcntl(pipe_fd2[0], F_SETFL, flags | O_NONBLOCK);
 
     // Redirect stdout to the write end of the pipe
-    dup2(console->pipe_fd[1], STDOUT_FILENO);
+    dup2(pipe_fd2[1], STDOUT_FILENO);
 
     // Create a GIOChannel to read from the pipe
-    GIOChannel *channel = g_io_channel_unix_new(console->pipe_fd[0]);
-    g_io_add_watch(channel, G_IO_IN, (GIOFunc)read_from_pipe, console);
+    GIOChannel *channel = g_io_channel_unix_new(pipe_fd2[0]);
+    g_io_add_watch(channel, G_IO_IN, (GIOFunc)read_from_pipe, textbuf);
     g_io_channel_unref(channel);
 }
 
@@ -178,8 +83,9 @@ int main(int argc, char *argv[]) {
     GtkCssProvider *cssProvider;
     GdkDisplay *display;
     GdkScreen *screen;
-    ConsoleData console_data = {0};
     std::vector<std::thread*> threads;
+    GtkWidget *text_view;
+    GtkTextBuffer *text_buffer;
 
 
 
@@ -234,17 +140,14 @@ int main(int argc, char *argv[]) {
     gtk_paned_add2(GTK_PANED(panedRight), bottom_pane);
 
     // Create a GtkTextView for the console output
-    console_data.text_view = gtk_text_view_new();
-    gtk_container_add(GTK_CONTAINER(bottom_pane), console_data.text_view);
+    text_view = gtk_text_view_new();
+    gtk_container_add(GTK_CONTAINER(bottom_pane), text_view);
 
     // Get the buffer for the text view
-    console_data.text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(console_data.text_view));
-
-    // Initialize the queue for keeping track of lines
-    console_data.lines = g_queue_new();
+    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
 
     // Redirect stdout to the console
-    redirect_stdout_to_console(&console_data);
+    redirect_stdout_to_console(text_buffer);
 
     // Example lines to add to the console
     for (int i = 0; i < 850; i++) {
