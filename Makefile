@@ -10,7 +10,7 @@ SRC = $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.cpp))
 OBJ = $(SRC:$(SRCDIR)/%.c=$(BINDIR)/%.o)
 
 CFLAGS = -std=c++17 -Wall -Wno-unused-parameter -g -O0 -I$(INCLUDE_SIM) -I$(INCLUDE_DIR) -Wextra -O2 -DSIMULATION
-LDLIBS = -pthread `pkg-config --cflags --libs gtk+-3.0`
+LDLIBS = -pthread `pkg-config --cflags --libs gtk+-3.0` -lX11
 
 CXX = g++
 

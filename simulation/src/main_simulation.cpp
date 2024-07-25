@@ -7,6 +7,8 @@
 #include <vector>
 #include <pthread.h>
 #include "simulation.h"
+#include "console.h"
+#include <iostream>
 
 void* loop_sys_tick(void* arg) {
     while (1)
@@ -22,52 +24,31 @@ void* stm_main_funct(void* arg) {
 }
 
 
-// Fonction pour écrire le texte dans le GtkTextView
-void write_to_text_view(GtkTextBuffer *buffer, const gchar *message) {
-    GtkTextIter end;
-    gtk_text_buffer_get_end_iter(buffer, &end);
-    gtk_text_buffer_insert(buffer, &end, message, -1);
+static void toggle_led(GtkWidget *widget, gpointer data) {
+    gboolean *led_on = (gboolean *)data;
+    *led_on = !*led_on;
+    gtk_widget_queue_draw(widget);
 }
 
-gboolean read_from_pipe(GIOChannel *source, GIOCondition condition, gpointer data) {
-    GtkTextBuffer *buffer = GTK_TEXT_BUFFER((GtkTextBuffer *)data);
-    //char buf[256];
-    gchar message[256];
-    gsize bytes_read;
-    GError *error = NULL;
 
-    // Read data from the pipe
-    GIOStatus status = g_io_channel_read_chars(source, message, 256, &bytes_read, &error);
-    if (status == G_IO_STATUS_NORMAL) {
-        message[bytes_read] = '\0';
-        //append_line_to_console(console, buf);
-        write_to_text_view(buffer, message);
-    } else if (status == G_IO_STATUS_ERROR) {
-        g_printerr("Error reading from pipe: %s\n", error->message);
-        g_error_free(error);
-    }
-    return TRUE;
-}
+static gboolean on_draw_led_area(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    // Dimensions de la zone de dessin
+    gint width = gtk_widget_get_allocated_width(widget);
+    gint height = gtk_widget_get_allocated_height(widget);
+    
+    // Calculer la taille et la position du carré pour qu'il soit centré
+    gint square_size = 15;
+    gint x = 5;
+    gint y = (height - square_size) / 2;
 
-void redirect_stdout_to_console(GtkTextBuffer *textbuf) {
-    // Create a pipe
-    int pipe_fd2[2];
-    if (pipe(pipe_fd2) == -1) {
-        perror("pipe");
-        return;
-    }
+    // Définir la couleur rouge pour le dessin
+    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);  // Rouge
 
-    // Set the pipe to non-blocking mode
-    int flags = fcntl(pipe_fd2[0], F_GETFL, 0);
-    fcntl(pipe_fd2[0], F_SETFL, flags | O_NONBLOCK);
+    // Dessiner le carré
+    cairo_rectangle(cr, x, y, square_size, square_size);
+    cairo_fill(cr);
 
-    // Redirect stdout to the write end of the pipe
-    dup2(pipe_fd2[1], STDOUT_FILENO);
-
-    // Create a GIOChannel to read from the pipe
-    GIOChannel *channel = g_io_channel_unix_new(pipe_fd2[0]);
-    g_io_add_watch(channel, G_IO_IN, (GIOFunc)read_from_pipe, textbuf);
-    g_io_channel_unref(channel);
+    return FALSE;  // Indiquer que le dessin est terminé
 }
 
 int main(int argc, char *argv[]) {
@@ -86,7 +67,16 @@ int main(int argc, char *argv[]) {
     std::vector<std::thread*> threads;
     GtkWidget *text_view;
     GtkTextBuffer *text_buffer;
-
+    GtkWidget *scrolledWindowLeftInfo;
+    GtkWidget *textViewLeftInfo;
+    GtkWidget *boxLed;
+    GtkWidget *led1_area;
+    GtkWidget *led2_area;
+    GtkWidget *led1_label;
+    GtkWidget *led2_label;
+    gboolean led1_on = TRUE;
+    gboolean led2_on = FALSE;
+    GtkWidget *fixed;
 
 
     // Initialiser GTK
@@ -119,6 +109,40 @@ int main(int argc, char *argv[]) {
     gtk_paned_add2(GTK_PANED(splitVertical),panedRight);
 
 
+    scrolledWindowLeftInfo = gtk_scrolled_window_new(NULL, NULL);
+    gtk_paned_add1(GTK_PANED(panedLeft), scrolledWindowLeftInfo);
+    textViewLeftInfo = gtk_text_view_new();
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textViewLeftInfo), GTK_WRAP_WORD);
+    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textViewLeftInfo), FALSE);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(textViewLeftInfo), FALSE);
+    gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(textViewLeftInfo)), 
+                             "This is some text inside the scrolled window. It will scroll if it gets too long. "
+                             "This text goes from left to right and top to bottom.", -1);
+    gtk_container_add(GTK_CONTAINER(scrolledWindowLeftInfo), textViewLeftInfo);
+
+
+    boxLed = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_paned_add2(GTK_PANED(panedLeft), boxLed);
+
+    led1_label = gtk_label_new("LED 1:");
+    gtk_box_pack_start(GTK_BOX(boxLed), led1_label, FALSE, FALSE, 5);
+
+
+    led1_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(led1_area, 20, 20);
+    gtk_box_pack_start(GTK_BOX(boxLed), led1_area, TRUE, TRUE, 0);
+    g_signal_connect(G_OBJECT(led1_area), "draw", G_CALLBACK(on_draw_led_area), NULL);
+
+    led2_label = gtk_label_new("LED 2:");
+    gtk_box_pack_start(GTK_BOX(boxLed), led2_label, FALSE, FALSE, 5);
+
+    led2_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(led2_area, 20, 20);
+    gtk_box_pack_start(GTK_BOX(boxLed), led2_area, TRUE, TRUE, 0);
+    g_signal_connect(G_OBJECT(led2_area), "draw", G_CALLBACK(on_draw_led_area), NULL);
+
+
+
 
     // Créer le panneau supérieur avec une image
     image_container = gtk_scrolled_window_new(NULL, NULL);
@@ -147,7 +171,7 @@ int main(int argc, char *argv[]) {
     text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
 
     // Redirect stdout to the console
-    redirect_stdout_to_console(text_buffer);
+    //redirect_stdout_to_console(text_buffer);
 
     // Example lines to add to the console
     for (int i = 0; i < 850; i++) {
