@@ -91,7 +91,7 @@ void i2c1_ev_isr(void){
 		}
 		// end TOFIX
 
-		if(I2C1_SR2 & I2C_SR2_TRA){
+		if(sr2 & I2C_SR2_TRA){
 			communicationType = DIRSEND;
 			if(callbackinitialiseTrans){
 				callbacki2cTrans();
