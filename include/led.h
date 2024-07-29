@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef SIMULATION
-    #include <simulation.h>
+    #include <hardware_interface.h>
 #else
     #include <libopencm3/stm32/rcc.h>
     #include <libopencm3/stm32/gpio.h>

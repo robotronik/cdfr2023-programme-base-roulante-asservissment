@@ -14,7 +14,7 @@
 //#define TESTMOTOR
 
 #ifdef SIMULATION
-	#include "simulation.h"
+	#include "hardware_interface.h"
 	#define main stm_main
 #endif
 

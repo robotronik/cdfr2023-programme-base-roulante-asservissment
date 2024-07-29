@@ -1,4 +1,4 @@
-#include "simulation.h"
+#include "hardware_interface.h"
 
 const int* rcc_hsi_configs = 0;
 

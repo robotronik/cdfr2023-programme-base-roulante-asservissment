@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <glib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -6,10 +7,14 @@
 #include <chrono>
 #include <vector>
 #include <pthread.h>
-#include "simulation.h"
+#include <atomic>
+#include <iostream>
+
+#include "hardware_interface.h"
 #include "console.h"
 #include "i2cProcess.h"
-#include <iostream>
+#include "statusTextView.h"
+#include "simulation.h"
 
 void* loop_sys_tick(void* arg) {
     while (1)
@@ -47,6 +52,7 @@ static gboolean on_draw_led_area(GtkWidget *widget, cairo_t *cr, gpointer data) 
 }
 
 int main(int argc, char *argv[]) {
+    std::atomic<bool> stop_thread(false);
     GtkWidget *window;
     GtkWidget *panedRight;
     GtkWidget *panedLeft;
@@ -68,6 +74,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *led2_area;
     GtkWidget *led1_label;
     GtkWidget *led2_label;
+    GThread *t3, *t4;
 
 
 
@@ -104,12 +111,7 @@ int main(int argc, char *argv[]) {
     scrolledWindowLeftInfo = gtk_scrolled_window_new(NULL, NULL);
     gtk_paned_add1(GTK_PANED(panedLeft), scrolledWindowLeftInfo);
     textViewLeftInfo = gtk_text_view_new();
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textViewLeftInfo), GTK_WRAP_WORD);
-    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textViewLeftInfo), FALSE);
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(textViewLeftInfo), FALSE);
-    gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(textViewLeftInfo)), 
-                             "This is some text inside the scrolled window. It will scroll if it gets too long. "
-                             "This text goes from left to right and top to bottom.", -1);
+    t3 = intiThreadStatusTextView(textViewLeftInfo,&stop_thread);
     gtk_container_add(GTK_CONTAINER(scrolledWindowLeftInfo), textViewLeftInfo);
 
 
@@ -177,8 +179,7 @@ int main(int argc, char *argv[]) {
     pthread_t t1, t2;
     pthread_create(&t2, nullptr, loop_sys_tick, nullptr);
     pthread_create(&t1, nullptr, stm_main_funct, nullptr);
-    sleep(4);
-    simI2c();
+    t4 = g_thread_new("simulationProcess", simulationProcess, NULL);
 
     gtk_widget_show_all(window);
     gtk_main();
@@ -188,6 +189,7 @@ int main(int argc, char *argv[]) {
     pthread_kill(t2, SIGTERM);
     pthread_join(t1, nullptr);
     pthread_join(t2, nullptr);
+    g_thread_join(t3);
 
     return 0;
 }
