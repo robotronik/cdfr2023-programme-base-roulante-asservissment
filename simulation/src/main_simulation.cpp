@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include "simulation.h"
 #include "console.h"
+#include "i2cProcess.h"
 #include <iostream>
 
 void* loop_sys_tick(void* arg) {
@@ -24,16 +25,10 @@ void* stm_main_funct(void* arg) {
 }
 
 
-static void toggle_led(GtkWidget *widget, gpointer data) {
-    gboolean *led_on = (gboolean *)data;
-    *led_on = !*led_on;
-    gtk_widget_queue_draw(widget);
-}
-
 
 static gboolean on_draw_led_area(GtkWidget *widget, cairo_t *cr, gpointer data) {
     // Dimensions de la zone de dessin
-    gint width = gtk_widget_get_allocated_width(widget);
+    //gint width = gtk_widget_get_allocated_width(widget);
     gint height = gtk_widget_get_allocated_height(widget);
     
     // Calculer la taille et la position du carré pour qu'il soit centré
@@ -66,7 +61,6 @@ int main(int argc, char *argv[]) {
     GdkScreen *screen;
     std::vector<std::thread*> threads;
     GtkWidget *text_view;
-    GtkTextBuffer *text_buffer;
     GtkWidget *scrolledWindowLeftInfo;
     GtkWidget *textViewLeftInfo;
     GtkWidget *boxLed;
@@ -74,9 +68,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *led2_area;
     GtkWidget *led1_label;
     GtkWidget *led2_label;
-    gboolean led1_on = TRUE;
-    gboolean led2_on = FALSE;
-    GtkWidget *fixed;
+
 
 
     // Initialiser GTK
@@ -167,16 +159,8 @@ int main(int argc, char *argv[]) {
     text_view = gtk_text_view_new();
     gtk_container_add(GTK_CONTAINER(bottom_pane), text_view);
 
-    // Get the buffer for the text view
-    text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
-
     // Redirect stdout to the console
     //redirect_stdout_to_console(text_buffer);
-
-    // Example lines to add to the console
-    for (int i = 0; i < 850; i++) {
-        printf("Line %d: Hello, world!\n", i + 1);
-    }
 
 
     cssProvider = gtk_css_provider_new();
@@ -191,9 +175,10 @@ int main(int argc, char *argv[]) {
 
 
     pthread_t t1, t2;
-    pthread_create(&t1, nullptr, stm_main_funct, nullptr);
     pthread_create(&t2, nullptr, loop_sys_tick, nullptr);
-
+    pthread_create(&t1, nullptr, stm_main_funct, nullptr);
+    sleep(4);
+    simI2c();
 
     gtk_widget_show_all(window);
     gtk_main();

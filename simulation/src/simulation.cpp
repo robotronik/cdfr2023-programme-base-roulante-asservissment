@@ -83,8 +83,7 @@ void i2c_enable_interrupt(int a, int b){}
 void i2c_set_own_7bit_slave_address(int a,int b){}
 void i2c_peripheral_enable(int a){}
 void i2c_enable_ack(int a){}
-void i2c_send_data(uint32_t i2c, uint8_t data){}
-uint8_t i2c_get_data(int a){return 0;}
+
 
 
 void systick_set_clocksource(int a){}

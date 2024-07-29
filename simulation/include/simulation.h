@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "config.h"
 
+
 #define GPIO0   0
 #define GPIO1   1
 #define GPIO2   2
@@ -39,19 +40,6 @@
 #define i2c_speed_sm_100k      0
 #define I2C_CR2_ITEVTEN        0
 #define I2C_CR2_ITBUFEN        0
-#define I2C1_SR2               0
-#define I2C_SR1_SMBALERT       0
-#define I2C_SR1_TIMEOUT        0
-#define I2C_SR1_PECERR         0
-#define I2C_SR1_OVR            0
-#define I2C_SR1_AF             0
-#define I2C_SR1_BERR           0
-#define I2C1_SR1               0
-#define I2C_SR1_ADDR           0
-#define I2C_SR2_TRA            0
-#define I2C_SR1_TxE            0
-#define I2C_SR1_RxNE           0
-#define I2C_SR1_STOPF          0
 #define TIM1                   0
 #define TIM_OC2                0
 #define TIM_OC1                0
@@ -87,7 +75,34 @@
 #define NVIC_EXTI4_IRQ         0
 #define EXTI4                  0
 
+
+
+#define I2C_SR1_SMBALERT    (1 << 15)
+#define I2C_SR1_TIMEOUT     (1 << 14)
+#define I2C_SR1_PECERR      (1 << 12)
+#define I2C_SR1_OVR         (1 << 11)
+#define I2C_SR1_AF          (1 << 10)
+#define I2C_SR1_ARLO        (1 << 9)
+#define I2C_SR1_BERR        (1 << 8)
+#define I2C_SR1_TxE         (1 << 7)
+#define I2C_SR1_RxNE        (1 << 6)
+#define I2C_SR1_STOPF       (1 << 4)
+#define I2C_SR1_ADD10       (1 << 3)
+#define I2C_SR1_BTF         (1 << 2)
+#define I2C_SR1_ADDR        (1 << 1)
+#define I2C_SR1_SB          (1 << 0)
+#define I2C_SR2_DUALF       (1 << 7)
+#define I2C_SR2_SMBHOST     (1 << 6)
+#define I2C_SR2_SMBDEFAULT  (1 << 5)
+#define I2C_SR2_GENCALL     (1 << 4)
+#define I2C_SR2_TRA         (1 << 2)
+#define I2C_SR2_BUSY        (1 << 1)
+#define I2C_SR2_MSL         (1 << 0)
+
 extern const int* rcc_hsi_configs;
+
+extern char I2C1_SR1;
+extern char I2C1_SR2;
 
 void nvic_enable_irq(int a);
 void nvic_set_priority(int a, int b);
@@ -147,7 +162,8 @@ void i2c_set_own_7bit_slave_address(int a,int b);
 void i2c_peripheral_enable(int a);
 void i2c_enable_ack(int a);
 void i2c_send_data(uint32_t i2c, uint8_t data);
-uint8_t i2c_get_data(int a);
+uint8_t i2c_get_data(uint32_t i2c);
+void i2c1_ev_isr(void);
 
 
 void systick_set_clocksource(int a);

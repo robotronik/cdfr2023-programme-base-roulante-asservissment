@@ -1,0 +1,24 @@
+CommandNum  , type, Command, ...
+10          , x   , turn_on_LED_1
+11          , x   , turn_off_LED_1
+12          , x   , turn_on_LED_2
+13          , x   , turn_off_LED_2
+20          , r   , get_coordinates, x, y, theta
+21          , w   , set_coordinates, x, y, theta
+30          , x   , stop
+31          , w   , set_consigne_lineaire, x, y
+32          , w   , set_Consigne_angulaire, angle, ROTATION
+33          , w   , set_Consigne_lookAt_forward, x, y, ROTATION 
+34          , w   , set_Consigne_lookAt_backward, x, y, ROTATION
+40          , r   , robot_moving_is_finish, resbool
+41          , r   , robot_running_is_finish, resbool
+42          , r   , robot_turningi_s_finish, resbool
+43          , r   , get_linear_error, error
+44          , r   , get_angular_error, error
+45          , r   , get_braking_distance, distance
+50          , x   , disable_motor
+51          , x   , enable_motor
+60          , r   , set_max_speed_forward, speed 
+61          , r   , set_max_speed_backward, speed
+62          , r   , set_max_speed_trigo, speed
+63          , r   , set_max_speed_horloge, speed
