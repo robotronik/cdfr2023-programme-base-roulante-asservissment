@@ -161,13 +161,23 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window);
     gtk_main();
 
-    delete(led1);
-    delete(led2);
+
     pthread_kill(t1, SIGTERM);
     pthread_kill(t2, SIGTERM);
     pthread_join(t1, nullptr);
     pthread_join(t2, nullptr);
     g_thread_join(t3);
+    g_thread_join(t4);
+
+
+    delete led1;
+    delete led2;
+    if (pixbuf) {
+        g_object_unref(pixbuf);
+    }
+    if (cssProvider) {
+        g_object_unref(cssProvider);
+    }
 
     return 0;
 }
