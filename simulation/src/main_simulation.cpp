@@ -31,6 +31,84 @@ void* stm_main_funct(void* arg) {
 }
 
 
+
+
+static GdkPixbuf *pixbuf1 = NULL;
+static GdkPixbuf *pixbuf2 = NULL;
+static gint bottom_panel_height = 120; // Default height of the bottom panel
+static gboolean is_manual_resize = FALSE;
+
+static gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    GtkAllocation allocation;
+    gtk_widget_get_allocation(widget, &allocation);
+
+    int widget_width = allocation.width;
+    int widget_height = allocation.height;
+
+    int image1_width = gdk_pixbuf_get_width(pixbuf1);
+    int image1_height = gdk_pixbuf_get_height(pixbuf1);
+
+    double scale_x = (double)widget_width / (double)image1_width;
+    double scale_y = (double)widget_height / (double)image1_height;
+    double scale = MIN(scale_x, scale_y);
+
+    int new_width = (int)(image1_width * scale);
+    int new_height = (int)(image1_height * scale);
+
+    GdkPixbuf *scaled_pixbuf1 = gdk_pixbuf_scale_simple(pixbuf1, new_width, new_height, GDK_INTERP_BILINEAR);
+
+    int offset_x = (widget_width - new_width) / 2;
+    int offset_y = (widget_height - new_height) / 2;
+
+    gdk_cairo_set_source_pixbuf(cr, scaled_pixbuf1, offset_x, offset_y);
+    cairo_paint(cr);
+
+    g_object_unref(scaled_pixbuf1);
+
+    // Draw the second image at a fixed position
+    if (pixbuf2) {
+        int image2_width = gdk_pixbuf_get_width(pixbuf2);
+        int image2_height = gdk_pixbuf_get_height(pixbuf2);
+
+        int new_width2 = (int)(image2_width * scale);
+        int new_height2 = (int)(image2_height * scale);
+
+        GdkPixbuf *scaled_pixbuf2 = gdk_pixbuf_scale_simple(pixbuf2, new_width2, new_height2, GDK_INTERP_BILINEAR);
+
+        // Fixed position for the second image
+        int image2_x = offset_x + (new_width*(0+1500))/3000 - (new_width2/2);
+        int image2_y = offset_y + (new_height*(0+1000))/2000 - (new_height2/2);
+
+        gdk_cairo_set_source_pixbuf(cr, scaled_pixbuf2, image2_x, image2_y);
+        cairo_paint(cr);
+    }
+
+    return FALSE;
+}
+
+void on_size_allocate(GtkWindow *window, GdkEvent *event, gpointer data){
+    GtkPaned *paned = GTK_PANED(data);
+
+    int window_height = event->configure.height;
+    int new_paned_position = window_height - bottom_panel_height;
+
+    if (new_paned_position > 0) {
+        is_manual_resize = FALSE;
+        gtk_paned_set_position(paned, new_paned_position);
+    }
+}
+
+
+static gboolean on_window_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer data) {
+    GtkPaned *paned = GTK_PANED(widget);
+    if(is_manual_resize){
+        bottom_panel_height = gtk_widget_get_allocated_height(gtk_paned_get_child2(paned));
+    }    
+    is_manual_resize = TRUE;
+    return FALSE;
+}
+
+
 int main(int argc, char *argv[]) {
     std::atomic<bool> stop_thread(false);
     GtkWidget *window;
@@ -40,7 +118,6 @@ int main(int argc, char *argv[]) {
     GtkWidget *image_container;
     GtkWidget *image;
     GtkWidget *bottom_pane;
-    GdkPixbuf *pixbuf;
     GdkPixbuf *window_icon_pixbuf;
     GtkCssProvider *cssProvider;
     GdkDisplay *display;
@@ -57,6 +134,7 @@ int main(int argc, char *argv[]) {
     GThread *t3, *t4;
     ledSim *led1;
     ledSim *led2;
+    GtkWidget *drawing_area;
 
 
 
@@ -115,18 +193,28 @@ int main(int argc, char *argv[]) {
 
 
 
-    // Créer le panneau supérieur avec une image
+    // Create the top panel with an image
     image_container = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_name(image_container, "image_container");
     gtk_paned_add1(GTK_PANED(panedRight), image_container);
-    // Charger l'image
-    pixbuf = gdk_pixbuf_new_from_file("icon.png", NULL);
-    if (!pixbuf) {
-        g_error("Failed to load image from file");
+
+    // Load the first image
+    pixbuf1 = gdk_pixbuf_new_from_file("table.png", NULL);
+    if (!pixbuf1) {
+        g_error("Failed to load image1 from file");
         return 1;
     }
-    image = gtk_image_new_from_pixbuf(pixbuf);
-    gtk_container_add(GTK_CONTAINER(image_container), image);
+    // Load the second image
+    pixbuf2 = gdk_pixbuf_new_from_file("icon.png", NULL);
+    if (!pixbuf2) {
+        g_error("Failed to load image2 from file");
+        return 1;
+    }
+    // Create a GtkDrawingArea to draw the images
+    drawing_area = gtk_drawing_area_new();
+    gtk_container_add(GTK_CONTAINER(image_container), drawing_area);
+    // Connect the draw signal to our callback function
+    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(draw_callback), NULL);
 
 
 
@@ -140,6 +228,9 @@ int main(int argc, char *argv[]) {
 
     // Redirect stdout to the console
     //redirect_stdout_to_console(text_buffer);
+
+    g_signal_connect(G_OBJECT(window), "configure-event",G_CALLBACK(on_size_allocate), panedRight);
+    g_signal_connect(panedRight, "notify::position", G_CALLBACK(on_window_configure_event), NULL);
 
 
     cssProvider = gtk_css_provider_new();
@@ -172,9 +263,6 @@ int main(int argc, char *argv[]) {
 
     delete led1;
     delete led2;
-    if (pixbuf) {
-        g_object_unref(pixbuf);
-    }
     if (cssProvider) {
         g_object_unref(cssProvider);
     }
