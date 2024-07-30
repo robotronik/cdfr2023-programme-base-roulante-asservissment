@@ -2,7 +2,12 @@
 #include <cstdint>
 #include <stdio.h>
 #include "config.h"
+#include "ledSim.h"
 
+
+//*********************************************************************
+// HARDWARE
+//*********************************************************************
 
 #define GPIO0   0
 #define GPIO1   1
@@ -22,9 +27,9 @@
 #define GPIO15  15
 
 #define GPIOA   0
-#define GPIOB   0
-#define GPIOC   0
-#define GPIOD   0
+#define GPIOB   1
+#define GPIOC   2
+#define GPIOD   3
 
 
 #define RCC_I2C1               0
@@ -172,7 +177,16 @@ void systick_clear();
 void systick_counter_enable();
 void systick_interrupt_enable();
 uint32_t systick_get_value();
+void sys_tick_handler();
 
 int stm_main(void);
 
-void sys_tick_handler();
+//*********************************************************************
+// SIMULATION
+//*********************************************************************
+
+
+extern ledSim* simLed1;
+extern ledSim* simLed2;
+
+void updateGPIO(int port,int pin);

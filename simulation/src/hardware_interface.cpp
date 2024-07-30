@@ -2,6 +2,11 @@
 
 const int* rcc_hsi_configs = 0;
 
+bool registreTab[16*4];
+
+ledSim* simLed1 = nullptr;
+ledSim* simLed2 = nullptr;
+
 void nvic_enable_irq(int a){}
 void nvic_set_priority(int a, int b){}
 
@@ -40,28 +45,24 @@ void gpio_set_af(int a, int b, int c){}
 void gpio_set_output_options(int a, int b, int c, int d){}
 
 void gpio_set(int port,int pin){
-    if(port == port_led1 && pin == pin_led1){
-        printf("led1 set\n");
-    }
-    else if(port == port_led1 && pin == pin_led1){
-        printf("led2 set\n");
-    }
-    
+    registreTab[port*16+pin] = 1;
+    updateGPIO(port,pin);    
 }
 void gpio_clear(int port,int pin){
-    if(port == port_led1 && pin == pin_led1){
-        printf("led1 clear\n");
-    }
-    else if(port == port_led1 && pin == pin_led1){
-        printf("led2 clear\n");
-    }
+    registreTab[port*16+pin] = 0;
+    updateGPIO(port,pin);
 }
 void gpio_toggle(int port,int pin){
+    registreTab[port*16+pin] = !registreTab[port*16+pin];
+    updateGPIO(port,pin);
+}
+
+void updateGPIO(int port,int pin){
     if(port == port_led1 && pin == pin_led1){
-        printf("led1 toggle\n");
+        simLed1->ledSetStatus(registreTab[port*16+pin]);
     }
-    else if(port == port_led1 && pin == pin_led1){
-        printf("led2 toggle\n");
+    else if(port == port_led2 && pin == pin_led2){
+        simLed2->ledSetStatus(registreTab[port*16+pin]);
     }
 }
 

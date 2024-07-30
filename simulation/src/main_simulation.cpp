@@ -15,6 +15,7 @@
 #include "i2cProcess.h"
 #include "statusTextView.h"
 #include "simulation.h"
+#include "ledSim.h"
 
 void* loop_sys_tick(void* arg) {
     while (1)
@@ -29,27 +30,6 @@ void* stm_main_funct(void* arg) {
     return 0;  
 }
 
-
-
-static gboolean on_draw_led_area(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    // Dimensions de la zone de dessin
-    //gint width = gtk_widget_get_allocated_width(widget);
-    gint height = gtk_widget_get_allocated_height(widget);
-    
-    // Calculer la taille et la position du carré pour qu'il soit centré
-    gint square_size = 15;
-    gint x = 5;
-    gint y = (height - square_size) / 2;
-
-    // Définir la couleur rouge pour le dessin
-    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);  // Rouge
-
-    // Dessiner le carré
-    cairo_rectangle(cr, x, y, square_size, square_size);
-    cairo_fill(cr);
-
-    return FALSE;  // Indiquer que le dessin est terminé
-}
 
 int main(int argc, char *argv[]) {
     std::atomic<bool> stop_thread(false);
@@ -75,6 +55,8 @@ int main(int argc, char *argv[]) {
     GtkWidget *led1_label;
     GtkWidget *led2_label;
     GThread *t3, *t4;
+    ledSim led1;
+    ledSim led2;
 
 
 
@@ -117,23 +99,16 @@ int main(int argc, char *argv[]) {
 
     boxLed = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_paned_add2(GTK_PANED(panedLeft), boxLed);
-
     led1_label = gtk_label_new("LED 1:");
     gtk_box_pack_start(GTK_BOX(boxLed), led1_label, FALSE, FALSE, 5);
-
-
-    led1_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(led1_area, 20, 20);
+    led1_area = led1.ledGetWidget();
     gtk_box_pack_start(GTK_BOX(boxLed), led1_area, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(led1_area), "draw", G_CALLBACK(on_draw_led_area), NULL);
-
     led2_label = gtk_label_new("LED 2:");
     gtk_box_pack_start(GTK_BOX(boxLed), led2_label, FALSE, FALSE, 5);
-
-    led2_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(led2_area, 20, 20);
+    led2_area = led2.ledGetWidget();
     gtk_box_pack_start(GTK_BOX(boxLed), led2_area, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(led2_area), "draw", G_CALLBACK(on_draw_led_area), NULL);
+    simLed1 = &led1;
+    simLed2 = &led2;
 
 
 
