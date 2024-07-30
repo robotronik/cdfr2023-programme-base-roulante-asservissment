@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     GtkWidget *led1_label;
     GtkWidget *led2_label;
     GThread *t3, *t4;
-    ledSim led1;
-    ledSim led2;
+    ledSim *led1;
+    ledSim *led2;
 
 
 
@@ -97,18 +97,20 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(scrolledWindowLeftInfo), textViewLeftInfo);
 
 
+    led1 = new ledSim();
+    led2 = new ledSim();
     boxLed = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_paned_add2(GTK_PANED(panedLeft), boxLed);
     led1_label = gtk_label_new("LED 1:");
     gtk_box_pack_start(GTK_BOX(boxLed), led1_label, FALSE, FALSE, 5);
-    led1_area = led1.ledGetWidget();
+    led1_area = led1->ledGetWidget();
     gtk_box_pack_start(GTK_BOX(boxLed), led1_area, TRUE, TRUE, 0);
     led2_label = gtk_label_new("LED 2:");
     gtk_box_pack_start(GTK_BOX(boxLed), led2_label, FALSE, FALSE, 5);
-    led2_area = led2.ledGetWidget();
+    led2_area = led2->ledGetWidget();
     gtk_box_pack_start(GTK_BOX(boxLed), led2_area, TRUE, TRUE, 0);
-    simLed1 = &led1;
-    simLed2 = &led2;
+    simLed1 = led1;
+    simLed2 = led2;
 
 
 
@@ -159,7 +161,8 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window);
     gtk_main();
 
-
+    delete(led1);
+    delete(led2);
     pthread_kill(t1, SIGTERM);
     pthread_kill(t2, SIGTERM);
     pthread_join(t1, nullptr);
