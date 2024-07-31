@@ -144,8 +144,9 @@ int main(int argc, char *argv[]) {
     image_container = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_name(image_container, "image_container");
     gtk_paned_pack1(GTK_PANED(panedRight), image_container, TRUE, FALSE);
-    robotDrawing = new robotSim("icon.png",50,50,"table.png");
+    robotDrawing = new robotSim("icon.png",300,400,"table.png");
     gtk_container_add(GTK_CONTAINER(image_container), robotDrawing->getWidget());
+    robotDrawing->setPosition(500,750,30);
 
 
 
