@@ -16,6 +16,7 @@
 #include "statusTextView.h"
 #include "simulation.h"
 #include "ledSim.h"
+#include "robotSim.h"
 
 
 #define DEFAULT_WINDOWS_HEIGHT  600
@@ -48,59 +49,6 @@ static gboolean on_paned_button_press_event(GtkWidget *widget, GdkEvent *event, 
     return TRUE;
 }
 
-static GdkPixbuf *pixbuf1 = NULL;
-static GdkPixbuf *pixbuf2 = NULL;
-static gint bottom_panel_height = 120; // Default height of the bottom panel
-static gboolean is_manual_resize = FALSE;
-
-static gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    GtkAllocation allocation;
-    gtk_widget_get_allocation(widget, &allocation);
-
-    int widget_width = allocation.width;
-    int widget_height = allocation.height;
-
-    int image1_width = gdk_pixbuf_get_width(pixbuf1);
-    int image1_height = gdk_pixbuf_get_height(pixbuf1);
-
-    double scale_x = (double)widget_width / (double)image1_width;
-    double scale_y = (double)widget_height / (double)image1_height;
-    double scale = MIN(scale_x, scale_y);
-
-    int new_width = (int)(image1_width * scale);
-    int new_height = (int)(image1_height * scale);
-
-    GdkPixbuf *scaled_pixbuf1 = gdk_pixbuf_scale_simple(pixbuf1, new_width, new_height, GDK_INTERP_BILINEAR);
-
-    int offset_x = (widget_width - new_width) / 2;
-    int offset_y = (widget_height - new_height) / 2;
-
-    gdk_cairo_set_source_pixbuf(cr, scaled_pixbuf1, offset_x, offset_y);
-    cairo_paint(cr);
-
-    g_object_unref(scaled_pixbuf1);
-
-    // Draw the second image at a fixed position
-    if (pixbuf2) {
-        int image2_width = gdk_pixbuf_get_width(pixbuf2);
-        int image2_height = gdk_pixbuf_get_height(pixbuf2);
-
-        int new_width2 = (int)(image2_width * scale);
-        int new_height2 = (int)(image2_height * scale);
-
-        GdkPixbuf *scaled_pixbuf2 = gdk_pixbuf_scale_simple(pixbuf2, new_width2, new_height2, GDK_INTERP_BILINEAR);
-
-        // Fixed position for the second image
-        int image2_x = offset_x + (new_width*(0+1500))/3000 - (new_width2/2);
-        int image2_y = offset_y + (new_height*(0+1000))/2000 - (new_height2/2);
-
-        gdk_cairo_set_source_pixbuf(cr, scaled_pixbuf2, image2_x, image2_y);
-        cairo_paint(cr);
-    }
-
-    return FALSE;
-}
-
 
 int main(int argc, char *argv[]) {
     std::atomic<bool> stop_thread(false);
@@ -109,7 +57,6 @@ int main(int argc, char *argv[]) {
     GtkWidget *panedLeft;
     GtkWidget *splitVertical;
     GtkWidget *image_container;
-    GtkWidget *image;
     GtkWidget *bottom_pane;
     GdkPixbuf *window_icon_pixbuf;
     GtkCssProvider *cssProvider;
@@ -127,7 +74,7 @@ int main(int argc, char *argv[]) {
     GThread *t3, *t4;
     ledSim *led1;
     ledSim *led2;
-    GtkWidget *drawing_area;
+    robotSim *robotDrawing;
 
 
 
@@ -193,29 +140,12 @@ int main(int argc, char *argv[]) {
 
 
 
-    // Create the top panel with an image
+    // Create the top panel with image Table and robot
     image_container = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_name(image_container, "image_container");
     gtk_paned_pack1(GTK_PANED(panedRight), image_container, TRUE, FALSE);
-    
-
-    // Load the first image
-    pixbuf1 = gdk_pixbuf_new_from_file("table.png", NULL);
-    if (!pixbuf1) {
-        g_error("Failed to load image1 from file");
-        return 1;
-    }
-    // Load the second image
-    pixbuf2 = gdk_pixbuf_new_from_file("icon.png", NULL);
-    if (!pixbuf2) {
-        g_error("Failed to load image2 from file");
-        return 1;
-    }
-    // Create a GtkDrawingArea to draw the images
-    drawing_area = gtk_drawing_area_new();
-    gtk_container_add(GTK_CONTAINER(image_container), drawing_area);
-    // Connect the draw signal to our callback function
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(draw_callback), NULL);
+    robotDrawing = new robotSim("icon.png",50,50,"table.png");
+    gtk_container_add(GTK_CONTAINER(image_container), robotDrawing->getWidget());
 
 
 
