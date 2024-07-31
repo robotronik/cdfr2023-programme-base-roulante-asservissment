@@ -17,6 +17,13 @@
 #include "simulation.h"
 #include "ledSim.h"
 
+
+#define DEFAULT_WINDOWS_HEIGHT  600
+#define DEFAULT_WINDOWS_WIDTH   800
+#define DEFAULT_SPLIT_VERTICAL  200
+#define DEFAULT_SPLIT_RIGHT     (DEFAULT_WINDOWS_HEIGHT - 200)
+#define MIN_SPLIT_LEFT          25
+
 void* loop_sys_tick(void* arg) {
     while (1)
     {
@@ -31,7 +38,15 @@ void* stm_main_funct(void* arg) {
 }
 
 
+static gboolean on_paned_motion_notify_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+    return TRUE;
+}
 
+static gboolean on_paned_button_press_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+    return TRUE;
+}
 
 static GdkPixbuf *pixbuf1 = NULL;
 static GdkPixbuf *pixbuf2 = NULL;
@@ -86,28 +101,6 @@ static gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data) {
     return FALSE;
 }
 
-void on_size_allocate(GtkWindow *window, GdkEvent *event, gpointer data){
-    GtkPaned *paned = GTK_PANED(data);
-
-    int window_height = event->configure.height;
-    int new_paned_position = window_height - bottom_panel_height;
-
-    if (new_paned_position > 0) {
-        is_manual_resize = FALSE;
-        gtk_paned_set_position(paned, new_paned_position);
-    }
-}
-
-
-static gboolean on_window_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer data) {
-    GtkPaned *paned = GTK_PANED(widget);
-    if(is_manual_resize){
-        bottom_panel_height = gtk_widget_get_allocated_height(gtk_paned_get_child2(paned));
-    }    
-    is_manual_resize = TRUE;
-    return FALSE;
-}
-
 
 int main(int argc, char *argv[]) {
     std::atomic<bool> stop_thread(false);
@@ -143,7 +136,7 @@ int main(int argc, char *argv[]) {
     // Créer une fenêtre
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "GTK Responsive Image Example");
-    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
+    gtk_window_set_default_size(GTK_WINDOW(window), DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), &threads);
     // Charger l'icône pour la fenêtre
     window_icon_pixbuf = gdk_pixbuf_new_from_file("icon.png", NULL); // Assurez-vous que le fichier est bien nommé et accessible
@@ -162,14 +155,20 @@ int main(int argc, char *argv[]) {
     gtk_widget_set_name(splitVertical, "splitVertical");
     gtk_widget_set_name(panedRight, "panedRight");
     gtk_widget_set_name(panedLeft, "panedLeft");
-    gtk_widget_set_size_request(panedLeft, 200, -1);
+    gtk_widget_set_size_request(panedLeft, 100, -1);
     gtk_container_add(GTK_CONTAINER(window), splitVertical);
-    gtk_paned_add1(GTK_PANED(splitVertical),panedLeft);
-    gtk_paned_add2(GTK_PANED(splitVertical),panedRight);
+    gtk_paned_pack1(GTK_PANED(splitVertical), panedLeft, FALSE, FALSE);
+    gtk_paned_pack2(GTK_PANED(splitVertical), panedRight, TRUE, FALSE);
+    gtk_paned_set_position(GTK_PANED(splitVertical),DEFAULT_SPLIT_VERTICAL);
+    gtk_paned_set_position(GTK_PANED(panedRight), DEFAULT_SPLIT_RIGHT);
+
+
+    g_signal_connect(panedLeft, "motion-notify-event", G_CALLBACK(on_paned_motion_notify_event), NULL);
+    g_signal_connect(panedLeft, "button-press-event", G_CALLBACK(on_paned_button_press_event), NULL);
 
 
     scrolledWindowLeftInfo = gtk_scrolled_window_new(NULL, NULL);
-    gtk_paned_add1(GTK_PANED(panedLeft), scrolledWindowLeftInfo);
+    gtk_paned_pack1(GTK_PANED(panedLeft), scrolledWindowLeftInfo, TRUE, FALSE);
     textViewLeftInfo = gtk_text_view_new();
     t3 = intiThreadStatusTextView(textViewLeftInfo,&stop_thread);
     gtk_container_add(GTK_CONTAINER(scrolledWindowLeftInfo), textViewLeftInfo);
@@ -178,7 +177,8 @@ int main(int argc, char *argv[]) {
     led1 = new ledSim();
     led2 = new ledSim();
     boxLed = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_paned_add2(GTK_PANED(panedLeft), boxLed);
+    gtk_widget_set_size_request(boxLed, -1, MIN_SPLIT_LEFT);
+    gtk_paned_pack2(GTK_PANED(panedLeft), boxLed, FALSE, FALSE);
     led1_label = gtk_label_new("LED 1:");
     gtk_box_pack_start(GTK_BOX(boxLed), led1_label, FALSE, FALSE, 5);
     led1_area = led1->ledGetWidget();
@@ -196,7 +196,8 @@ int main(int argc, char *argv[]) {
     // Create the top panel with an image
     image_container = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_name(image_container, "image_container");
-    gtk_paned_add1(GTK_PANED(panedRight), image_container);
+    gtk_paned_pack1(GTK_PANED(panedRight), image_container, TRUE, FALSE);
+    
 
     // Load the first image
     pixbuf1 = gdk_pixbuf_new_from_file("table.png", NULL);
@@ -220,7 +221,8 @@ int main(int argc, char *argv[]) {
 
     // Créer le panneau inférieur
     bottom_pane = gtk_scrolled_window_new(NULL, NULL);
-    gtk_paned_add2(GTK_PANED(panedRight), bottom_pane);
+    gtk_widget_set_size_request(bottom_pane, -1, 50);
+    gtk_paned_pack2(GTK_PANED(panedRight), bottom_pane, FALSE, FALSE);
 
     // Create a GtkTextView for the console output
     text_view = gtk_text_view_new();
@@ -229,8 +231,6 @@ int main(int argc, char *argv[]) {
     // Redirect stdout to the console
     //redirect_stdout_to_console(text_buffer);
 
-    g_signal_connect(G_OBJECT(window), "configure-event",G_CALLBACK(on_size_allocate), panedRight);
-    g_signal_connect(panedRight, "notify::position", G_CALLBACK(on_window_configure_event), NULL);
 
 
     cssProvider = gtk_css_provider_new();
