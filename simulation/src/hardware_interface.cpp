@@ -32,15 +32,26 @@ void timer_enable_oc_preload(int a, int b){}
 void timer_set_oc_slow_mode(int a, int b){}
 void timer_set_oc_mode(int a, int b, int c){}
 void timer_set_oc_polarity_high(int a, int b){}
-void timer_set_oc_value(int a, int b, int c){}
 void timer_enable_oc_output(int a, int b){}
 void timer_enable_preload(int a){}
 void timer_enable_break_main_output(int a){}
 void timer_enable_counter(int a){}
+void timer_set_oc_value (uint32_t timer_peripheral, uint32_t oc_id, uint32_t value){
+    if(timer_peripheral == TIM1){
+        if(oc_id == TIM_OC1){
+            value;
+        }
+        else if(oc_id == TIM_OC2){
+            value;
+        }        
+    }
+}
 
 	
 void gpio_mode_setup(int a, int b, int c, int d){}
-uint16_t gpio_get(uint32_t gpioport, uint16_t gpios){return 0;}
+uint16_t gpio_get(uint32_t gpioport, uint16_t gpios){
+    return registreTab[gpioport*16+gpios] ;
+}
 void gpio_set_af(int a, int b, int c){}
 void gpio_set_output_options(int a, int b, int c, int d){}
 
@@ -64,6 +75,10 @@ void updateGPIO(int port,int pin){
     else if(port == port_led2 && pin == pin_led2){
         simLed2->ledSetStatus(registreTab[port*16+pin]);
     }
+}
+
+void set_gpio_get(int port,int pin,bool value){
+    registreTab[port*16+pin] = value;
 }
 
 void usart_set_baudrate(int a, int b){}

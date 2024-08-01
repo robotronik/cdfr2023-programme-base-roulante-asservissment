@@ -45,9 +45,6 @@
 #define i2c_speed_sm_100k      0
 #define I2C_CR2_ITEVTEN        0
 #define I2C_CR2_ITBUFEN        0
-#define TIM1                   0
-#define TIM_OC2                0
-#define TIM_OC1                0
 #define RCC_GPIOA              0
 #define RCC_GPIOC              0
 #define GPIO_MODE_OUTPUT       0
@@ -79,6 +76,11 @@
 #define EXTI_TRIGGER_RISING    0
 #define NVIC_EXTI4_IRQ         0
 #define EXTI4                  0
+
+
+#define TIM1                   1
+#define TIM_OC2                2
+#define TIM_OC1                1
 
 
 
@@ -117,6 +119,8 @@ void exti_select_source(int a, int b);
 void exti_set_trigger(int a, int b);
 void exti_enable_request(int a);
 void exti_reset_request(int a);
+void exti2_isr(void);
+void exti4_isr(void);
 
 void rcc_clock_setup_pll(const int* a);
 void rcc_periph_clock_enable(int a);
@@ -134,11 +138,11 @@ void timer_enable_oc_preload(int a, int b);
 void timer_set_oc_slow_mode(int a, int b);
 void timer_set_oc_mode(int a, int b, int c);
 void timer_set_oc_polarity_high(int a, int b);
-void timer_set_oc_value(int a, int b, int c);
 void timer_enable_oc_output(int a, int b);
 void timer_enable_preload(int a);
 void timer_enable_break_main_output(int a);
 void timer_enable_counter(int a);
+void timer_set_oc_value (uint32_t timer_peripheral, uint32_t oc_id, uint32_t value);
 
 	
 void gpio_mode_setup(int a, int b, int c, int d);
@@ -190,3 +194,4 @@ extern ledSim* simLed1;
 extern ledSim* simLed2;
 
 void updateGPIO(int port,int pin);
+void set_gpio_get(int port,int pin,bool value);

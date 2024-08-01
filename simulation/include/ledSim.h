@@ -25,6 +25,7 @@ public:
     ~ledSim();
 
     static gboolean on_draw_led_area(GtkWidget *widget, cairo_t *cr, gpointer data);
+    static gboolean queue_draw(gpointer data);
 };
 
 

@@ -17,6 +17,7 @@
 #include "simulation.h"
 #include "ledSim.h"
 #include "robotSim.h"
+#include "odometrieSim.h"
 
 
 #define DEFAULT_WINDOWS_HEIGHT  600
@@ -75,6 +76,7 @@ int main(int argc, char *argv[]) {
     ledSim *led1;
     ledSim *led2;
     robotSim *robotDrawing;
+    odometrieSim *odometrie;
 
 
 
@@ -172,7 +174,8 @@ int main(int argc, char *argv[]) {
     screen = gdk_display_get_default_screen(display);
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-
+    odometrie = new odometrieSim();
+    odometrie->setLeftSpeed(4000);
 
     pthread_t t1, t2;
     pthread_create(&t2, nullptr, loop_sys_tick, nullptr);
@@ -182,7 +185,7 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window);
     gtk_main();
 
-
+    odometrie->stopThread();
     pthread_kill(t1, SIGTERM);
     pthread_kill(t2, SIGTERM);
     pthread_join(t1, nullptr);

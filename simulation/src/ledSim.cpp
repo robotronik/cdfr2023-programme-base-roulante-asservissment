@@ -15,7 +15,14 @@ void ledSim::setcolor(int red, int green, int blue){
     ledColor.red = ((double)red)/255;
     ledColor.green = ((double)green)/255;
     ledColor.blue = ((double)blue)/255;
-    gtk_widget_queue_draw(ledWidget);
+    g_idle_add((GSourceFunc)queue_draw, this);
+}
+
+
+gboolean ledSim::queue_draw(gpointer data){
+    ledSim* led = (ledSim*)data;
+    gtk_widget_queue_draw(led->ledWidget);
+    return FALSE;
 }
 
 

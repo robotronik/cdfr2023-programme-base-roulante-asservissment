@@ -34,7 +34,6 @@ void robotSim::setPosition(int x,int y, int teta){
     this->y = y;
     this->teta = teta;
     g_idle_add((GSourceFunc)queue_draw, this);
-    //gtk_widget_queue_draw(robotWidget);
 }
 
 gboolean robotSim::queue_draw(gpointer data) {
