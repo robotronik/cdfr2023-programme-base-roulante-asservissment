@@ -6,6 +6,7 @@ bool registreTab[16*4];
 
 ledSim* simLed1 = nullptr;
 ledSim* simLed2 = nullptr;
+odometrieSim* odometrieGlobal = nullptr;
 
 void nvic_enable_irq(int a){}
 void nvic_set_priority(int a, int b){}
@@ -39,10 +40,10 @@ void timer_enable_counter(int a){}
 void timer_set_oc_value (uint32_t timer_peripheral, uint32_t oc_id, uint32_t value){
     if(timer_peripheral == TIM1){
         if(oc_id == TIM_OC1){
-            value;
+            odometrieGlobal->setRightSpeed(value);
         }
         else if(oc_id == TIM_OC2){
-            value;
+            odometrieGlobal->setLeftSpeed(value);
         }        
     }
 }
@@ -74,6 +75,12 @@ void updateGPIO(int port,int pin){
     }
     else if(port == port_led2 && pin == pin_led2){
         simLed2->ledSetStatus(registreTab[port*16+pin]);
+    }
+    else if(port == port_directionR && pin == pin_directionR){
+        odometrieGlobal->setRightDirection(registreTab[port*16+pin]);
+    }
+    else if(port == port_directionL && pin == pin_directionL){
+        odometrieGlobal->setLeftDirection(!registreTab[port*16+pin]);
     }
 }
 

@@ -1,11 +1,6 @@
 #pragma once
 
-#include "simulation.h"
-#include "motor.h"
-
-#define MINSPEED    500000
-#define MAXSPEED    10
-#define SEUIL       5*COEFMULT
+#include <gtk/gtk.h>
 
 class odometrieSim
 {

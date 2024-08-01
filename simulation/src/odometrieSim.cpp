@@ -1,4 +1,9 @@
 #include "odometrieSim.h"
+#include "hardware_interface.h"
+#include "motor.h"
+
+#define MAXSPEED    500
+#define SEUIL       1*COEFMULT
 
 
 odometrieSim::odometrieSim(/* args */){
@@ -8,8 +13,6 @@ odometrieSim::odometrieSim(/* args */){
 
 void odometrieSim::setLeftSpeed(int speed){
     valueLeft = speed;
-    int wait_time = map(valueLeft,10,100*COEFMULT,500000,500);
-    printf("%d\n",wait_time);
 }
 void odometrieSim::setRightSpeed(int speed){
     valueRight = speed;
@@ -36,21 +39,18 @@ odometrieSim::~odometrieSim(){
 
 gpointer odometrieSim::threadFuncOdometrieLeft(gpointer data) {
     odometrieSim* odometrie = (odometrieSim*)data;
-    printf("START\n");
-    g_usleep(5000000);
     while (!odometrie->stop_thread) {
         if(odometrie->valueLeft<SEUIL){
-            printf("START3\n");
             g_usleep(7000);
         }
         else{
-            int wait_time = map(odometrie->valueLeft,10,100*COEFMULT,500000,500);
-            g_usleep(500);
-            set_gpio_get(port_odometrie2R,pin_odometrie2R,odometrie->moveForwardLeft);
+            int frequency = map(odometrie->valueLeft,0,100*COEFMULT,0,MAXSPEED);
+            int wait_time = 1000000 / frequency;
+            g_usleep(wait_time);
+            set_gpio_get(port_odometrie2R,pin_odometrie2R,!odometrie->moveForwardLeft);
             exti2_isr();
         }
     }
-    printf("FIN\n");
     return NULL;
 }
 
@@ -61,7 +61,8 @@ gpointer odometrieSim::threadFuncOdometrieRight(gpointer data) {
             g_usleep(7000);
         }
         else{
-            int wait_time = map(odometrie->valueRight,10,100*COEFMULT,500000,500);
+            int frequency = map(odometrie->valueRight,0,100*COEFMULT,0,MAXSPEED);
+            int wait_time = 1000000 / frequency;
             g_usleep(wait_time);
             set_gpio_get(port_odometrie2L,pin_odometrie2L,odometrie->moveForwardRight);
             exti4_isr();

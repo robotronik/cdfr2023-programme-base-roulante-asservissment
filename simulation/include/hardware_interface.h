@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <stdio.h>
+#include "odometrieSim.h"
 #include "config.h"
 #include "ledSim.h"
 
@@ -192,6 +193,7 @@ int stm_main(void);
 
 extern ledSim* simLed1;
 extern ledSim* simLed2;
+extern odometrieSim* odometrieGlobal;
 
 void updateGPIO(int port,int pin);
 void set_gpio_get(int port,int pin,bool value);

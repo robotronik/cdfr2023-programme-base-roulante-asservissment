@@ -7,6 +7,7 @@ void simI2c (void){
     // I2cSendData(52,data,1);
     printPos();
     //set_coordinates(-1000,20,50);
+    set_consigne_lineaire(-50,0);
     sleep(1);
     printPos();
 }

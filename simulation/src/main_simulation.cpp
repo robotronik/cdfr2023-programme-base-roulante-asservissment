@@ -175,7 +175,11 @@ int main(int argc, char *argv[]) {
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     odometrie = new odometrieSim();
-    odometrie->setLeftSpeed(4000);
+    odometrieGlobal = odometrie;
+    // odometrie->setLeftSpeed(40);
+    // odometrie->setLeftDirection(true);
+    // odometrie->setRightSpeed(40);
+    // odometrie->setRightDirection(true);
 
     pthread_t t1, t2;
     pthread_create(&t2, nullptr, loop_sys_tick, nullptr);
