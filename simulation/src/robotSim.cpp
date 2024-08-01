@@ -1,5 +1,7 @@
 #include "robotSim.h"
 
+#define ROBOT_X_OFFSET 155
+#define ROBOT_Y_OFFSET 60
 
 
 robotSim::robotSim(const char *filenameRobot, int robotLength, int robotWidth, const char *filenameTable, int tableLength, int tableWidth):
@@ -20,6 +22,7 @@ robotSim::robotSim(const char *filenameRobot, int robotLength, int robotWidth, c
     robotWidget = gtk_drawing_area_new();
     // Connect the draw signal to our callback function
     g_signal_connect(G_OBJECT(robotWidget), "draw", G_CALLBACK(draw_callback), this);
+    threadRobot = g_thread_new("robotPostionUpdateThread", threadFuncRobot, this);
 }
 
 GtkWidget* robotSim::getWidget(void){
@@ -30,7 +33,22 @@ void robotSim::setPosition(int x,int y, int teta){
     this->x = x;
     this->y = y;
     this->teta = teta;
-    gtk_widget_queue_draw(robotWidget);
+    g_idle_add((GSourceFunc)queue_draw, this);
+    //gtk_widget_queue_draw(robotWidget);
+}
+
+gboolean robotSim::queue_draw(gpointer data) {
+    robotSim* robot = (robotSim*)data;
+    gtk_widget_queue_draw(robot->robotWidget);
+    return FALSE;
+}
+
+void robotSim::stopRobotSim(void){
+    stop_thread = true;
+}
+
+GThread* robotSim::getTheard(void){
+    return threadRobot;
 }
 
 robotSim::~robotSim()
@@ -86,4 +104,18 @@ gboolean robotSim::draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data){
     g_object_unref(scaled_pixbuf2);
 
     return FALSE;
+}
+
+
+gpointer robotSim::threadFuncRobot(gpointer data) {
+    robotSim* robot = (robotSim*)data;
+    while (!robot->stop_thread) {
+        g_usleep(7000);
+        int16_t x;
+        int16_t y;
+        int16_t theta;
+        get_coordinates(x,y,theta);
+        robot->setPosition(x,y,theta);
+    }
+    return NULL;
 }

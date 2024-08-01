@@ -15,7 +15,7 @@ gpointer thread_func(gpointer data) {
     GtkTextBuffer* buffer = thread_data->buffer;
     std::atomic<bool>* stop_thread = thread_data->stop_thread;
     while (!(*stop_thread)) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        g_usleep(7000);
 
         std::string new_text = generateText();
 

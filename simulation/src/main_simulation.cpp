@@ -146,7 +146,6 @@ int main(int argc, char *argv[]) {
     gtk_paned_pack1(GTK_PANED(panedRight), image_container, TRUE, FALSE);
     robotDrawing = new robotSim("icon.png",300,400,"table.png");
     gtk_container_add(GTK_CONTAINER(image_container), robotDrawing->getWidget());
-    robotDrawing->setPosition(500,750,30);
 
 
 
@@ -190,6 +189,7 @@ int main(int argc, char *argv[]) {
     pthread_join(t2, nullptr);
     g_thread_join(t3);
     g_thread_join(t4);
+    g_thread_join(robotDrawing->getTheard());
 
 
     delete led1;
