@@ -40,10 +40,10 @@ void timer_enable_counter(int a){}
 void timer_set_oc_value (uint32_t timer_peripheral, uint32_t oc_id, uint32_t value){
     if(timer_peripheral == TIM1){
         if(oc_id == TIM_OC1){
-            odometrieGlobal->setRightSpeed(value);
+            odometrieGlobal->setLeftSpeed(value);
         }
         else if(oc_id == TIM_OC2){
-            odometrieGlobal->setLeftSpeed(value);
+            odometrieGlobal->setRightSpeed(value);
         }        
     }
 }
@@ -77,10 +77,10 @@ void updateGPIO(int port,int pin){
         simLed2->ledSetStatus(registreTab[port*16+pin]);
     }
     else if(port == port_directionR && pin == pin_directionR){
-        odometrieGlobal->setRightDirection(!registreTab[port*16+pin]);
+        odometrieGlobal->setLeftDirection(!registreTab[port*16+pin]);
     }
     else if(port == port_directionL && pin == pin_directionL){
-        odometrieGlobal->setLeftDirection(registreTab[port*16+pin]);
+        odometrieGlobal->setRightDirection(registreTab[port*16+pin]);
     }
 }
 
