@@ -77,10 +77,10 @@ void updateGPIO(int port,int pin){
         simLed2->ledSetStatus(registreTab[port*16+pin]);
     }
     else if(port == port_directionR && pin == pin_directionR){
-        odometrieGlobal->setRightDirection(registreTab[port*16+pin]);
+        odometrieGlobal->setRightDirection(!registreTab[port*16+pin]);
     }
     else if(port == port_directionL && pin == pin_directionL){
-        odometrieGlobal->setLeftDirection(!registreTab[port*16+pin]);
+        odometrieGlobal->setLeftDirection(registreTab[port*16+pin]);
     }
 }
 

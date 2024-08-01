@@ -340,6 +340,7 @@ int main(void)
 			if(speed.R<-maxTorque){
 				speed.R = -maxTorque;
 			}
+			usartprintf("%d %d\n",speed.L,speed.R);
 			motorSpeedSignedL(speed.L);
 			motorSpeedSignedR(speed.R);
 		}
