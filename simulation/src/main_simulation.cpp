@@ -176,9 +176,9 @@ int main(int argc, char *argv[]) {
 
     odometrie = new odometrieSim();
     odometrieGlobal = odometrie;
-    // odometrie->setLeftSpeed(40);
+    // odometrie->setLeftSpeed(4000);
     // odometrie->setLeftDirection(true);
-    // odometrie->setRightSpeed(40);
+    // odometrie->setRightSpeed(4000);
     // odometrie->setRightDirection(true);
 
     pthread_t t1, t2;

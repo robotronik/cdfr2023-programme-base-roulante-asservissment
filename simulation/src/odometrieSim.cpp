@@ -40,15 +40,15 @@ odometrieSim::~odometrieSim(){
 gpointer odometrieSim::threadFuncOdometrieLeft(gpointer data) {
     odometrieSim* odometrie = (odometrieSim*)data;
     while (!odometrie->stop_thread) {
-        if(odometrie->valueLeft<SEUIL){
-            g_usleep(7000);
-        }
-        else{
-            int frequency = map(odometrie->valueLeft,0,100*COEFMULT,0,MAXSPEED);
+        int frequency = map(odometrie->valueLeft,0,100*COEFMULT,0,MAXSPEED);
+        if(frequency!=0){            
             int wait_time = 1000000 / frequency;
+            if(wait_time>500000){
+                wait_time = 500000;
+            }
             g_usleep(wait_time);
-            set_gpio_get(port_odometrie2R,pin_odometrie2R,!odometrie->moveForwardLeft);
-            exti2_isr();
+            set_gpio_get(port_odometrie2L,pin_odometrie2L,odometrie->moveForwardRight);
+            exti4_isr();
         }
     }
     return NULL;
@@ -57,16 +57,16 @@ gpointer odometrieSim::threadFuncOdometrieLeft(gpointer data) {
 gpointer odometrieSim::threadFuncOdometrieRight(gpointer data) {
     odometrieSim* odometrie = (odometrieSim*)data;
     while (!odometrie->stop_thread) {
-        if(odometrie->valueRight<SEUIL){
-            g_usleep(7000);
-        }
-        else{
-            int frequency = map(odometrie->valueRight,0,100*COEFMULT,0,MAXSPEED);
+        int frequency = map(odometrie->valueRight,0,100*COEFMULT,0,MAXSPEED);
+        if(frequency!=0){
             int wait_time = 1000000 / frequency;
+            if(wait_time>500000){
+                wait_time = 500000;
+            }
             g_usleep(wait_time);
-            set_gpio_get(port_odometrie2L,pin_odometrie2L,odometrie->moveForwardRight);
-            exti4_isr();
-        }        
+            set_gpio_get(port_odometrie2R,pin_odometrie2R,!odometrie->moveForwardLeft);
+            exti2_isr();
+        }          
     }
     return NULL;
 }

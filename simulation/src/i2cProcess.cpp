@@ -8,6 +8,8 @@ void simI2c (void){
     printPos();
     //set_coordinates(-1000,20,50);
     set_consigne_lineaire(-500,0);
+    //set_consigne_lookAt_forward(-500,500,0);
+    //set_consigne_angulaire(90,0);
     sleep(1);
     printPos();
 }
