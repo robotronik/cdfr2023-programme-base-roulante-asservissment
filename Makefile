@@ -1,5 +1,5 @@
 TARGET = bin/simulationAsserv
-SRCDIR = src simulation/src
+SRCDIR = src simulation/src simulation/test
 INCLUDE_DIR = include 
 INCLUDE_SIM = simulation/include
 BINDIR = bin

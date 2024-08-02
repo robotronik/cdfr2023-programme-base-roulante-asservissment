@@ -12,7 +12,6 @@
 
 #include "hardware_interface.h"
 #include "console.h"
-#include "i2cProcess.h"
 #include "statusTextView.h"
 #include "simulation.h"
 #include "ledSim.h"
