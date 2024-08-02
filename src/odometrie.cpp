@@ -91,7 +91,6 @@ void printBuffer(void){
 }
 
 void odometrieLoop(robot* robot){
-	int i =0;
 	position_t position = robot->getPosition();
 	while (endBuffer != startBuffer){
 		switch (buffer[endBuffer])
@@ -119,7 +118,6 @@ void odometrieLoop(robot* robot){
 		default:
 			break;
 		}
-		i++;
 		endBuffer++;
 		if(endBuffer>=_BUFFERSIZE){
 			endBuffer = 0;
