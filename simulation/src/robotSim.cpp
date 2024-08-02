@@ -74,14 +74,16 @@ gboolean robotSim::draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data){
     int new_width = (int)(image1_width * scale);
 
     GdkPixbuf *scaled_pixbuf1 = gdk_pixbuf_scale_simple(robot->pixbufTable, new_length, new_width, GDK_INTERP_BILINEAR);
+    GdkPixbuf *scaled_pixbufRot1 = gdk_pixbuf_rotate_simple(scaled_pixbuf1,GDK_PIXBUF_ROTATE_UPSIDEDOWN);
 
     int offset_x = (widget_length - new_length) / 2;
     int offset_y = (widget_width - new_width) / 2;
 
-    gdk_cairo_set_source_pixbuf(cr, scaled_pixbuf1, offset_x, offset_y);
+    gdk_cairo_set_source_pixbuf(cr, scaled_pixbufRot1, offset_x, offset_y);
     cairo_paint(cr);
 
     g_object_unref(scaled_pixbuf1);
+    g_object_unref(scaled_pixbufRot1);
 
     int new_length2 = (robot->robotLength * new_length)/robot->tableLength;
     int new_width2 = (robot->robotWidth * new_width)/robot->tableWidth;
