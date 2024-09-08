@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "uart.h"
 
 //local variables
 int modeL;

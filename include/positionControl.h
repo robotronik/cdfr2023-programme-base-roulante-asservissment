@@ -3,21 +3,8 @@
 #include <math.h>
 #include <stdint.h>
 
-#ifdef STM32F4
-
 #include "uart.h"
 #include "clock.h"
-
-#else 
-
-#include <time.h>
-inline unsigned long get_uptime_ms() {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts); // Utilisation de CLOCK_MONOTONIC pour éviter les changements d'horloge
-    return (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000); // Conversion en millisecondes
-}
-
-#endif
 
 class positionControl{
 public:

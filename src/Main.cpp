@@ -1,8 +1,3 @@
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/timer.h>
-
 #include "config.h"
 #include "motor.h"
 #include "uart.h"
@@ -17,6 +12,11 @@
 
 //#define TESTROBOT
 //#define TESTMOTOR
+
+#ifdef SIMULATION
+	#include "hardware_interface.h"
+	#define main stm_main
+#endif
 
 bool benableMotorDebug = true;
 position_t newPostion;
@@ -340,6 +340,7 @@ int main(void)
 			if(speed.R<-maxTorque){
 				speed.R = -maxTorque;
 			}
+			usartprintf("%d %d\n",speed.L,speed.R);
 			motorSpeedSignedL(speed.L);
 			motorSpeedSignedR(speed.R);
 		}

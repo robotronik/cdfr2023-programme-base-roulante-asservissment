@@ -45,7 +45,7 @@ void exti2_isr(void)
 {
     exti_reset_request(EXTI2);
 	gpio_toggle(port_led1,pin_led1);
-	if(gpio_get (GPIOB,GPIO3)){
+	if(gpio_get (port_odometrie2R,pin_odometrie2R)){
 		buffer[startBuffer]=backwardR;
 		startBuffer++;
 		if(startBuffer>=_BUFFERSIZE){
@@ -66,7 +66,7 @@ void exti4_isr(void)
 {
 	exti_reset_request(EXTI4);
     gpio_toggle(port_led1,pin_led1);
-	if(gpio_get (GPIOB,GPIO5)){
+	if(gpio_get (port_odometrie2L,pin_odometrie2L)){
 		//Vers l'avant
 		buffer[startBuffer]=fordwardL;
 		startBuffer++;
@@ -91,7 +91,6 @@ void printBuffer(void){
 }
 
 void odometrieLoop(robot* robot){
-	int i =0;
 	position_t position = robot->getPosition();
 	while (endBuffer != startBuffer){
 		switch (buffer[endBuffer])
@@ -119,7 +118,6 @@ void odometrieLoop(robot* robot){
 		default:
 			break;
 		}
-		i++;
 		endBuffer++;
 		if(endBuffer>=_BUFFERSIZE){
 			endBuffer = 0;

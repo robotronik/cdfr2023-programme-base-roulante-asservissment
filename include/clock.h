@@ -1,4 +1,12 @@
 #pragma once
+
+#ifdef SIMULATION
+    #include <hardware_interface.h>
+#else
+    #include <libopencm3/cm3/systick.h>
+    #include <libopencm3/stm32/rcc.h>
+#endif
+
 #include <stdint.h>
 
 // RCC Clock Frequency [Hz]
