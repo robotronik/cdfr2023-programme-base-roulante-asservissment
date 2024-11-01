@@ -98,22 +98,22 @@ void odometrieLoop(robot* robot){
 		case fordwardL:
 				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
 				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLEG;
+				position.teta -= STEPANGLEG;
 			break;
 		case backwardL:
 				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
 				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLEG;
+				position.teta += STEPANGLEG;
 			break;
 		case fordwardR:
 				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
 				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLED;
+				position.teta += STEPANGLED;
 			break;
 		case backwardR:
 				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
 				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLED;
+				position.teta -= STEPANGLED;
 			break;
 		default:
 			break;

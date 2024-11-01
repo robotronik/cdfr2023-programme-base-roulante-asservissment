@@ -75,7 +75,7 @@ motorSpeed_t Asservissement::asservissementLoop(){
     // usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
     //usartprintf(">rotatif:%lf\n",consigne.teta);
     
-    motorSpeed_t speed = {(int)(valPidLineaire+valPidAngulaire),(int)(valPidLineaire-valPidAngulaire)};
+    motorSpeed_t speed = {(int)(valPidLineaire-valPidAngulaire),(int)(valPidLineaire+valPidAngulaire)};
     // usartprintf(">speedL:%d\n>speedR:%d\n",speed.R,speed.L);
     
     return speed;
