@@ -1,12 +1,24 @@
 #include "motor.h"
 #include "uart.h"
+#include "clock.h"
 
 //local variables
 int modeL;
 int modeR;
+uint16_t adc_value_L = 0;
+uint16_t adc_value_R = 0;
+uint8_t current_channel = adc_channelL;
+int maxTorqueR = 4096;
+int maxTorqueL = 4096;
+bool motorEnR = true;
+bool motorEnL = true;
+int maxSpeedR = 100;
+int maxSpeedL = 100;
+bool enableMaxTorque = false;
 
 //local fonctions
 void setuptimer(void);
+void adc_setup(void);
 void setupGPIO(void);
 void motorSetSpeedL(int speed);
 void motorSetSpeedR(int speed);
@@ -15,6 +27,7 @@ void motorSetSpeedR(int speed);
 void motorSetup(void){
 	setupGPIO();
 	setuptimer();
+	adc_setup();
 }
 
 //direction inverted for the left motor
@@ -129,6 +142,7 @@ void motorSetSpeedL(int speed){
 	else if(speed>100){
 		speed = 100;
 	}
+	speed = CLIP(speed,(maxSpeedL/2)-50,(maxSpeedL/2)+50);
 	if(modeL==0){
 		speed =	speed/2 + 50;
 	}
@@ -141,6 +155,7 @@ void motorSetSpeedR(int speed){
 	else if(speed>100){
 		speed = 100;
 	}
+	speed = CLIP(speed,(maxSpeedR/2)-50,(maxSpeedR/2)+50);
 	if(modeR==0){
 		speed = speed/2 + 50;
 	}
@@ -150,16 +165,25 @@ void motorSetSpeedR(int speed){
 void disableMotor(void){
 	gpio_clear(port_CoastL,pin_CoastL);
 	gpio_clear(port_CoastR,pin_CoastR);
+	motorEnR = false;
+	motorEnL = false;
 }
 void enableMotor(void){
 	gpio_set(port_CoastL,pin_CoastL);
 	gpio_set(port_CoastR,pin_CoastR);
+	motorEnR = true;
+	motorEnL = true;
 }
 
 void setupGPIO(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_ADC1);
+
+    /* Configure PA5 en entrée analogique */
+    gpio_mode_setup(port_infoSpeedL, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedL);
+	gpio_mode_setup(port_infoSpeedR, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedR);
 	
 	gpio_mode_setup(port_ModeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeL);
 	gpio_mode_setup(port_brakeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_brakeL);
@@ -197,6 +221,8 @@ void setupGPIO(void){
 	//coast disable = 1 (coast : reset only the gate)
 	gpio_set(port_CoastL,pin_CoastL);
 	gpio_set(port_CoastR,pin_CoastR);
+	motorEnR = true;
+	motorEnL = true;
 	//esf = 1 (in case of fault, disable the driver)
 	gpio_clear(port_esfL,pin_esfL);
 	gpio_clear(port_esfR,pin_esfR);
@@ -275,4 +301,110 @@ void setuptimer(void){
 
 	/* Counter enable. */
 	timer_enable_counter(TIM1);
+}
+
+
+
+
+void adc_setup(void) {
+    rcc_periph_clock_enable(RCC_GPIOA);
+    rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_ADC1);
+
+    gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1); // PA1 = ADC_Channel_2
+    gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO3); // PC3 = ADC_Channel_13
+
+
+    adc_power_off(ADC1);
+    adc_set_single_conversion_mode(ADC1);
+    adc_disable_external_trigger_regular(ADC1);
+    adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_480CYC);
+    adc_enable_eoc_interrupt(ADC1);
+    nvic_enable_irq(NVIC_ADC_IRQ);
+	nvic_set_priority(NVIC_ADC_IRQ, 10);
+
+    adc_power_on(ADC1);
+
+    //delay_ms(1);
+
+    // Démarrer la première conversion sur le canal 2
+    adc_set_regular_sequence(ADC1, 1, &current_channel);
+    adc_start_conversion_regular(ADC1);
+}
+
+// Fonction d'interruption pour l'ADC
+void adc_isr(void) {
+    if (adc_eoc(ADC1)) { // Vérifier si la conversion est terminée
+        if (current_channel == adc_channelL) {
+            adc_value_L = adc_read_regular(ADC1);
+			if((adc_value_L > maxTorqueL) || motorEnL == false){
+				gpio_clear(port_CoastL,pin_CoastL);
+			}
+			else{
+				gpio_set(port_CoastL,pin_CoastL);
+			}
+            current_channel = adc_channelR;
+        } else if (current_channel == adc_channelR) {
+            adc_value_R = adc_read_regular(ADC1);
+			if((adc_value_R > maxTorqueR) || motorEnR == false){
+				gpio_clear(port_CoastR,pin_CoastR);
+			}
+			else{
+				gpio_set(port_CoastR,pin_CoastR);
+			}
+            current_channel = adc_channelL;
+        }
+        // Configurer le prochain canal et relancer la conversion
+        adc_set_regular_sequence(ADC1, 1, &current_channel);
+
+        if(enableMaxTorque){
+			adc_start_conversion_regular(ADC1);
+		}
+		else{
+			gpio_set(port_CoastR,pin_CoastR);
+			gpio_set(port_CoastL,pin_CoastL);
+		}
+    }
+}
+
+void setMaxSpeedR(int speed){
+	maxSpeedR = speed;
+}
+void setMaxSpeedL(int speed){
+	maxSpeedL = speed;
+}
+
+void setMaxTorqueR(int torque){
+	maxTorqueR = (torque*4096)/100;
+	if(maxTorqueR == 4096 && maxTorqueL == 4096){
+		enableMaxTorque = false;
+	}
+	else{
+		enableMaxTorque = true;
+		adc_start_conversion_regular(ADC1);
+	}
+}
+
+void setMaxTorqueL(int torque){
+	maxTorqueL = (torque*4096)/100;
+	if(maxTorqueR == 4096 && maxTorqueL == 4096){
+		enableMaxTorque = false;
+	}
+	else{
+		enableMaxTorque = true;
+		adc_start_conversion_regular(ADC1);
+	}
+}
+
+int getMotorCurrentL() {
+    return adc_value_L;
+}
+
+int getMotorCurrentR() {
+    return adc_value_R;
+}
+
+void prinAdcValue() {
+    usartprintf(">courant_13 : %4d\n",adc_value_R);
+	usartprintf(">courant_2 : %4d\n",adc_value_L);
 }

@@ -8,6 +8,7 @@
     #include <libopencm3/stm32/gpio.h>
     #include <libopencm3/cm3/nvic.h>
     #include <libopencm3/stm32/timer.h>
+    #include <libopencm3/stm32/adc.h>
 #endif
 
 #include "config.h"
@@ -18,7 +19,7 @@
 //with a periode off 4000, this creat a frequence off 21kHz, that people don't hear
 #define TIMERPERIOD 4000
 #define COEFMULT TIMERPERIOD/100
-
+#define CLIP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
 
 
@@ -53,5 +54,19 @@ void motorSetModeR(int mode);
 
 void disableMotor(void);
 void enableMotor(void);
+
+// value must be bettween 0 and 100
+void setMaxTorqueR(int torque);
+void setMaxTorqueL(int torque);
+
+// value must be bettween 0 and 100
+void setMaxSpeedR(int speed);
+void setMaxSpeedL(int speed);
+
+//return value between 0 and 4095
+int getMotorCurrentL();
+int getMotorCurrentR();
+
+void prinAdcValue();
 
 

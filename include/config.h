@@ -29,6 +29,9 @@
 #define port_info1L				GPIOC
 #define pin_info2L			GPIO7
 #define port_info2L				GPIOA
+#define pin_infoSpeedL		GPIO1
+#define port_infoSpeedL			GPIOA
+#define adc_channelL		1
 
 
 //PIN and Port to control the second MotorR
@@ -50,6 +53,9 @@
 #define port_info1R				GPIOC
 #define pin_info2R			GPIO7
 #define port_info2R				GPIOC
+#define pin_infoSpeedR		GPIO3
+#define port_infoSpeedR			GPIOC
+#define adc_channelR		13
 
 
 //PIN and Port to control the to led

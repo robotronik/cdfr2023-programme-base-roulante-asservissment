@@ -21,7 +21,6 @@
 bool benableMotorDebug = true;
 position_t newPostion;
 bool needChangePos = false;
-int maxTorque = 100;
 
 robot* robotCDFR = new robot();
 Asservissement* robotAsservisement = new Asservissement(robotCDFR);
@@ -135,7 +134,8 @@ void I2CRecieveData(uint8_t* data, int size){
 	else if( data[0]==54){
 		uintConv max;
 		max.tab[1] = data[1]; max.tab[0] = data[2];
-		maxTorque = max.num;
+		setMaxTorqueL(max.num);
+		setMaxTorqueR(max.num);
 	}
 	else if( data[0]==60){
 		uintConv x;
@@ -222,8 +222,8 @@ int main(void)
 	//SETUP
 	clock_setup();
 	ledSetup();
-	motorSetup();
 	usartSetup();
+	motorSetup();
 	odometrieSetup();
 	i2c_setup();	
 	setCallbackReceive(I2CRecieveData);
@@ -290,6 +290,7 @@ int main(void)
 		//delay_ms(50);
 		odometrieLoop(robotCDFR);
 		position_t robotPosition = robotCDFR->getPosition();
+		prinAdcValue();
 		usartprintf(">x:%lf\n",robotPosition.x);
 		usartprintf(">y:%lf\n",robotPosition.y);
 		usartprintf(">teta:%lf\n",robotPosition.teta);
@@ -325,22 +326,11 @@ int main(void)
 			robotAsservisement->setConsigne(newPostion);
 		}
 		if(nextTime < get_uptime_ms()){
+			prinAdcValue();
 			nextTime = get_uptime_ms() + 50;
 			motorSpeed_t speed = robotAsservisement->asservissementLoop();
-			//usartprintf(">x : %.3lf\n>y : %.3lf\n>teta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
-			if(speed.L>maxTorque){
-				speed.L = maxTorque;
-			}
-			if(speed.L<-maxTorque){
-				speed.L = -maxTorque;
-			}
-			if(speed.R>maxTorque){
-				speed.R = maxTorque;
-			}
-			if(speed.R<-maxTorque){
-				speed.R = -maxTorque;
-			}
-			usartprintf("%d %d\n",speed.L,speed.R);
+			// usartprintf(">x : %.3lf\n>y : %.3lf\n>teta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
+			// usartprintf("%d %d\n",speed.L,speed.R);
 			motorSpeedSignedL(speed.L);
 			motorSpeedSignedR(speed.R);
 		}
