@@ -43,13 +43,13 @@ void I2CRecieveData(uint8_t* data, int size){
 		position_u posi;
 		posi.position.x =  robotCDFR->getPosition_X();
 		posi.position.y =  robotCDFR->getPosition_Y();
-		posi.position.teta =  robotCDFR->getPosition_Teta();
+		posi.position.theta =  robotCDFR->getPosition_theta();
 		I2CSetBuffer(posi.tab,6);
 	}
 	else if( data[0]==21 && size == 7){
 		newPostion.x = (double)((int16_t) (data[1]<<8 | data[2]));
 		newPostion.y = (double)((int16_t) (data[3]<<8 | data[4]));
-		newPostion.teta = (double)((int16_t) (data[5]<<8 | data[6]));
+		newPostion.theta = (double)((int16_t) (data[5]<<8 | data[6]));
 		needChangePos = true;
 	}
 	else if( data[0]==30){
@@ -62,10 +62,10 @@ void I2CRecieveData(uint8_t* data, int size){
 		robotAsservisement->setProtectedConsigneLineaire((double)x.num,(double)y.num);
 	}
 	else if( data[0]==32 && size == 5){
-		uintConv teta,rotation;
-		teta.tab[1] = data[1]; teta.tab[0] = data[2];
+		uintConv theta,rotation;
+		theta.tab[1] = data[1]; theta.tab[0] = data[2];
 		rotation.tab[1] = data[3]; rotation.tab[0] = data[4];
-		robotAsservisement->setProtectedConsigneAngulaire((double)teta.num,(sensRotation_t)rotation.num);
+		robotAsservisement->setProtectedConsigneAngulaire((double)theta.num,(sensRotation_t)rotation.num);
 	}
 	else if( data[0]==33 && size == 7){
 		uintConv x,y,rotation;
@@ -292,7 +292,7 @@ int main(void)
 		position_t robotPosition = robotCDFR->getPosition();
 		usartprintf(">x:%lf\n",robotPosition.x);
 		usartprintf(">y:%lf\n",robotPosition.y);
-		usartprintf(">teta:%lf\n",robotPosition.teta);
+		usartprintf(">theta:%lf\n",robotPosition.theta);
 		motorSpeed_t speed = robotAsservisement->asservissementLoop();
 		motorSpeedSignedL(speed.L);
 		motorSpeedSignedR(speed.R);
@@ -327,7 +327,7 @@ int main(void)
 		if(nextTime < get_uptime_ms()){
 			nextTime = get_uptime_ms() + 50;
 			motorSpeed_t speed = robotAsservisement->asservissementLoop();
-			//usartprintf(">x : %.3lf\n>y : %.3lf\n>teta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_Teta());
+			//usartprintf(">x : %.3lf\n>y : %.3lf\n>theta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_theta());
 			if(speed.L>maxTorque){
 				speed.L = maxTorque;
 			}

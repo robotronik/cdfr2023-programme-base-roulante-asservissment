@@ -118,7 +118,7 @@
 typedef struct{
 	double x = 0;
     double y = 0;
-	double teta = 0;
+	double theta = 0;
 	uint64_t time = 0;
 }position_t;
 
@@ -130,7 +130,7 @@ typedef struct{
 typedef struct{
 	int16_t x;
     int16_t y;
-	int16_t teta;
+	int16_t theta;
 }positionint_t;
 
 union position_u

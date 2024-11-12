@@ -2,8 +2,8 @@
 #include <Wire.h>
 
 void sendPosition(int16_t x,int16_t y, int16_t avant);
-void setPostion(int16_t x,int16_t y, int16_t teta);
-void sendAngle(int16_t teta);
+void setPostion(int16_t x,int16_t y, int16_t theta);
+void sendAngle(int16_t theta);
 void ledOn(void);
 void ledOff(void);
 void getLinearError(void);
@@ -18,8 +18,8 @@ void setup()
 
   uint16_t x = 21;                  // 0x0015     
   uint16_t y = -400;                // 0xFE70
-  uint16_t teta = 23;               // 0x0017
-  setPostion(x,y,teta);
+  uint16_t theta = 23;               // 0x0017
+  setPostion(x,y,theta);
 
   sendPosition(400,-400,0);
   delay(5000);
@@ -59,18 +59,18 @@ void loop()
 //**************************************
 // Set postion at the begining if the robot are not in the center
 //**************************************
-void setPostion(int16_t x,int16_t y, int16_t teta){
+void setPostion(int16_t x,int16_t y, int16_t theta){
   x = 21;                  // 0x0015     
   y = -400;                // 0xFE70
-  teta = 23;               // 0x0017
+  theta = 23;               // 0x0017
   Wire.beginTransmission(42);       // transmit to device #42
   Wire.write(21);                   // send command 21
   Wire.write((uint8_t)x);           // send 00
   Wire.write((uint8_t)(x>>8));      // send 15
   Wire.write((uint8_t)y);           // send FE
   Wire.write((uint8_t)(y>>8));      // send 70
-  Wire.write((uint8_t)teta);        // send 00
-  Wire.write((uint8_t)(teta>>8));   // send 17
+  Wire.write((uint8_t)theta);        // send 00
+  Wire.write((uint8_t)(theta>>8));   // send 17
   Wire.endTransmission();           // stop transmitting
 }
 
@@ -96,11 +96,11 @@ void sendPosition(int16_t x,int16_t y, int16_t backwar){
 //**************************************
 // Set angular control
 //**************************************
-void sendAngle(int16_t teta){
+void sendAngle(int16_t theta){
   Wire.beginTransmission(42); // transmit to device #42
   Wire.write(31);
-  Wire.write((uint8_t)teta);
-  Wire.write((uint8_t)(teta>>8));
+  Wire.write((uint8_t)theta);
+  Wire.write((uint8_t)(theta>>8));
   Wire.endTransmission();         // stop transmitting
 }
 
@@ -164,7 +164,7 @@ void getPosition(void){
   Wire.write(20);                 // sends command 33 (get angular position)
   Wire.endTransmission();         // stop transmitting
   Wire.requestFrom(42, 6);        // request 2 bytes from peripheral device #42
-  while (Wire.available()) {      // while byte are available (Normaly the while are process 3 time to get x y and teta)
+  while (Wire.available()) {      // while byte are available (Normaly the while are process 3 time to get x y and theta)
     uint8_t c1 = Wire.read();     // receive the first byte (example : 0x01)
     uint8_t c2 = Wire.read();     // receive the second byte (example : 0x45)
     int final =  c1 | (c2<<8);    // assemble the two bytes (example : 0x0145)

@@ -96,24 +96,24 @@ void odometrieLoop(robot* robot){
 		switch (buffer[endBuffer])
 		{
 		case fordwardL:
-				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLEG;
+				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
+				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
+				position.theta -= STEPANGLEG;
 			break;
 		case backwardL:
-				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLEG;
+				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
+				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
+				position.theta += STEPANGLEG;
 			break;
 		case fordwardR:
-				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLED;
+				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
+				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
+				position.theta += STEPANGLED;
 			break;
 		case backwardR:
-				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLED;
+				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
+				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
+				position.theta -= STEPANGLED;
 			break;
 		default:
 			break;

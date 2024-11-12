@@ -13,15 +13,15 @@ public:
     robot();
 
     void updatePostion(position_t inCommingposition);
-    void updatePostion(double x, double y, double teta, uint64_t time);
+    void updatePostion(double x, double y, double theta, uint64_t time);
 
     void setPosition(position_t inCommingposition);
-    void setPosition(double x, double y, double teta, uint64_t time);
+    void setPosition(double x, double y, double theta, uint64_t time);
 
     position_t getPosition();
     double getPosition_X();
     double getPosition_Y();
-    double getPosition_Teta();
+    double getPosition_theta();
     double getPosition_Time();
 
     double getAngularSpeed(void);
