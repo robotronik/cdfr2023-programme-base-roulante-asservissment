@@ -37,7 +37,7 @@ typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 void odometrieSetup(void);
 void printBuffer(void);
 void printPosition(void);
-void odometrieLoop(robot* robot);
+void odometrieLoop(position_t position, position_t* updatedPos);
 position_t odometrieGetPosition(void);
 position_u odometrieGetPositionInt(void);
 void odometrieSetPosition(position_u positionUnion);

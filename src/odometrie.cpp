@@ -89,8 +89,7 @@ void printBuffer(void){
 	usartprintf("\n");
 }
 
-void odometrieLoop(robot* robot){
-	position_t position = robot->getPosition();
+void odometrieLoop(position_t position, position_t* updatedPos){
 	while (bufferIdx > 0){
 		bufferIdx--;
 		double a = DEG_TO_RAD*(position.theta);
@@ -122,6 +121,6 @@ void odometrieLoop(robot* robot){
 		}
 	}
 	position.time = get_uptime_ms();
-	robot->updatePostion(position);
+	updatedPos = &position;
 }
 

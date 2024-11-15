@@ -36,19 +36,6 @@ void robot::setPosition(double x, double y, double theta, uint64_t time){
 position_t robot::getPosition(){
     return position;
 }
-double robot::getPosition_X(){
-    return position.x;
-}
-double robot::getPosition_Y(){
-    return position.y;
-}
-double robot::getPosition_theta(){
-    return position.theta;
-}
-double robot::getPosition_Time(){
-    return position.time;
-}
-
 
 double robot::getAngularSpeed(void){
     return (mod_angle(position.theta - oldPosition.theta))/(position.time - oldPosition.time);

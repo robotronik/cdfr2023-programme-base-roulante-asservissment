@@ -24,9 +24,9 @@ The I2C of this bord is 42 in decimal.
 | 33 | set Consigne LookAt Forward | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) ROTATION | -
 | 34 | set Consigne LookAt Backward | (uint16_t) x,<br> (uint16_t) y,<br> (uint16_t) ROTATION | -
 | | | | |
-| 40 | robot Moving Is Finish | - | (uint16_t) bool |
-| 41 | robot Running Is Finish | - | (uint16_t) bool |
-| 42 | robot Turning Is Finish | - | (uint16_t) bool |
+| 40 | robot Moving Is Done | - | (uint16_t) bool |
+| 41 | robot Running Is Done | - | (uint16_t) bool |
+| 42 | robot Turning Is Done | - | (uint16_t) bool |
 | 43 | Get Linear error | - | (uint16_t) error |
 | 44 | Get Angular error | - | (uint16_t) error |
 | 45 | Get Braking Distance | - | (uint16_t) distance |

@@ -24,7 +24,7 @@ bool overridePos = false;
 int maxTorque = 100;
 
 robot* robotCDFR = new robot();
-Asservissement* robotAsservisement = new Asservissement(robotCDFR);
+Asservissement* robotAsservisement = new Asservissement();
 
 enum CommandNum {
     // LED Commands
@@ -45,9 +45,9 @@ enum CommandNum {
     CMD_SET_CONSIGNE_LOOKAT_BACKWARD = 34,
 
     // Robot Status Commands
-    CMD_ROBOT_MOVING_IS_FINISH = 40,
-    CMD_ROBOT_RUNNING_IS_FINISH = 41,
-    CMD_ROBOT_TURNING_IS_FINISH = 42,
+    CMD_ROBOT_MOVING_IS_DONE = 40,
+    CMD_ROBOT_RUNNING_IS_DONE = 41,
+    CMD_ROBOT_TURNING_IS_DONE = 42,
     CMD_GET_LINEAR_ERROR = 43,
     CMD_GET_ANGULAR_ERROR = 44,
     CMD_GET_BRAKING_DISTANCE = 45,
@@ -85,9 +85,10 @@ void I2CRecieveData(uint8_t* data, int size){
 
 	case CMD_GET_COORDINATES: {
         position_u posi;
-        posi.position.x = robotCDFR->getPosition_X();
-        posi.position.y = robotCDFR->getPosition_Y();
-        posi.position.theta = robotCDFR->getPosition_theta();
+		position_t pos = robotCDFR->getPosition();
+        posi.position.x = pos.x;
+        posi.position.y = pos.y;
+        posi.position.theta = pos.theta;
         I2CSetBuffer(posi.tab, 6);
         break;
     }
@@ -138,22 +139,22 @@ void I2CRecieveData(uint8_t* data, int size){
 			robotAsservisement->setConsigneLookAtBackward((double)x.num,(double)y.num,(sensRotation_t)rotation.num);
 		}
 		break;
-	case CMD_ROBOT_MOVING_IS_FINISH:
-    case CMD_ROBOT_RUNNING_IS_FINISH:
-    case CMD_ROBOT_TURNING_IS_FINISH:
+	case CMD_ROBOT_MOVING_IS_DONE:
+    case CMD_ROBOT_RUNNING_IS_DONE:
+    case CMD_ROBOT_TURNING_IS_DONE:
     case CMD_GET_LINEAR_ERROR:
     case CMD_GET_ANGULAR_ERROR:
     case CMD_GET_BRAKING_DISTANCE: {
         uintConv result;
         switch ((CommandNum)data[0]) {
-            case CMD_ROBOT_MOVING_IS_FINISH:
-                result.num = robotAsservisement->robotMovingIsFinish();
+            case CMD_ROBOT_MOVING_IS_DONE:
+                result.num = robotAsservisement->robotMovingIsDone();
                 break;
-            case CMD_ROBOT_RUNNING_IS_FINISH:
-                result.num = robotAsservisement->robotRunningIsFinish();
+            case CMD_ROBOT_RUNNING_IS_DONE:
+                result.num = robotAsservisement->robotRunningIsDone();
                 break;
-            case CMD_ROBOT_TURNING_IS_FINISH:
-                result.num = robotAsservisement->robotTurningIsFinish();
+            case CMD_ROBOT_TURNING_IS_DONE:
+                result.num = robotAsservisement->robotTurningIsDone();
                 break;
             case CMD_GET_LINEAR_ERROR:
                 result.num = robotAsservisement->getLinearError();
@@ -380,11 +381,18 @@ int main(void)
 
 	while (1){
 		
-		odometrieLoop(robotCDFR);
+		position_t pos = robotCDFR->getPosition();
+		position_t* newPos;
+		odometrieLoop(pos, newPos);
+		robotCDFR->updatePostion(*newPos);
+
+		robotAsservisement->setCurrentPos(robotCDFR->getPosition());
+		
 		if (overridePos) {
 			overridePos = false;
 			robotCDFR->setPosition(newPostion);
-			robotAsservisement->setConsigne(newPostion);
+			robotAsservisement->setCurrentPos(robotCDFR->getPosition());
+			robotAsservisement->setConsigne(robotCDFR->getPosition());
 		}
 		if (get_uptime_ms() > nextTime) {
 			nextTime = get_uptime_ms() + 50; //Loop time in ms

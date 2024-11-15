@@ -21,9 +21,9 @@ private:
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
-    robot* robotAsservi;
     sensRotation_t currentState;
     position_t consigne;
+    position_t currentPostion;
 
     double getAngularErrorReel(void);
     double getLinearErrorReel(void);
@@ -35,7 +35,7 @@ public :
 public:
     
 
-    Asservissement(robot* bot);
+    Asservissement();
     bool asservissementLoop(int *pL_speed, int *pR_speed);
     void reset(void);
 
@@ -47,13 +47,14 @@ public:
     void setProtectedConsigneLineaire(double x, double y);
     void setConsigneStop(void);
     void setConsigne(position_t position);
+    void setCurrentPos(position_t position);
 
     double getAngularError(void);
     double getLinearError(void);
 
-    bool robotMovingIsFinish(void);
-    bool robotTurningIsFinish(void);
-    bool robotRunningIsFinish(void);
+    bool robotMovingIsDone(void);
+    bool robotTurningIsDone(void);
+    bool robotRunningIsDone(void);
     int getBrakingDistance(void);
     ~Asservissement();
 };

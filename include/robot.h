@@ -19,10 +19,6 @@ public:
     void setPosition(double x, double y, double theta, uint64_t time);
 
     position_t getPosition();
-    double getPosition_X();
-    double getPosition_Y();
-    double getPosition_theta();
-    double getPosition_Time();
 
     double getAngularSpeed(void);
     double getLinearSpeed(void);
