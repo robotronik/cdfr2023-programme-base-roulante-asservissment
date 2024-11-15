@@ -37,7 +37,7 @@ Asservissement::~Asservissement()
 }
 
 
-motorSpeed_t Asservissement::asservissementLoop(){
+bool Asservissement::asservissementLoop(int *pL_speed, int *pR_speed){
     position_t actualPostion = robotAsservi->getPosition();
     double test = calculAngle(consigne.x,consigne.y,actualPostion);
     bool reTargetAngle = false;
@@ -74,11 +74,12 @@ motorSpeed_t Asservissement::asservissementLoop(){
     // usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
     // usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
     //usartprintf(">rotatif:%lf\n",consigne.theta);
+    *pL_speed = (int)(valPidLineaire-valPidAngulaire);
+    *pR_speed = (int)(valPidLineaire+valPidAngulaire);
+
+    // usartprintf(">speedL:%d\n>speedR:%d\n",*pL_speed,*pR_speed);
     
-    motorSpeed_t speed = {(int)(valPidLineaire-valPidAngulaire),(int)(valPidLineaire+valPidAngulaire)};
-    // usartprintf(">speedL:%d\n>speedR:%d\n",speed.R,speed.L);
-    
-    return speed;
+    return true;
 }
 
 

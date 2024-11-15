@@ -36,7 +36,7 @@ public:
     
 
     Asservissement(robot* bot);
-    motorSpeed_t asservissementLoop(void);
+    bool Asservissement::asservissementLoop(int *pL_speed, int *pR_speed);
     void reset(void);
 
     void setConsigneAngulaire(double angle,sensRotation_t rotation);

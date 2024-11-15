@@ -123,11 +123,6 @@ typedef struct{
 }position_t;
 
 typedef struct{
-	int L = 0;
-    int R = 0;
-}motorSpeed_t;
-
-typedef struct{
 	int16_t x;
     int16_t y;
 	int16_t theta;

@@ -305,7 +305,7 @@ int main(void)
 // Test motor
 // Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward 
 //	
-	#ifdef TESTMOTOR
+#ifdef TESTMOTOR
 		enableMotor();
 		for (int i = 0; i < 100; i++){
 			usartprintf("%d\n",i);
@@ -333,7 +333,7 @@ int main(void)
 			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
 		}
 		while (1);		
-	#endif
+#endif
 	
 #ifdef TESTROBOT
 //
@@ -363,16 +363,18 @@ int main(void)
 			led1_toggle();
 		},1000);
 	}
-#endif
 
 
-#ifndef TESTROBOT
+#else
+
 //
 //	Main Loop off the robot
 //	
 	sequence ledToggleSeq;
 	robotAsservisement->reset();
 	uint32_t nextTime =  get_uptime_ms();
+
+	int LmotorSpeed, RmotorSpeed;
 
 	while (1){
 		
@@ -382,25 +384,25 @@ int main(void)
 			robotCDFR->setPosition(newPostion);
 			robotAsservisement->setConsigne(newPostion);
 		}
-		if(nextTime < get_uptime_ms()){
-			nextTime = get_uptime_ms() + 50;
-			motorSpeed_t speed = robotAsservisement->asservissementLoop();
+		if(get_uptime_ms() > nextTime){
+			nextTime = get_uptime_ms() + 50; //Loop time in ms
+			if(robotAsservisement->asservissementLoop(&LmotorSpeed, &RmotorSpeed));
 			//usartprintf(">x : %.3lf\n>y : %.3lf\n>theta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_theta());
-			if(speed.L>maxTorque){
-				speed.L = maxTorque;
+			if(LmotorSpeed>maxTorque){
+				LmotorSpeed = maxTorque;
 			}
-			if(speed.L<-maxTorque){
-				speed.L = -maxTorque;
+			if(LmotorSpeed<-maxTorque){
+				LmotorSpeed = -maxTorque;
 			}
-			if(speed.R>maxTorque){
-				speed.R = maxTorque;
+			if(RmotorSpeed>maxTorque){
+				RmotorSpeed = maxTorque;
 			}
-			if(speed.R<-maxTorque){
-				speed.R = -maxTorque;
+			if(RmotorSpeed<-maxTorque){
+				RmotorSpeed = -maxTorque;
 			}
-			usartprintf("%d %d\n",speed.L,speed.R);
-			motorSpeedSignedL(speed.L);
-			motorSpeedSignedR(speed.R);
+			//usartprintf("%d %d\n",LmotorSpeed,RmotorSpeed);
+			motorSpeedSignedL(LmotorSpeed);
+			motorSpeedSignedR(RmotorSpeed);
 		}
 
 		//BLINK LED
