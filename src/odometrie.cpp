@@ -2,7 +2,6 @@
 
 
 odometrieTrigger_t buffer[_BUFFERSIZE];
-int endBuffer = 0;
 int bufferIdx =0;
 
 
@@ -92,8 +91,10 @@ void printBuffer(void){
 
 void odometrieLoop(robot* robot){
 	position_t position = robot->getPosition();
-	while (endBuffer != bufferIdx){
-		switch (buffer[endBuffer])
+	int i = 0;
+	while (bufferIdx > 0){
+		bufferIdx--;
+		switch (buffer[bufferIdx])
 		{
 			//This could be improved, needs to be tested
 		case fordwardL:
@@ -119,10 +120,6 @@ void odometrieLoop(robot* robot){
 		default:
 			break;
 		}
-		endBuffer++;
-		if(endBuffer>=_BUFFERSIZE){
-			endBuffer = 0;
-		}	
 	}
 	position.time = get_uptime_ms();
 	robot->updatePostion(position);
