@@ -3,7 +3,7 @@
 
 odometrieTrigger_t buffer[_BUFFERSIZE];
 int endBuffer = 0;
-int startBuffer =0;
+int bufferIdx =0;
 
 
 void odometrieSetup(void){
@@ -46,18 +46,18 @@ void exti2_isr(void)
     exti_reset_request(EXTI2);
 	gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2R,pin_odometrie2R)){
-		buffer[startBuffer]=backwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[bufferIdx]=backwardR;
+		bufferIdx++;
+		if(bufferIdx>=_BUFFERSIZE){
+			bufferIdx = 0;
 		}
 	}
 	else{
 		//Vers l'avant
-		buffer[startBuffer]=fordwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[bufferIdx]=fordwardR;
+		bufferIdx++;
+		if(bufferIdx>=_BUFFERSIZE){
+			bufferIdx = 0;
 		}
 	}
 }
@@ -68,17 +68,17 @@ void exti4_isr(void)
     gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2L,pin_odometrie2L)){
 		//Vers l'avant
-		buffer[startBuffer]=fordwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[bufferIdx]=fordwardL;
+		bufferIdx++;
+		if(bufferIdx>=_BUFFERSIZE){
+			bufferIdx = 0;
 		}
 	}
 	else{
-		buffer[startBuffer]=backwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
+		buffer[bufferIdx]=backwardL;
+		bufferIdx++;
+		if(bufferIdx>=_BUFFERSIZE){
+			bufferIdx = 0;
 		}
 	}
 }
@@ -92,27 +92,28 @@ void printBuffer(void){
 
 void odometrieLoop(robot* robot){
 	position_t position = robot->getPosition();
-	while (endBuffer != startBuffer){
+	while (endBuffer != bufferIdx){
 		switch (buffer[endBuffer])
 		{
+			//This could be improved, needs to be tested
 		case fordwardL:
-				position.y -= STEP_FWD_L * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
-				position.x -= STEP_FWD_L * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.y += STEP_FWD_L * sin(DEG_TO_RAD*(position.theta));
+				position.x += STEP_FWD_L * cos(DEG_TO_RAD*(position.theta));
 				position.theta -= STEP_ANGLE_L;
 			break;
 		case backwardL:
-				position.y += STEP_FWD_L * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
-				position.x += STEP_FWD_L * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.y -= STEP_FWD_L * sin(DEG_TO_RAD*(position.theta));
+				position.x -= STEP_FWD_L * cos(DEG_TO_RAD*(position.theta));
 				position.theta += STEP_ANGLE_L;
 			break;
 		case fordwardR:
-				position.y -= STEP_FWD_R * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
-				position.x -= STEP_FWD_R * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.y += STEP_FWD_R * sin(DEG_TO_RAD*(position.theta));
+				position.x += STEP_FWD_R * cos(DEG_TO_RAD*(position.theta));
 				position.theta += STEP_ANGLE_R;
 			break;
 		case backwardR:
-				position.y += STEP_FWD_R * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
-				position.x += STEP_FWD_R * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.y -= STEP_FWD_R * sin(DEG_TO_RAD*(position.theta));
+				position.x -= STEP_FWD_R * cos(DEG_TO_RAD*(position.theta));
 				position.theta -= STEP_ANGLE_R;
 			break;
 		default:
