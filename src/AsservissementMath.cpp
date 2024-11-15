@@ -5,31 +5,16 @@
 
 
 double calculAngle(double x, double y, position_t actualPostion){
-    double angleTournerPoint;
-    if((x - actualPostion.x) == 0){
-        if((y - actualPostion.y)<0){
-                angleTournerPoint = 90;
-            }
-            else{
-                angleTournerPoint = -90;
-            }
-    }
-    else{
-        angleTournerPoint = atan2(y - actualPostion.y, x - actualPostion.x)*RAD_TO_DEG;
-    }
-    angleTournerPoint = mod_angle(angleTournerPoint);
-    return angleTournerPoint;
+    return mod_angle(atan2(y - actualPostion.y, x - actualPostion.x)*RAD_TO_DEG);
 }
 
 
 
 double mod_angle(double a){
 	a = fmod(a,360);
-	if(a>180){
-		a -=360;
-	}
-	else if(a<-180){
-		a +=360;
-	}
+	if (a>180) 
+        a -=360;	
+	else if (a<-180) 
+        a +=360;	
 	return a;
 }
