@@ -96,24 +96,24 @@ void odometrieLoop(robot* robot){
 		switch (buffer[endBuffer])
 		{
 		case fordwardL:
-				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
-				position.theta -= STEPANGLEG;
+				position.y -= STEP_FWD_L * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
+				position.x -= STEP_FWD_L * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.theta -= STEP_ANGLE_L;
 			break;
 		case backwardL:
-				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
-				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
-				position.theta += STEPANGLEG;
+				position.y += STEP_FWD_L * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
+				position.x += STEP_FWD_L * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.theta += STEP_ANGLE_L;
 			break;
 		case fordwardR:
-				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
-				position.theta += STEPANGLED;
+				position.y -= STEP_FWD_R * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
+				position.x -= STEP_FWD_R * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.theta += STEP_ANGLE_R;
 			break;
 		case backwardR:
-				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.theta+90)); //Voir pour optimisation
-				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.theta-90)); //Voir pour optimisation
-				position.theta -= STEPANGLED;
+				position.y += STEP_FWD_R * cos(DEG_TO_RAD*(position.theta+90)); //Voir pour optimisation
+				position.x += STEP_FWD_R * sin(DEG_TO_RAD*(position.theta-90)); //Voir pour optimisation
+				position.theta -= STEP_ANGLE_R;
 			break;
 		default:
 			break;

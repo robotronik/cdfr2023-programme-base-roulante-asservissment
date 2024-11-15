@@ -17,24 +17,20 @@
 #define _BUFFERSIZE 512
 #define PI 3.14159265359
 
-// theorical distance between the 2 wheel : 298.765mm
-// theorical diametre of the wheel : 39mm
 // Number of step for each resolution : 360 step
-
-// STEPANGLE = (RayonRoueCodeuse * 360) / (NbDePasRoueCodeuse * LargeurEntraxeDes2RoueCodeuses * 2)
-// STEPAVANCE = (RayonRoueCodeuse * 360)/(NbDePasRoueCodeuse*2)
-
 #define NUMBERSTEPBYROTATION 360
-#define DISTANCEWHEEL 300 // + = teat -
-#define DIAMETERWHEELD 41.12                // +1 roue = +25 distance
-#define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
 
-#define STEPANGLED ((DIAMETERWHEELD*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
-#define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL)) 
-#define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
-#define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
+// theorical distance between the 2 wheel : 298.765mm
+#define DISTANCEWHEEL 300 
 
-#define COEFCONVDEGRETORADIAN PI/180
+// theorical diametre of the wheel : 39mm
+#define DIAMETER_WHEEL_R 41.12                // +1 roue = +25 distance 
+#define DIAMETER_WHEEL_L 41.410 // + = y -     // +1 roue = +25 distance
+
+#define STEP_ANGLE_R ((DIAMETER_WHEEL_R*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
+#define STEP_ANGLE_L ((DIAMETER_WHEEL_L*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL)) 
+#define STEP_FWD_R ((DIAMETER_WHEEL_R*PI)/(NUMBERSTEPBYROTATION*2))
+#define STEP_FWD_L ((DIAMETER_WHEEL_L*PI)/(NUMBERSTEPBYROTATION*2))
 
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
