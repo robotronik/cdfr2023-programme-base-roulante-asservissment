@@ -91,7 +91,6 @@ void printBuffer(void){
 
 void odometrieLoop(robot* robot){
 	position_t position = robot->getPosition();
-	int i = 0;
 	while (bufferIdx > 0){
 		bufferIdx--;
 		double a = DEG_TO_RAD*(position.theta);
