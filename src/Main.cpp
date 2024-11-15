@@ -386,23 +386,24 @@ int main(void)
 		}
 		if(get_uptime_ms() > nextTime){
 			nextTime = get_uptime_ms() + 50; //Loop time in ms
-			if(robotAsservisement->asservissementLoop(&LmotorSpeed, &RmotorSpeed));
-			//usartprintf(">x : %.3lf\n>y : %.3lf\n>theta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_theta());
-			if(LmotorSpeed>maxTorque){
-				LmotorSpeed = maxTorque;
+			if(robotAsservisement->asservissementLoop(&LmotorSpeed, &RmotorSpeed)){
+				//usartprintf(">x : %.3lf\n>y : %.3lf\n>theta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_theta());
+				if(LmotorSpeed>maxTorque){
+					LmotorSpeed = maxTorque;
+				}
+				if(LmotorSpeed<-maxTorque){
+					LmotorSpeed = -maxTorque;
+				}
+				if(RmotorSpeed>maxTorque){
+					RmotorSpeed = maxTorque;
+				}
+				if(RmotorSpeed<-maxTorque){
+					RmotorSpeed = -maxTorque;
+				}
+				//usartprintf("%d %d\n",LmotorSpeed,RmotorSpeed);
+				motorSpeedSignedL(LmotorSpeed);
+				motorSpeedSignedR(RmotorSpeed);
 			}
-			if(LmotorSpeed<-maxTorque){
-				LmotorSpeed = -maxTorque;
-			}
-			if(RmotorSpeed>maxTorque){
-				RmotorSpeed = maxTorque;
-			}
-			if(RmotorSpeed<-maxTorque){
-				RmotorSpeed = -maxTorque;
-			}
-			//usartprintf("%d %d\n",LmotorSpeed,RmotorSpeed);
-			motorSpeedSignedL(LmotorSpeed);
-			motorSpeedSignedR(RmotorSpeed);
 		}
 
 		//BLINK LED
