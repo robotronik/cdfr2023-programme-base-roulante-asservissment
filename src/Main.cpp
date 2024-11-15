@@ -20,7 +20,7 @@
 
 bool benableMotorDebug = true;
 position_t newPostion;
-bool needChangePos = false;
+bool overridePos = false;
 int maxTorque = 100;
 
 robot* robotCDFR = new robot();
@@ -96,7 +96,7 @@ void I2CRecieveData(uint8_t* data, int size){
             newPostion.x = (double)((int16_t)(data[1] << 8 | data[2]));
             newPostion.y = (double)((int16_t)(data[3] << 8 | data[4]));
             newPostion.theta = (double)((int16_t)(data[5] << 8 | data[6]));
-            needChangePos = true;
+            overridePos = true;
         }
         break;
 
@@ -164,6 +164,7 @@ void I2CRecieveData(uint8_t* data, int size){
             case CMD_GET_BRAKING_DISTANCE:
                 result.num = robotAsservisement->getBrakingDistance();
                 break;
+			default: break;
         }
         I2CSetBuffer(result.tab, 2);
         break;
@@ -213,6 +214,7 @@ void I2CRecieveData(uint8_t* data, int size){
             case CMD_SET_MAX_SPEED_HORLOGE:
                 robotAsservisement->positionControlAngulaire.vitesseMaxAr = speed.num;
                 break;
+			default: break;
         }
         break;
     }
@@ -379,27 +381,23 @@ int main(void)
 	while (1){
 		
 		odometrieLoop(robotCDFR);
-		if(needChangePos){
-			needChangePos = false;
+		if (overridePos) {
+			overridePos = false;
 			robotCDFR->setPosition(newPostion);
 			robotAsservisement->setConsigne(newPostion);
 		}
-		if(get_uptime_ms() > nextTime){
+		if (get_uptime_ms() > nextTime) {
 			nextTime = get_uptime_ms() + 50; //Loop time in ms
-			if(robotAsservisement->asservissementLoop(&LmotorSpeed, &RmotorSpeed)){
+			if (robotAsservisement->asservissementLoop(&LmotorSpeed, &RmotorSpeed)) {
 				//usartprintf(">x : %.3lf\n>y : %.3lf\n>theta : %.3lf\n",robotCDFR->getPosition_X(),robotCDFR->getPosition_Y(),robotCDFR->getPosition_theta());
-				if(LmotorSpeed>maxTorque){
+				if (LmotorSpeed > maxTorque)
 					LmotorSpeed = maxTorque;
-				}
-				if(LmotorSpeed<-maxTorque){
+				if (LmotorSpeed < -maxTorque)
 					LmotorSpeed = -maxTorque;
-				}
-				if(RmotorSpeed>maxTorque){
+				if (RmotorSpeed > maxTorque)
 					RmotorSpeed = maxTorque;
-				}
-				if(RmotorSpeed<-maxTorque){
+				if (RmotorSpeed < -maxTorque)
 					RmotorSpeed = -maxTorque;
-				}
 				//usartprintf("%d %d\n",LmotorSpeed,RmotorSpeed);
 				motorSpeedSignedL(LmotorSpeed);
 				motorSpeedSignedR(RmotorSpeed);
