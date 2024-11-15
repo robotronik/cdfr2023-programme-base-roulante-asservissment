@@ -83,7 +83,7 @@ motorSpeed_t Asservissement::asservissementLoop(){
 
 
 //******************************************************
-//Set consigne
+// Set consigne
 //******************************************************
 
 void Asservissement::setProtectedConsigneAngulaire(double angle, sensRotation_t rotation){
@@ -160,7 +160,7 @@ void Asservissement::reset(void){
 }
 
 //******************************************************
-//Recupération de l'erreur Réel
+// Recupération de l'erreur Réelle
 //******************************************************
 
 double Asservissement::getAngularErrorReel(void){

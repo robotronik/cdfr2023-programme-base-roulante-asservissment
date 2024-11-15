@@ -15,10 +15,7 @@ double calculAngle(double x, double y, position_t actualPostion){
             }
     }
     else{
-        angleTournerPoint = (atan((y - actualPostion.y)/(x - actualPostion.x))*RAD_TO_DEG);
-        if((x - actualPostion.x)<0){
-            angleTournerPoint -= 180;
-        }
+        angleTournerPoint = atan2(y - actualPostion.y, x - actualPostion.x)*RAD_TO_DEG;
     }
     angleTournerPoint = mod_angle(angleTournerPoint);
     return angleTournerPoint;
