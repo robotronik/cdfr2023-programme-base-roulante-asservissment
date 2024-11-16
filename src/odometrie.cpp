@@ -90,10 +90,10 @@ void printBuffer(void){
 }
 
 void odometrieLoop(position_t position, position_t* updatedPos){
-	while (bufferIdx > 0){
-		bufferIdx--;
+	int i = 0;
+	while (i < bufferIdx){
 		double a = DEG_TO_RAD*(position.theta);
-		switch (buffer[bufferIdx])
+		switch (buffer[i])
 		{
 			//This could be improved, needs to be tested
 		case fordwardL:
@@ -119,7 +119,9 @@ void odometrieLoop(position_t position, position_t* updatedPos){
 		default:
 			break;
 		}
+		i++;
 	}
+	bufferIdx = 0;
 	position.time = get_uptime_ms();
 	updatedPos = &position;
 }
