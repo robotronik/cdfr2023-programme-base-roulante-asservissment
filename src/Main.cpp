@@ -382,9 +382,8 @@ int main(void)
 	while (1){
 		
 		position_t pos = robotCDFR->getPosition();
-		position_t* newPos = 0;
-		odometrieLoop(pos, newPos);
-		robotCDFR->updatePostion(*newPos);
+		odometrieLoop(&pos);
+		robotCDFR->updatePostion(pos);
 
 		robotAsservisement->setCurrentPos(robotCDFR->getPosition());
 		

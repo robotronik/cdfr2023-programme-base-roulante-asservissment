@@ -89,32 +89,32 @@ void printBuffer(void){
 	usartprintf("\n");
 }
 
-void odometrieLoop(position_t position, position_t* updatedPos){
+void odometrieLoop(position_t* position){
 	int i = 0;
 	while (i < bufferIdx){
-		double a = DEG_TO_RAD*(position.theta);
+		double a = DEG_TO_RAD*(position->theta);
 		switch (buffer[i])
 		{
 			//This could be improved, needs to be tested
 		case fordwardL:
-				position.y += STEP_FWD_L * sin(a);
-				position.x += STEP_FWD_L * cos(a);
-				position.theta -= STEP_ANGLE_L;
+				position->y += STEP_FWD_L * sin(a);
+				position->x += STEP_FWD_L * cos(a);
+				position->theta -= STEP_ANGLE_L;
 			break;
 		case backwardL:
-				position.y -= STEP_FWD_L * sin(a);
-				position.x -= STEP_FWD_L * cos(a);
-				position.theta += STEP_ANGLE_L;
+				position->y -= STEP_FWD_L * sin(a);
+				position->x -= STEP_FWD_L * cos(a);
+				position->theta += STEP_ANGLE_L;
 			break;
 		case fordwardR:
-				position.y += STEP_FWD_R * sin(a);
-				position.x += STEP_FWD_R * cos(a);
-				position.theta += STEP_ANGLE_R;
+				position->y += STEP_FWD_R * sin(a);
+				position->x += STEP_FWD_R * cos(a);
+				position->theta += STEP_ANGLE_R;
 			break;
 		case backwardR:
-				position.y -= STEP_FWD_R * sin(a);
-				position.x -= STEP_FWD_R * cos(a);
-				position.theta -= STEP_ANGLE_R;
+				position->y -= STEP_FWD_R * sin(a);
+				position->x -= STEP_FWD_R * cos(a);
+				position->theta -= STEP_ANGLE_R;
 			break;
 		default:
 			break;
@@ -122,7 +122,6 @@ void odometrieLoop(position_t position, position_t* updatedPos){
 		i++;
 	}
 	bufferIdx = 0;
-	position.time = get_uptime_ms();
-	updatedPos = &position;
+	position->time = get_uptime_ms();
 }
 
