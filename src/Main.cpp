@@ -382,7 +382,7 @@ int main(void)
 	while (1){
 		
 		position_t pos = robotCDFR->getPosition();
-		position_t* newPos;
+		position_t* newPos = 0;
 		odometrieLoop(pos, newPos);
 		robotCDFR->updatePostion(*newPos);
 
