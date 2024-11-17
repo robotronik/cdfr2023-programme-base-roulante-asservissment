@@ -39,11 +39,15 @@ Asservissement::~Asservissement()
 bool Asservissement::asservissementLoop(int *pL_speed, int *pR_speed){
     double test = calculAngle(consigne.x,consigne.y,currentPostion);
     bool reTargetAngle = false;
-    if(getLinearErrorReel() >= 100){
+
+    double linearErrorReel = getLinearErrorReel();
+    double angularErrorReel = getAngularErrorReel();
+
+    if(linearErrorReel >= 100){
         reTargetAngle = true;
         setConsigneAngulaire(test,ROTATION_DIRECT);
     }
-    else if(getLinearErrorReel() <= -100){
+    else if(linearErrorReel <= -100){
         reTargetAngle = true;
         setConsigneAngulaire(test+180,ROTATION_DIRECT);
     }
@@ -51,24 +55,24 @@ bool Asservissement::asservissementLoop(int *pL_speed, int *pR_speed){
     double valPidLineaire;
     double valPidAngulaire;    
     if(positionControlLineaire.getPostion()==0){
-        valPidLineaire = pidLineaireBlock.update(getLinearErrorReel()-positionControlLineaire.getPostion(),currentPostion.time);
+        valPidLineaire = pidLineaireBlock.update(linearErrorReel-positionControlLineaire.getPostion(),currentPostion.time);
         pidLineaire.reset();
     }
     else{
-        valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),currentPostion.time);
+        valPidLineaire = pidLineaire.update(linearErrorReel-positionControlLineaire.getPostion(),currentPostion.time);
         pidLineaireBlock.reset();
     }
 
     if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
-        valPidAngulaire = pidAngulaireBlock.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),currentPostion.time);
+        valPidAngulaire = pidAngulaireBlock.update(angularErrorReel-positionControlAngulaire.getPostion(),currentPostion.time);
         pidAngulaire.reset();
     }
     else{
-        valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),currentPostion.time);
+        valPidAngulaire = pidAngulaire.update(angularErrorReel-positionControlAngulaire.getPostion(),currentPostion.time);
         pidAngulaireBlock.reset();
     }
     
-    // usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n",getAngularErrorReel(),getLinearErrorReel());
+    // usartprintf(">erreurAngulaire:%lf\n>erreurLineaire:%lf\n",angularErrorReel,linearErrorReel);
     // usartprintf(">pidLineaire:%lf\n>valPidAngulaire:%lf\n",valPidLineaire,valPidAngulaire);
     // usartprintf(">p:%lf\n>i:%lf\n>d:%lf\n",pidAngulaireBlock.valP,pidAngulaireBlock.valI,pidAngulaireBlock.valD);
     //usartprintf(">rotatif:%lf\n",consigne.theta);
