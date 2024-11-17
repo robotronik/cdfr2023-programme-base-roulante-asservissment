@@ -1,12 +1,15 @@
 #include "odometrie.h"
 
 
-odometrieTrigger_t buffer[_BUFFERSIZE];
-int endBuffer = 0;
-int startBuffer =0;
+uint8_t buffer[_BUFFERSIZE];
+int size = _BUFFERSIZE;
+CircularBuffer* circularBuffer;
+
 
 
 void odometrieSetup(void){
+	circularBuffer = new CircularBuffer(size,buffer);
+
 
     rcc_periph_clock_enable(RCC_GPIOD);
     rcc_periph_clock_enable(RCC_GPIOB);
@@ -46,19 +49,11 @@ void exti2_isr(void)
     exti_reset_request(EXTI2);
 	gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2R,pin_odometrie2R)){
-		buffer[startBuffer]=backwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
-		}
+		circularBuffer->push(backwardR);
 	}
 	else{
 		//Vers l'avant
-		buffer[startBuffer]=fordwardR;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
-		}
+		circularBuffer->push(fordwardR);
 	}
 }
 
@@ -68,32 +63,18 @@ void exti4_isr(void)
     gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2L,pin_odometrie2L)){
 		//Vers l'avant
-		buffer[startBuffer]=fordwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
-		}
+		circularBuffer->push(fordwardL);
 	}
 	else{
-		buffer[startBuffer]=backwardL;
-		startBuffer++;
-		if(startBuffer>=_BUFFERSIZE){
-			startBuffer = 0;
-		}
+		circularBuffer->push(backwardL);
 	}
 }
 
-void printBuffer(void){
-	for(int i =0; i<_BUFFERSIZE;i++){
-		usartprintf("%d",buffer[i]);
-	}
-	usartprintf("\n");
-}
 
 void odometrieLoop(robot* robot){
 	position_t position = robot->getPosition();
-	while (endBuffer != startBuffer){
-		switch (buffer[endBuffer])
+	while (!circularBuffer->isEmpty()){
+		switch (circularBuffer->pop())
 		{
 		case fordwardL:
 				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
@@ -118,11 +99,8 @@ void odometrieLoop(robot* robot){
 		default:
 			break;
 		}
-		endBuffer++;
-		if(endBuffer>=_BUFFERSIZE){
-			endBuffer = 0;
-		}	
 	}
+	//usartprintf("end\n");
 	position.time = get_uptime_ms();
 	robot->updatePostion(position);
 }

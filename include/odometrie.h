@@ -9,12 +9,13 @@
 
 #include <math.h>
 
+#include "circularBuffer.h"
 #include "config.h"
 #include "clock.h"
 #include "uart.h"
 #include "robot.h"
 
-#define _BUFFERSIZE 512
+#define _BUFFERSIZE 50000
 #define PI 3.14159265359
 
 // theorical distance between the 2 wheel : 298.765mm
@@ -30,7 +31,7 @@
 #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
 
 #define STEPANGLED ((DIAMETERWHEELD*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
-#define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL)) 
+#define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
 #define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
 #define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
 
@@ -39,9 +40,4 @@
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
 void odometrieSetup(void);
-void printBuffer(void);
-void printPosition(void);
 void odometrieLoop(robot* robot);
-position_t odometrieGetPosition(void);
-position_u odometrieGetPositionInt(void);
-void odometrieSetPosition(position_u positionUnion);
