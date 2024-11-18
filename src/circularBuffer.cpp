@@ -12,6 +12,8 @@ void CircularBuffer::init(void){
     m_startbitCount = 0;
     m_endBuffer = 0;
     m_endbitCount = 0;
+    m_freezePush = false;
+    m_validRedord = false;
 }
 
 
@@ -31,6 +33,15 @@ bool CircularBuffer::isEmpty() const {
 
 
 bool CircularBuffer::push(uint8_t data) {
+    if(m_freezePush){
+        return false;
+    }
+
+    //buffer is large, optimisation not needed
+    if(m_startBuffer == m_size){
+        m_validRedord = false;
+    }
+
     if (data > 3) {
         usartprintf("Erreur: données hors limites (doivent être sur 2 bits).\n");
         return false;
@@ -96,4 +107,71 @@ bool CircularBuffer::pop(uint8_t &data) {
 #endif
 
     return true;
+}
+
+void CircularBuffer::freezePush(bool freeze){
+    m_freezePush = freeze;
+}
+
+
+
+void CircularBuffer::startRecording(void){
+    this->init();
+    m_endPopRecord = 0;
+    m_endbitPopRecord = 0;
+    m_validRedord = true;
+}
+
+bool CircularBuffer::recordIsValid(void){
+    return  m_validRedord;
+}
+
+void CircularBuffer::stopRecording(void){
+    m_freezePush = true;
+}
+
+bool CircularBuffer::popRecod(uint8_t &data){
+    if (isEmpty()) {
+        usartprintf("Erreur: Buffer vide.\n");
+        return false;
+    }
+
+#ifdef OPTIMIZE_BUFFER
+    data = ((m_buffer[m_endPopRecord]>>m_endbitPopRecord) & 0x03);
+    m_endbitPopRecord += 2;
+
+    if (m_endbitPopRecord == 8) {
+        m_endbitPopRecord = 0;
+        m_endPopRecord ++;
+        if(m_endPopRecord == m_size){
+            m_endPopRecord = 0;
+        }
+    }
+#else
+    data = (m_buffer[m_endPopRecord]);
+    m_endPopRecord ++;
+    if(m_endPopRecord == m_size){
+        m_endPopRecord = 0;
+    }
+#endif
+
+    return true;
+}
+
+bool CircularBuffer::recordIsEmpty() const {
+#ifdef OPTIMIZE_BUFFER
+    return (m_startBuffer == m_endPopRecord) && (m_endbitPopRecord == m_startbitCount);
+#else
+    return (m_startBuffer == m_endPopRecord);
+#endif
+}
+
+uint8_t CircularBuffer::popRecod(void){
+    uint8_t data;
+    this->pop(data);
+    return data;
+}
+void CircularBuffer::resetPopRecord(void){
+    m_endPopRecord = 0;
+    m_endbitPopRecord = 0;
 }
