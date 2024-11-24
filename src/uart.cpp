@@ -28,7 +28,7 @@ void usartSendMessage(uint32_t usart, char* Message){
 	while (Message[i] != 0)	{
 		usart_send_blocking(usart,Message[i]);
 		i++;
-	}	
+	}
 }
 
 void usartprintf(const char* format, ...) {

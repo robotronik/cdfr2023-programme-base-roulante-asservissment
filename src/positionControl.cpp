@@ -83,7 +83,7 @@ void positionControl::calculVitesse(){
             }
             else{
                 vitesse = (consigne-position);
-            }            
+            }
         }
         else{
             vitesse = consigne-position;
@@ -100,7 +100,7 @@ void positionControl::calculVitesse(){
             }
             else{
                 vitesse = (consigne-position);
-            } 
+            }
         }
         else{
             vitesse = consigne-position;

@@ -9,7 +9,7 @@
 
 #include <math.h>
 
-#include "circularBuffer.h"
+#include "circularBufferOdo.h"
 #include "config.h"
 #include "clock.h"
 #include "uart.h"

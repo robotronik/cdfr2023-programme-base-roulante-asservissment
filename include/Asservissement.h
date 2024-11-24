@@ -7,11 +7,6 @@
 #include "positionControl.h"
 
 
-typedef enum {
-    ROTATION_DIRECT = 0,
-    ROTATION_TRIGO = 1,
-    ROTATION_HORRAIRE = 2
-} sensRotation_t;
 
 class Asservissement
 {
@@ -22,7 +17,7 @@ private:
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
     robot* robotAsservi;
-    sensRotation_t currentState;
+    Rotation currentState;
     position_t consigne;
 
     double getAngularErrorReel(void);
@@ -33,18 +28,10 @@ public :
     positionControl positionControlAngulaire;
 
 public:
-    
-
     Asservissement(robot* bot);
     motorSpeed_t asservissementLoop(void);
     void reset(void);
 
-    void setConsigneAngulaire(double angle,sensRotation_t rotation);
-    void setConsigneLineaire(double x, double y);
-    void setConsigneLookAtForward(double x, double y, sensRotation_t rotation);
-    void setConsigneLookAtBackward(double x, double y, sensRotation_t rotation);
-    void setProtectedConsigneAngulaire(double angle, sensRotation_t rotation);
-    void setProtectedConsigneLineaire(double x, double y);
     void setConsigneStop(void);
     void setConsigne(position_t position);
 
@@ -55,5 +42,19 @@ public:
     bool robotTurningIsFinish(void);
     bool robotRunningIsFinish(void);
     int getBrakingDistance(void);
+    Rotation getRotationSide(void);
+    Direction getDirectionSide(void);
+    position_t getCurrentConsigne(void);
+
     ~Asservissement();
+
+private:
+    void setConsigneAngulaire(double angle,Rotation rotation);
+    void setConsigneLineaire(double x, double y);
+
+protected:
+    void setProtectedConsigneLineaire(double x, double y);
+    void setConsigneLookAtForward(double x, double y, Rotation rotation);
+    void setConsigneLookAtBackward(double x, double y, Rotation rotation);
+    void setProtectedConsigneAngulaire(double angle, Rotation rotation);
 };

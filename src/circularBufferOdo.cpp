@@ -1,13 +1,13 @@
-#include "circularBuffer.h"
+#include "circularBufferOdo.h"
 
-CircularBuffer::CircularBuffer(int size,uint8_t* buffer){
+CircularBufferOdo::CircularBufferOdo(int size,uint8_t* buffer){
     m_buffer = buffer;
     m_size = size;
     this->init();
 }
 
 
-void CircularBuffer::init(void){
+void CircularBufferOdo::init(void){
     m_startBuffer = 0;
     m_startbitCount = 0;
     m_endBuffer = 0;
@@ -18,12 +18,12 @@ void CircularBuffer::init(void){
 
 
 //since the buffer is large and never full, there is no need to check the last 4 data with m_endbitCount and m_startbitCount
-bool CircularBuffer::isFull() const {
+bool CircularBufferOdo::isFull() const {
     return ((m_startBuffer == m_endBuffer-1) || (m_startBuffer == 0 && m_endBuffer == m_size-1));
 }
 
 
-bool CircularBuffer::isEmpty() const {
+bool CircularBufferOdo::isEmpty() const {
 #ifdef OPTIMIZE_BUFFER
     return (m_startBuffer == m_endBuffer) && (m_endbitCount == m_startbitCount);
 #else
@@ -32,7 +32,7 @@ bool CircularBuffer::isEmpty() const {
 }
 
 
-bool CircularBuffer::push(uint8_t data) {
+bool CircularBufferOdo::push(uint8_t data) {
     if(m_freezePush){
         return false;
     }
@@ -75,13 +75,13 @@ bool CircularBuffer::push(uint8_t data) {
     return true;
 }
 
-uint8_t CircularBuffer::pop(void){
+uint8_t CircularBufferOdo::pop(void){
     uint8_t data;
     this->pop(data);
     return data;
 }
 
-bool CircularBuffer::pop(uint8_t &data) {
+bool CircularBufferOdo::pop(uint8_t &data) {
     if (isEmpty()) {
         usartprintf("Erreur: Buffer vide.\n");
         return false;
@@ -109,28 +109,28 @@ bool CircularBuffer::pop(uint8_t &data) {
     return true;
 }
 
-void CircularBuffer::freezePush(bool freeze){
+void CircularBufferOdo::freezePush(bool freeze){
     m_freezePush = freeze;
 }
 
 
 
-void CircularBuffer::startRecording(void){
+void CircularBufferOdo::startRecording(void){
     this->init();
     m_endPopRecord = 0;
     m_endbitPopRecord = 0;
     m_validRedord = true;
 }
 
-bool CircularBuffer::recordIsValid(void){
+bool CircularBufferOdo::recordIsValid(void){
     return  m_validRedord;
 }
 
-void CircularBuffer::stopRecording(void){
+void CircularBufferOdo::stopRecording(void){
     m_freezePush = true;
 }
 
-bool CircularBuffer::popRecod(uint8_t &data){
+bool CircularBufferOdo::popRecod(uint8_t &data){
     if (isEmpty()) {
         usartprintf("Erreur: Buffer vide.\n");
         return false;
@@ -158,7 +158,7 @@ bool CircularBuffer::popRecod(uint8_t &data){
     return true;
 }
 
-bool CircularBuffer::recordIsEmpty() const {
+bool CircularBufferOdo::recordIsEmpty() const {
 #ifdef OPTIMIZE_BUFFER
     return (m_startBuffer == m_endPopRecord) && (m_endbitPopRecord == m_startbitCount);
 #else
@@ -166,12 +166,12 @@ bool CircularBuffer::recordIsEmpty() const {
 #endif
 }
 
-uint8_t CircularBuffer::popRecod(void){
+uint8_t CircularBufferOdo::popRecod(void){
     uint8_t data;
     this->pop(data);
     return data;
 }
-void CircularBuffer::resetPopRecord(void){
+void CircularBufferOdo::resetPopRecord(void){
     m_endPopRecord = 0;
     m_endbitPopRecord = 0;
 }

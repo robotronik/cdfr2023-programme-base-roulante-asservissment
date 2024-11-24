@@ -3,12 +3,12 @@
 
 uint8_t buffer[_BUFFERSIZE];
 int size = _BUFFERSIZE;
-CircularBuffer* circularBuffer;
+CircularBufferOdo* circularBufferOdo;
 
 
 
 void odometrieSetup(void){
-	circularBuffer = new CircularBuffer(size,buffer);
+	circularBufferOdo = new CircularBufferOdo(size,buffer);
 
 
     rcc_periph_clock_enable(RCC_GPIOD);
@@ -49,11 +49,11 @@ void exti2_isr(void)
     exti_reset_request(EXTI2);
 	gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2R,pin_odometrie2R)){
-		circularBuffer->push(backwardR);
+		circularBufferOdo->push(backwardR);
 	}
 	else{
 		//Vers l'avant
-		circularBuffer->push(fordwardR);
+		circularBufferOdo->push(fordwardR);
 	}
 }
 
@@ -63,18 +63,18 @@ void exti4_isr(void)
     gpio_toggle(port_led1,pin_led1);
 	if(gpio_get (port_odometrie2L,pin_odometrie2L)){
 		//Vers l'avant
-		circularBuffer->push(fordwardL);
+		circularBufferOdo->push(fordwardL);
 	}
 	else{
-		circularBuffer->push(backwardL);
+		circularBufferOdo->push(backwardL);
 	}
 }
 
 
 void odometrieLoop(robot* robot){
 	position_t position = robot->getPosition();
-	while (!circularBuffer->isEmpty()){
-		switch (circularBuffer->pop())
+	while (!circularBufferOdo->isEmpty()){
+		switch (circularBufferOdo->pop())
 		{
 		case fordwardL:
 				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation

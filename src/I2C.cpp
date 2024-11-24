@@ -36,7 +36,7 @@ void i2c_setup(void){
 
 	///I2C1_CR1 |= I2C_CR1_NOSTRETCH;
 
-	//addressing mode	
+	//addressing mode
     i2c_set_own_7bit_slave_address(I2C1,ADDRI2CBASEROULANTE);
 
 	i2c_peripheral_enable(I2C1);
@@ -95,7 +95,7 @@ void i2c1_ev_isr(void){
 			communicationType = DIRSEND;
 			if(callbackinitialiseTrans){
 				callbacki2cTrans();
-			}		
+			}
 		}
 		else{
 			communicationType = DIRRECEIVE;

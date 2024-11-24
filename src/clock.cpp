@@ -11,7 +11,7 @@ void clock_setup() {
   systick_clear();
   systick_counter_enable();
   systick_interrupt_enable();
-  
+
 }
 
 volatile uint32_t systicks = 0;

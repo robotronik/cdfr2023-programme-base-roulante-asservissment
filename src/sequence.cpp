@@ -20,14 +20,14 @@ void sequence::delay(FunctionPointer func, uint32_t delay) {
             func();
         }
     }
-    count ++;    
+    count ++;
 }
 
 void sequence::interval(FunctionPointer func, uint32_t delay) {
     if(startTime < get_uptime_ms()){
         startTime = get_uptime_ms() + delay;
         func();
-    }    
+    }
 }
 
 sequence::~sequence(){

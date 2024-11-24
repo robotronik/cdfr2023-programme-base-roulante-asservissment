@@ -26,7 +26,7 @@ double PID::update(double error, uint32_t time) {
     valP = kp * error;
 
     // Calcul du terme intégral
-    integral += error * deltaTime;    
+    integral += error * deltaTime;
     valI = ki * integral;
 
     // Calcul du terme dérivé

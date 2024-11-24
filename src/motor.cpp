@@ -50,7 +50,7 @@ void motorSpeedSignedL(int speed){
 		motorSetSpeedL(speed);
 	}
 }
-	
+
 
 void motorSpeedUnsignedL(int speed,int direction){
 	if(direction == 1){
@@ -82,7 +82,7 @@ void motorSpeedSignedR(int speed){
 		motorSetSpeedR(speed);
 	}
 }
-	
+
 
 void motorSpeedUnsignedR(int speed,int direction){
 	if(direction == 1){
@@ -92,7 +92,7 @@ void motorSpeedUnsignedR(int speed,int direction){
 		motorDirectionR(0);
 	}
 	motorSetSpeedR(speed);
-	
+
 }
 
 void motorBrakeL(int brake){
@@ -184,7 +184,7 @@ void setupGPIO(void){
     /* Configure PA5 en entrée analogique */
     gpio_mode_setup(port_infoSpeedL, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedL);
 	gpio_mode_setup(port_infoSpeedR, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedR);
-	
+
 	gpio_mode_setup(port_ModeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeL);
 	gpio_mode_setup(port_brakeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_brakeL);
 	gpio_mode_setup(port_directionL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_directionL);

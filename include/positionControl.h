@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <math.h>
 #include <stdint.h>
@@ -14,10 +14,10 @@ public:
     double vitesse;
 
     double vitesseMaxAv = 45;
-    double accelerationMaxAv = 25; 
+    double accelerationMaxAv = 25;
     double decelerationMaxAv = 25;
     double vitesseMaxAr = 45;
-    double accelerationMaxAr = 25; 
+    double accelerationMaxAr = 25;
     double decelerationMaxAr = 25;
     double deltaTemps = 0;
     bool decelationLineair = true;

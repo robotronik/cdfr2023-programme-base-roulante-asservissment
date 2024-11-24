@@ -1,39 +1,56 @@
 #pragma once
-#include "uart.h"
-#include <cstdint>
 
-#define OPTIMIZE_BUFFER
-
+template <typename T, int N>
 class CircularBuffer {
 private:
-    uint8_t* m_buffer;
-    int m_startBuffer;
-    int m_startbitCount;
-    int m_endBuffer;
-    int m_endbitCount;
-    int m_size;
-    bool m_freezePush;
-
-    int m_endPopRecord;
-    int m_endbitPopRecord;
-    bool m_validRedord;
+    T buffer[N];
+    int head = 0;
+    int tail = 0;
+    bool full = false;
 
 public:
-    CircularBuffer(int size,uint8_t* buffer);
-    void init(void);
-    bool isFull() const;
-    bool isEmpty() const;
-    bool push(uint8_t data);
-    bool pop(uint8_t &data);
-    uint8_t pop(void);
-    void freezePush(bool);
 
-    void startRecording(void);
-    void stopRecording(void);
-    bool recordIsValid(void);
-    bool popRecod(uint8_t &data);
-    uint8_t popRecod(void);
-    bool recordIsEmpty() const;
-    void resetPopRecord(void);
+    CircularBuffer() : head(0), tail(0), full(false) {}
 
+    void push(const T& item) {
+        if (full) {
+        }
+
+        buffer[tail] = item;
+        tail = (tail + 1) % N;
+        full = (tail == head);
+    }
+
+    T pop() {
+        if (isEmpty()) {
+        }
+
+        T item = buffer[head];
+        head = (head + 1) % N;
+        full = false;
+        return item;
+    }
+
+    bool isEmpty() const {
+        return (!full && (head == tail));
+    }
+
+    bool isFull() const {
+        return full;
+    }
+
+    int getAvailableSpace() const {
+        if (full) {
+            return 0;
+        }
+        if (tail >= head) {
+            return N - (tail - head);
+        } else {
+            return head - tail;
+        }
+    }
+
+    int getCapacity() const {
+        return N;
+    }
 };

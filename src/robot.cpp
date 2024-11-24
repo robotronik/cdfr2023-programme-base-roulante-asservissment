@@ -69,7 +69,7 @@ double robot::getLinearSpeed(void){
         anglevitesse = (atan((position.y - oldPosition.y)/(position.x - oldPosition.x))*-RAD_TO_DEG);
         if((position.x - oldPosition.x)<0){
                 anglevitesse = mod_angle(anglevitesse+180);
-        } 
+        }
     }
     if(anglevitesse-position.teta<-90 || anglevitesse-position.teta>90){
         return -longueurDeplacement;

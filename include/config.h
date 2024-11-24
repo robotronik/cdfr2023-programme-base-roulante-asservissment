@@ -106,7 +106,7 @@
 #define pin_SWCLK           GPIO14
 #define port_SWCLK              GPIOA
 
-//PIN and PORT for the endstop. Use the end stop to calibrate the odometrie. 
+//PIN and PORT for the endstop. Use the end stop to calibrate the odometrie.
 #define pin_endStopL         GPIO11
 #define port_endstopL            GPIOC
 #define pin_endStopR         GPIO12
@@ -120,6 +120,28 @@
 
 
 //Variable
+enum class Rotation {
+    NONE = 0,
+    SHORTEST = 1,
+    ANTICLOCKWISE = 2,
+    CLOCKWISE = 3
+};
+
+enum class Direction {
+    NONE = -1,
+    FORWARD = 0,
+    BACKWARD = 1
+};
+
+enum class BaseCommand {
+    ANGULAR_THETA,
+    ANGULAR_LOOKAT,
+    LINEAR
+};
+
+const char* directionToChar(Direction dir);
+const char* rotationToChar(Rotation rot);
+const char* baseCommandToString(BaseCommand cmd);
 
 typedef struct{
 	double x = 0;
