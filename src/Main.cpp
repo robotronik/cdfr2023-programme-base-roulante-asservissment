@@ -21,7 +21,7 @@
 #endif
 
 position* robotPosition = new position();
-movement* robotAsservisement = new movement();
+movement* robotAsservisement = new movement(robotPosition);
 i2c_interface* robotI2cInterface = new i2c_interface(robotPosition, robotAsservisement);
 
 void I2CRecieveData(uint8_t* data, int size){
@@ -92,7 +92,6 @@ int main(void)
 	odometrieSetup();
 	i2c_setup();
 	setCallbackReceive(I2CRecieveData);
-
 
 
 	//WAIT
@@ -181,20 +180,13 @@ int main(void)
 //	Main Loop off the robot
 //
 	sequence ledToggleSeq;
+
+    //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
-	uint32_t nextTime =  get_uptime_ms();
 
 	while (1){
-
 		robotPosition->loop();
         robotAsservisement->loop();
-		if(nextTime < get_uptime_ms()){
-			//prinAdcValue();
-			nextTime = get_uptime_ms() + 50;
-			motorSpeed_t speed = robotAsservisement->asservissementLoop(*robotPosition);
-			motorSpeedSignedL(speed.L);
-			motorSpeedSignedR(speed.R);
-		}
 
 		//BLINK LED
 		ledToggleSeq.interval([](){

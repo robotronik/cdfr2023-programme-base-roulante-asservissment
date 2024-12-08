@@ -1,6 +1,6 @@
 #include "movement.h"
 
-movement::movement():Asservissement(){
+movement::movement(position* pos):Asservissement(pos){
 }
 
 bool movement::goToPoint(uint16_t x,uint16_t y,Rotation rotation, Direction direction){
@@ -158,6 +158,7 @@ bool movement::commandRun(void){
 }
 
 void movement::loop(void){
+    Asservissement::loop();
     if(!run && !commandBuffer.isEmpty()){
         currentCommand = commandBuffer.pop();
         launchCommande();

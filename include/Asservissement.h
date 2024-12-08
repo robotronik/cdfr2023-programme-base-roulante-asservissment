@@ -5,6 +5,7 @@
 #include "uart.h"
 #include "positionControl.h"
 #include "position.h"
+#include "motor.h"
 
 
 
@@ -16,20 +17,28 @@ private:
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
-    position posRobot;
     Rotation currentState;
     position_t consigne;
 
     double getAngularErrorReel(void);
     double getLinearErrorReel(void);
 
+    uint32_t nextTime;
+    int loopPeriod = 50;
+
+    position* posRobot;
+
 public :
     positionControl positionControlLineaire;
     positionControl positionControlAngulaire;
 
 public:
-    Asservissement();
-    motorSpeed_t asservissementLoop(position positionRobot);
+    Asservissement(position* pos);
+
+    void loop();
+    void asservissementLoop();
+    void setAsservissementLoopPeriod(int period);
+
     void reset(void);
 
     void setConsigneStop(void);

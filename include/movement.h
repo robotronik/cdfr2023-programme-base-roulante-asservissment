@@ -24,7 +24,7 @@ private:
     bool run = false;
 
 public:
-    movement();
+    movement(position* pos);
     bool goToPoint(uint16_t x,uint16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
     bool goToPoint(uint16_t x,uint16_t y,uint16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::FORWARD, Rotation rotationSecond = Rotation::SHORTEST);
     bool setConsigneAngulaire(uint16_t angle,Rotation rotation);
