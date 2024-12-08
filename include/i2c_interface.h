@@ -1,12 +1,19 @@
 #pragma once
 
 #include "robot_interface.h"
+#include "movement.h"
+#include "motor.h"
+#include "led.h"
+#include "I2C.h"
 
 class i2c_interface : public Robot_interface
 {
 private:
-    /* data */
+    position* robotPosition;
+    movement* robotAsservisement;
 public:
+    i2c_interface(position* inRobotPosition, movement* inRobotAsservisement);
+
     void turn_on_LED_1();
     void turn_off_LED_1();
     void turn_on_LED_2();
@@ -37,10 +44,10 @@ public:
     void set_max_speed_backward(int16_t speed);
     void set_max_speed_trigo(int16_t speed);
     void set_max_speed_horloge(int16_t speed);
-    void go_to_point(int16_t x,int16_t y,Rotation rotation = ROTATION_DIRECT, Direction direction = MOVE_FORWARD);
+    void go_to_point(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
     void go_to_point(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst, Direction direction, Rotation rotationSecond);
 
-    void I2CSetBuffer(uint8_t* data, int size);
+    void setReponseBuffer(uint8_t* data, int size);
 };
 
 

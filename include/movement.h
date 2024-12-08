@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Asservissement.h"
-#include "robot.h"
 #include "stdint.h"
 #include "circularBuffer.h"
 #include "config.h"
@@ -25,14 +24,14 @@ private:
     bool run = false;
 
 public:
-    movement(robot* bot);
+    movement();
     bool goToPoint(uint16_t x,uint16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
     bool goToPoint(uint16_t x,uint16_t y,uint16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::FORWARD, Rotation rotationSecond = Rotation::SHORTEST);
     bool setConsigneAngulaire(uint16_t angle,Rotation rotation);
     bool setConsigneLookAtForward(uint16_t x,uint16_t y,Rotation rotation);
     bool setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation);
     bool commandRun(void);
-    void loop(void);
+    void loop();
     ~movement();
 
 private:

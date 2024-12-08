@@ -1,10 +1,10 @@
 #pragma once
 
-#include "robot.h"
 #include "config.h"
 #include "PID.h"
 #include "uart.h"
 #include "positionControl.h"
+#include "position.h"
 
 
 
@@ -16,7 +16,7 @@ private:
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
-    robot* robotAsservi;
+    position posRobot;
     Rotation currentState;
     position_t consigne;
 
@@ -28,8 +28,8 @@ public :
     positionControl positionControlAngulaire;
 
 public:
-    Asservissement(robot* bot);
-    motorSpeed_t asservissementLoop(void);
+    Asservissement();
+    motorSpeed_t asservissementLoop(position positionRobot);
     void reset(void);
 
     void setConsigneStop(void);

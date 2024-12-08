@@ -13,7 +13,6 @@
 #include "config.h"
 #include "clock.h"
 #include "uart.h"
-#include "robot.h"
 
 #define _BUFFERSIZE 50000
 #define PI 3.14159265359
@@ -40,4 +39,4 @@
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
 void odometrieSetup(void);
-void odometrieLoop(robot* robot);
+void odometrieLoop(position_t position);

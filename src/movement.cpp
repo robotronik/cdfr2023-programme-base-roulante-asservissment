@@ -1,6 +1,6 @@
 #include "movement.h"
 
-movement::movement(robot* bot):Asservissement(bot){
+movement::movement():Asservissement(){
 }
 
 bool movement::goToPoint(uint16_t x,uint16_t y,Rotation rotation, Direction direction){

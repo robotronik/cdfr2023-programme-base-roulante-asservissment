@@ -8,7 +8,7 @@
 	#include <libopencm3/cm3/nvic.h>
 	#include <libopencm3/stm32/timer.h>
 #endif
-
+#include "type.h"
 
 //PIN and Port to control the first MotorL
 #define pin_ModeL 			GPIO0
@@ -118,20 +118,6 @@
 #define pin_I2CSda			GPIO7
 #define port_I2CSda				GPIOB
 
-
-//Variable
-enum class Rotation {
-    NONE = 0,
-    SHORTEST = 1,
-    ANTICLOCKWISE = 2,
-    CLOCKWISE = 3
-};
-
-enum class Direction {
-    NONE = -1,
-    FORWARD = 0,
-    BACKWARD = 1
-};
 
 enum class BaseCommand {
     ANGULAR_THETA,

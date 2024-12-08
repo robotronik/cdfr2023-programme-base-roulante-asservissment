@@ -1,12 +1,11 @@
 #include "Asservissement.h"
 
 
-Asservissement::Asservissement(robot* bot):
+Asservissement::Asservissement():
     pidLineaire(1,0.000,100),
     pidAngulaire(2,0.0,200),
     pidLineaireBlock(1,0.001,100),
-    pidAngulaireBlock(2,0.001,200),
-    robotAsservi(bot)
+    pidAngulaireBlock(2,0.001,200)
 {
 
     currentState = Rotation::SHORTEST;
@@ -37,9 +36,13 @@ Asservissement::~Asservissement()
 }
 
 
-motorSpeed_t Asservissement::asservissementLoop(){
-    position_t actualPostion = robotAsservi->getPosition();
-    double test = calculAngle(consigne.x,consigne.y,actualPostion);
+motorSpeed_t Asservissement::asservissementLoop(position positionRobot){
+    if(positionRobot.getPositionChanged()){
+        setConsigne(positionRobot.getPosition());
+    }
+    posRobot = positionRobot;
+
+    double test = calculAngle(consigne.x,consigne.y,posRobot.getPosition());
     bool reTargetAngle = false;
     if(getLinearErrorReel() >= 100){
         reTargetAngle = true;
@@ -53,20 +56,20 @@ motorSpeed_t Asservissement::asservissementLoop(){
     double valPidLineaire;
     double valPidAngulaire;
     if(positionControlLineaire.getPostion()==0){
-        valPidLineaire = pidLineaireBlock.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
+        valPidLineaire = pidLineaireBlock.update(getLinearErrorReel()-positionControlLineaire.getPostion(),posRobot.getPosition_Time());
         pidLineaire.reset();
     }
     else{
-        valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),robotAsservi->getPosition_Time());
+        valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),posRobot.getPosition_Time());
         pidLineaireBlock.reset();
     }
 
     if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
-        valPidAngulaire = pidAngulaireBlock.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+        valPidAngulaire = pidAngulaireBlock.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot.getPosition_Time());
         pidAngulaire.reset();
     }
     else{
-        valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),robotAsservi->getPosition_Time());
+        valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot.getPosition_Time());
         pidAngulaireBlock.reset();
     }
 
@@ -88,8 +91,8 @@ motorSpeed_t Asservissement::asservissementLoop(){
 
 void Asservissement::setProtectedConsigneAngulaire(double angle, Rotation rotation){
     if(positionControlLineaire.getPostion()!=0){
-        consigne.x = robotAsservi->getPosition_X();
-        consigne.y = robotAsservi->getPosition_Y();
+        consigne.x = posRobot.getPosition_X();
+        consigne.y = posRobot.getPosition_Y();
         positionControlLineaire.setPosition(0);
         positionControlLineaire.setConsigne(0);
     }
@@ -106,7 +109,7 @@ void Asservissement::setConsigneAngulaire(double angle, Rotation rotation){
 
 void Asservissement::setProtectedConsigneLineaire(double x, double y){
     if(positionControlAngulaire.getPostion()!=0){
-        consigne.teta = mod_angle(robotAsservi->getPosition_Teta());
+        consigne.teta = mod_angle(posRobot.getPosition_Teta());
         positionControlAngulaire.setPosition(0);
         positionControlAngulaire.setConsigne(0);
     }
@@ -122,11 +125,11 @@ void Asservissement::setConsigneLineaire(double x, double y){
 }
 
 void Asservissement::setConsigneLookAtForward(double x, double y, Rotation rotation){
-    setProtectedConsigneAngulaire(calculAngle(x,y,robotAsservi->getPosition()),rotation);
+    setProtectedConsigneAngulaire(calculAngle(x,y,posRobot.getPosition()),rotation);
 }
 
 void Asservissement::setConsigneLookAtBackward(double x, double y, Rotation rotation){
-    setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,robotAsservi->getPosition())+180),rotation);
+    setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,posRobot.getPosition())+180),rotation);
 }
 
 void Asservissement::setConsigneStop(void){
@@ -172,9 +175,9 @@ Direction Asservissement::getDirectionSide(void){
 
 void Asservissement::reset(void){
     currentState = Rotation::SHORTEST;
-    consigne.teta = robotAsservi->getPosition_Teta();
-    consigne.x = robotAsservi->getPosition_X();
-    consigne.y = robotAsservi->getPosition_Y();
+    consigne.teta = posRobot.getPosition_Teta();
+    consigne.x = posRobot.getPosition_X();
+    consigne.y = posRobot.getPosition_Y();
     positionControlLineaire.reset(0);
     positionControlAngulaire.reset(0);
     pidAngulaire.reset();
@@ -188,7 +191,7 @@ void Asservissement::reset(void){
 //******************************************************
 
 double Asservissement::getAngularErrorReel(void){
-    double angleErreur = mod_angle(consigne.teta-robotAsservi->getPosition_Teta());
+    double angleErreur = mod_angle(consigne.teta-posRobot.getPosition_Teta());
 
     if(angleErreur>0 && currentState == Rotation::CLOCKWISE){
         angleErreur -= 360;
@@ -204,11 +207,11 @@ double Asservissement::getAngularErrorReel(void){
 
 double Asservissement::getLinearErrorReel(void){
     //Première partie, connaitre l'angle formé entre le robot et le point de la consigne
-    double erreurAngulaireSurPoint = calculAngle(consigne.x,consigne.y,robotAsservi->getPosition());
+    double erreurAngulaireSurPoint = calculAngle(consigne.x,consigne.y,posRobot.getPosition());
 
     // Calculer la distance entre le robot et la droite orthogonal qui passe par le point de la consigne
-    double distanceRobotPoint = sqrt(pow((consigne.x - robotAsservi->getPosition_X()),2)+pow((consigne.y -robotAsservi->getPosition_Y()),2));
-    return (distanceRobotPoint*cos((erreurAngulaireSurPoint-robotAsservi->getPosition_Teta())*DEG_TO_RAD));
+    double distanceRobotPoint = sqrt(pow((consigne.x - posRobot.getPosition_X()),2)+pow((consigne.y -posRobot.getPosition_Y()),2));
+    return (distanceRobotPoint*cos((erreurAngulaireSurPoint-posRobot.getPosition_Teta())*DEG_TO_RAD));
 }
 
 

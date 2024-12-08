@@ -71,8 +71,7 @@ void exti4_isr(void)
 }
 
 
-void odometrieLoop(robot* robot){
-	position_t position = robot->getPosition();
+void odometrieLoop(position_t position){
 	while (!circularBufferOdo->isEmpty()){
 		switch (circularBufferOdo->pop())
 		{
@@ -100,8 +99,5 @@ void odometrieLoop(robot* robot){
 			break;
 		}
 	}
-	//usartprintf("end\n");
-	position.time = get_uptime_ms();
-	robot->updatePostion(position);
 }
 
