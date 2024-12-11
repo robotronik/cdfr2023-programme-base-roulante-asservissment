@@ -12,7 +12,7 @@
 #include "i2c_interface.h"
 
 
-#define TESTROBOT
+//#define TESTROBOT
 //#define TESTMOTOR
 
 #ifdef SIMULATION
