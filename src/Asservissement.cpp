@@ -43,6 +43,8 @@ void Asservissement::setAsservissementLoopPeriod(int period){
 }
 
 void Asservissement::loop(){
+    asservissementLoop();
+    return;
     if(nextTime < get_uptime_ms()){
         if(posRobot->getPositionChanged()){
             setConsigne(posRobot->getPosition());
@@ -84,7 +86,7 @@ void Asservissement::asservissementLoop(){
         valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot->getPosition_Time());
         pidAngulaireBlock.reset();
     }
-
+    //usartprintf(">speedL:%d\n>speedR:%d\n",(int)(valPidLineaire-valPidAngulaire),(int)(valPidLineaire+valPidAngulaire));
     motorSpeedSignedL((int)(valPidLineaire-valPidAngulaire));
 	motorSpeedSignedR((int)(valPidLineaire+valPidAngulaire));
 }
