@@ -12,7 +12,7 @@ void position::loop(){
         needChangePos = false;
         positionChanged = true;
     }
-    positionRobot.time = get_uptime_us();
+    positionRobot.time = get_uptime_ms();
 }
 
 void position::setPosition(position_t inCommingposition){
@@ -24,7 +24,7 @@ void position::setPosition(double x, double y, double teta){
     positionRobot.x = x;
     positionRobot.y = y;
     positionRobot.teta =  mod_angle(teta);
-    positionRobot.time = get_uptime_us();
+    positionRobot.time = get_uptime_ms();
 }
 
 position_t position::getPosition(){

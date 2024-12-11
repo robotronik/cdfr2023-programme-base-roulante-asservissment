@@ -39,4 +39,4 @@
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
 void odometrieSetup(void);
-void odometrieLoop(position_t position);
+void odometrieLoop(position_t &position);

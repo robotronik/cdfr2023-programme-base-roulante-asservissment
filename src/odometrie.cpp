@@ -71,7 +71,7 @@ void exti4_isr(void)
 }
 
 
-void odometrieLoop(position_t position){
+void odometrieLoop(position_t &position){
 	while (!circularBufferOdo->isEmpty()){
 		switch (circularBufferOdo->pop())
 		{

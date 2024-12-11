@@ -12,7 +12,7 @@
 #include "i2c_interface.h"
 
 
-//#define TESTROBOT
+#define TESTROBOT
 //#define TESTMOTOR
 
 #ifdef SIMULATION
@@ -33,6 +33,7 @@ void testloop(sequence* seq){
 	seq->start();
 
 	seq->delay([](){
+        enableMotor();
 		robotAsservisement->setConsigneAngulaire(90,Rotation::SHORTEST);
 	},0);
 
@@ -111,75 +112,44 @@ int main(void)
 // Test motor
 // Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward
 //
-	#ifdef TESTMOTOR
-		enableMotor();
-		for (int i = 0; i < 100; i++){
-			usartprintf("%d\n",i);
-			motorSpeedSignedL(i);
-			motorSpeedSignedR(i);
-			delay_ms(100);
-			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
-			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
-		}
-		for (int i = 100; i > -100; i--){
-			usartprintf("%d\n",i);
-			motorSpeedSignedL(i);
-			motorSpeedSignedR(i);
-			delay_ms(100);
-			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
-			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
-		}
+#ifdef TESTMOTOR
+    enableMotor();
+    for (int i = 0; i < 100; i++){
+        usartprintf("%d\n",i);
+        motorSpeedSignedL(i);
+        motorSpeedSignedR(i);
+        delay_ms(100);
+        usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+        usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
+    }
+    for (int i = 100; i > -100; i--){
+        usartprintf("%d\n",i);
+        motorSpeedSignedL(i);
+        motorSpeedSignedR(i);
+        delay_ms(100);
+        usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+        usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
+    }
 
-		for (int i = -100; i < 0; i++){
-			usartprintf("%d\n",i);
-			motorSpeedSignedL(i);
-			motorSpeedSignedR(i);
-			delay_ms(100);
-			usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
-			usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
-		}
-		while (1);
-	#endif
-
-#ifdef TESTROBOT
-//
-// Test move on the robot
-// Forwarde backwadr and rotation
-//
-	sequence mySeq;
-	sequence ledToggleSeq;
-	robotAsservisement->reset();
-	enableMotor();
-	while (1){
-		//delay_ms(50);
-		odometrieLoop(robotCDFR);
-        robotAsservisement->loop();
-		position_t robotPosition = robotCDFR->getPosition();
-        // usartprintf("%s\n",robotAsservisement->getDirectionSide());
-		// prinAdcValue();
-		// usartprintf(">x:%lf\n",robotPosition.x);
-		// usartprintf(">y:%lf\n",robotPosition.y);
-		// usartprintf(">teta:%lf\n",robotPosition.teta);
-		motorSpeed_t speed = robotAsservisement->asservissementLoop();
-		motorSpeedSignedL(speed.L);
-		motorSpeedSignedR(speed.R);
-
-		testloop(&mySeq);
-
-
-		//BLINK LED
-		ledToggleSeq.interval([](){
-			led1_toggle();
-		},1000);
-	}
+    for (int i = -100; i < 0; i++){
+        usartprintf("%d\n",i);
+        motorSpeedSignedL(i);
+        motorSpeedSignedR(i);
+        delay_ms(100);
+        usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
+        usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
+    }
+    while (1);
 #endif
 
 
-#ifndef TESTROBOT
+
 //
 //	Main Loop off the robot
 //
 	sequence ledToggleSeq;
+    sequence mySeq;
+    sequence dbg;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
@@ -188,11 +158,19 @@ int main(void)
 		robotPosition->loop();
         robotAsservisement->loop();
 
+#ifdef TESTROBOT
+        testloop(&mySeq);
+#endif
+
+        dbg.interval([](){
+			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",robotPosition->getPosition_X(),robotPosition->getPosition_Y(),robotPosition->getPosition_Teta());;
+		},100);
+
 		//BLINK LED
 		ledToggleSeq.interval([](){
 			led1_toggle();
 		},1000);
 	}
-#endif
+
 	return 0;
 }
