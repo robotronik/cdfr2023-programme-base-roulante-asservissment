@@ -17,7 +17,7 @@ void position::loop(){
 
 void position::setPosition(position_t inCommingposition){
     newPosition = inCommingposition;
-    newPosition.teta = mod_angle(positionRobot.teta);
+    newPosition.teta = mod_angle(inCommingposition.teta);
     needChangePos = true;
 }
 void position::setPosition(double x, double y, double teta){
