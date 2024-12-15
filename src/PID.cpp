@@ -9,6 +9,19 @@ PID::PID(double _kp, double _ki, double _kd) {
     reset();
 }
 
+void PID::setPID(double _kp, double _ki, double _kd){
+    kp = _kp;
+    ki = _ki;
+    kd = _kd;
+    reset();
+}
+
+void PID::getPID(double &_kp, double &_ki, double &_kd){
+    _kp = kp;
+    _ki = ki;
+    _kd = kd;
+}
+
 void PID::reset(void){
     lastError = 0.0;
     integral = 0.0;

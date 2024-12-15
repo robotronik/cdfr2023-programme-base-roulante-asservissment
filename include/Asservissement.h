@@ -13,10 +13,6 @@ class Asservissement
 {
 private:
     /* data */
-    PID pidLineaire;
-    PID pidAngulaire;
-    PID pidLineaireBlock;
-    PID pidAngulaireBlock;
     Rotation currentState;
     position_t consigne;
 
@@ -31,6 +27,10 @@ private:
 public :
     positionControl positionControlLineaire;
     positionControl positionControlAngulaire;
+    PID pidLineaire;
+    PID pidAngulaire;
+    PID pidLineaireBlock;
+    PID pidAngulaireBlock;
 
 public:
     Asservissement(position* pos);

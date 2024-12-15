@@ -15,8 +15,8 @@ public:
         MaxValue = max;
     }
 
-    T getValue() const {
-        return value;
+    T getMaxValue() const {
+        return MaxValue;
     }
 
     protectedMaxValue& operator=(T newValue) {
