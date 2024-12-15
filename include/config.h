@@ -122,7 +122,9 @@
 enum class BaseCommand {
     ANGULAR_THETA,
     ANGULAR_LOOKAT,
-    LINEAR
+    LINEAR,
+    MAX_SPEED_LINEAR,
+    MAX_SPEED_ANGULAR
 };
 
 const char* directionToChar(Direction dir);

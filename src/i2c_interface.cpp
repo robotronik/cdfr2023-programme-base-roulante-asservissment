@@ -71,11 +71,11 @@ void i2c_interface::consigne_angulaire(int16_t x, int16_t y, Rotation rotation, 
 }
 
 void i2c_interface::set_linear_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration){
-
+    robotAsservisement->setConsigneMaxSpeedLinear(max_speed,max_acceleration,max_deceleration);
 }
 
 void i2c_interface::set_angular_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration){
-
+    robotAsservisement->setConsigneMaxSpeedAngular(max_speed,max_acceleration,max_deceleration);
 }
 
 int16_t i2c_interface::get_braking_distance(){

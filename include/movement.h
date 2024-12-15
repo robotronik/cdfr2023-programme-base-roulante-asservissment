@@ -29,6 +29,8 @@ public:
     bool setConsigneAngulaire(uint16_t angle,Rotation rotation);
     bool setConsigneLookAtForward(uint16_t x,uint16_t y,Rotation rotation);
     bool setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation);
+    bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
+    bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
     bool commandRun(void);
     void loop();
     uint16_t getCommandBufferSize();

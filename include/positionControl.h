@@ -5,6 +5,7 @@
 
 #include "uart.h"
 #include "clock.h"
+#include "protectedMaxValue.h"
 
 class positionControl{
 public:
@@ -13,12 +14,12 @@ public:
     double consigne;
     double vitesse;
 
-    double vitesseMaxAv = 45;
-    double accelerationMaxAv = 25;
-    double decelerationMaxAv = 25;
-    double vitesseMaxAr = 45;
-    double accelerationMaxAr = 25;
-    double decelerationMaxAr = 25;
+    protectedMaxValue<double> vitesseMaxAv = 45;
+    protectedMaxValue<double> accelerationMaxAv = 25;
+    protectedMaxValue<double> decelerationMaxAv = 25;
+    protectedMaxValue<double> vitesseMaxAr = 45;
+    protectedMaxValue<double> accelerationMaxAr = 25;
+    protectedMaxValue<double> decelerationMaxAr = 25;
     double deltaTemps = 0;
     bool decelationLineair = true;
     double decelerationStop = 0;

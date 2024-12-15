@@ -112,6 +112,41 @@ bool movement::setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation
     return 0;
 }
 
+bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration){
+    if(!commandBuffer.isFull()){
+        commandBuffer.push(Command{
+            BaseCommand::MAX_SPEED_LINEAR,
+            max_speed,
+            max_acceleration,
+            max_deceleration,
+            Direction::BACKWARD,    //usless
+            Rotation::NONE          //usless
+        });
+    }
+    else{
+        return -1;
+    }
+    return 0;
+}
+
+bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration){
+    if(!commandBuffer.isFull()){
+        commandBuffer.push(Command{
+            BaseCommand::MAX_SPEED_ANGULAR,
+            max_speed,
+            max_acceleration,
+            max_deceleration,
+            Direction::BACKWARD,    //usless
+            Rotation::NONE          //usless
+        });
+    }
+    else{
+        return -1;
+    }
+    return 0;
+}
+
+
 void movement::launchCommande(void){
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
     usartprintf("x %d\n",currentCommand.x);
@@ -137,6 +172,24 @@ void movement::launchCommande(void){
 
     case BaseCommand::ANGULAR_THETA:
         setProtectedConsigneAngulaire(currentCommand.theta,currentCommand.rotation);
+        break;
+
+    case BaseCommand::MAX_SPEED_LINEAR:
+        positionControlLineaire.vitesseMaxAv = currentCommand.x;
+        positionControlLineaire.vitesseMaxAr = currentCommand.x;
+        positionControlLineaire.accelerationMaxAv = currentCommand.y;
+        positionControlLineaire.accelerationMaxAr = currentCommand.y;
+        positionControlLineaire.decelerationMaxAv = currentCommand.theta;
+        positionControlLineaire.decelerationMaxAv = currentCommand.theta;
+        break;
+
+    case BaseCommand::MAX_SPEED_ANGULAR:
+        positionControlAngulaire.vitesseMaxAv = currentCommand.x;
+        positionControlAngulaire.vitesseMaxAr = currentCommand.x;
+        positionControlAngulaire.accelerationMaxAv = currentCommand.y;
+        positionControlAngulaire.accelerationMaxAr = currentCommand.y;
+        positionControlAngulaire.decelerationMaxAv = currentCommand.theta;
+        positionControlAngulaire.decelerationMaxAv = currentCommand.theta;
         break;
 
     default:
