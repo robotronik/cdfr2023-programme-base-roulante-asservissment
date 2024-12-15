@@ -18,8 +18,7 @@ struct Command {
 class movement : public Asservissement
 {
 private:
-
-    CircularBuffer<Command, 50> commandBuffer;
+    CircularBuffer<Command, 1000> commandBuffer;
     Command currentCommand;
     bool run = false;
 
@@ -32,6 +31,7 @@ public:
     bool setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation);
     bool commandRun(void);
     void loop();
+    uint16_t getCommandBufferSize();
     ~movement();
 
 private:

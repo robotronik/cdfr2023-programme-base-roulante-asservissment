@@ -83,7 +83,7 @@ int16_t i2c_interface::get_braking_distance(){
 }
 
 int16_t i2c_interface::get_command_buffer_size(){
-    return 0;// TODO
+    return robotAsservisement->getCommandBufferSize();
 }
 
 Direction i2c_interface::get_direction_side(){

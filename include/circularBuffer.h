@@ -50,6 +50,17 @@ public:
         }
     }
 
+    int getUsedSpace() const {
+        if (full) {
+            return N;
+        }
+        if (tail >= head) {
+            return tail - head;
+        } else {
+            return N - (head - tail);
+        }
+    }
+
     int getCapacity() const {
         return N;
     }
