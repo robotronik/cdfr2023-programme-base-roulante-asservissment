@@ -70,20 +70,28 @@ void i2c_interface::consigne_angulaire(int16_t x, int16_t y, Rotation rotation, 
         robotAsservisement->setConsigneLookAtBackward(x ,y ,rotation);
 }
 
-void i2c_interface::get_braking_distance(int16_t &distance){
-    distance = (int16_t)robotAsservisement->getBrakingDistance();
+void i2c_interface::set_linear_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration){
+
 }
 
-void i2c_interface::get_commande_buffer_size(int16_t &size){
-    // TODO
+void i2c_interface::set_angular_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration){
+
 }
 
-void i2c_interface::get_direction_side(Direction &direction_side){
-    direction_side = robotAsservisement->getDirectionSide();
+int16_t i2c_interface::get_braking_distance(){
+    return (int16_t)robotAsservisement->getBrakingDistance();
 }
 
-void i2c_interface::get_rotation_side(Rotation &rotation_side){
-    rotation_side = robotAsservisement->getRotationSide();
+int16_t i2c_interface::get_command_buffer_size(){
+    return 0;// TODO
+}
+
+Direction i2c_interface::get_direction_side(){
+   return robotAsservisement->getDirectionSide();
+}
+
+Rotation i2c_interface::get_rotation_side(){
+    return robotAsservisement->getRotationSide();
 }
 
 void i2c_interface::get_current_target(int16_t &x, int16_t &y, int16_t &theta){
@@ -93,24 +101,24 @@ void i2c_interface::get_current_target(int16_t &x, int16_t &y, int16_t &theta){
     theta = consigne.teta;
 }
 
-void i2c_interface::get_moving_is_done(bool &state){
-    state = robotAsservisement->robotMovingIsFinish();
+bool i2c_interface::get_moving_is_done(){
+    return robotAsservisement->robotMovingIsFinish();
 }
 
-void i2c_interface::get_running_is_done(bool &state){
-    state = robotAsservisement->robotRunningIsFinish();
+bool i2c_interface::get_running_is_done(){
+    return robotAsservisement->robotRunningIsFinish();
 }
 
-void i2c_interface::get_turning_is_done(bool &state){
-    state = robotAsservisement->robotTurningIsFinish();
+bool i2c_interface::get_turning_is_done(){
+    return robotAsservisement->robotTurningIsFinish();
 }
 
-void i2c_interface::get_linear_error(int16_t &error){
-    error = (int16_t)robotAsservisement->getLinearError();
+int16_t i2c_interface::get_linear_error(){
+    return (int16_t)robotAsservisement->getLinearError();
 }
 
-void i2c_interface::get_angular_error(int16_t &error){
-    error = (int16_t)robotAsservisement->getAngularError();
+int16_t i2c_interface::get_angular_error(){
+    return (int16_t)robotAsservisement->getAngularError();
 }
 
 void i2c_interface::get_current(int16_t &currentRigth, int16_t &currentLeft){
@@ -152,21 +160,12 @@ void i2c_interface::set_max_torque(int16_t max_torque){
     setMaxTorqueR(max_torque);
 }
 
+void i2c_interface::set_linear_position_control(int16_t max_speed_for, int16_t max_speed_back, int16_t max_acceleration_for, int16_t max_acceleration_back, int16_t max_deceleration_for, int16_t max_deceleration_back){
 
-void i2c_interface::set_max_speed_forward(int16_t speed){
-    robotAsservisement->positionControlLineaire.vitesseMaxAv = speed;
 }
 
-void i2c_interface::set_max_speed_backward(int16_t speed){
-    robotAsservisement->positionControlLineaire.vitesseMaxAr = speed;
-}
+void i2c_interface::set_angular_position_control(int16_t max_speed_clock, int16_t max_speed_anti, int16_t max_acceleration_clock, int16_t max_acceleration_anti, int16_t max_deceleration_clock, int16_t max_deceleration_anti){
 
-void i2c_interface::set_max_speed_trigo(int16_t speed){
-    robotAsservisement->positionControlAngulaire.vitesseMaxAv = speed;
-}
-
-void i2c_interface::set_max_speed_horloge(int16_t speed){
-    robotAsservisement->positionControlAngulaire.vitesseMaxAr = speed;
 }
 
 void i2c_interface::set_pid_linear_static(int16_t p, int16_t i, int16_t d){
@@ -189,23 +188,14 @@ void i2c_interface::set_odometry_metric(int16_t sizeWheelLeft, int16_t sizeWheel
 
 }
 
-void i2c_interface::get_max_torque(int16_t max_torque){
-    // TODO
+int16_t i2c_interface::get_max_torque(){
+    return 0;// TODO
 }
 
-void i2c_interface::get_max_speed_forward(int16_t speed){
+void i2c_interface::get_linear_position_control(int16_t &max_speed_for, int16_t &max_speed_back, int16_t &max_acceleration_for, int16_t &max_acceleration_back, int16_t &max_deceleration_for, int16_t &max_deceleration_back){
     // TODO
 }
-
-void i2c_interface::get_max_speed_backward(int16_t speed){
-    // TODO
-}
-
-void i2c_interface::get_max_speed_trigo(int16_t speed){
-    // TODO
-}
-
-void i2c_interface::get_max_speed_horloge(int16_t speed){
+void i2c_interface::get_angular_position_control(int16_t &max_speed_clock, int16_t &max_speed_anti, int16_t &max_acceleration_clock, int16_t &max_acceleration_anti, int16_t &max_deceleration_clock, int16_t &max_deceleration_anti){
     // TODO
 }
 
