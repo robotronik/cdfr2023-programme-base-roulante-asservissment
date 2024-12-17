@@ -13,6 +13,7 @@ public:
 
     void setMaxValue(T max) {
         MaxValue = max;
+        value = max;
     }
 
     T getMaxValue() const {

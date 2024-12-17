@@ -14,22 +14,22 @@ Asservissement::Asservissement(position* pos):
     currentState = Rotation::SHORTEST;
 
     //Réglage
-    positionControlLineaire.vitesseMaxAv =  10000;
-    positionControlLineaire.accelerationMaxAv = 300;//acceleration max AR
-    positionControlLineaire.decelerationMaxAv = 300; //decelaration max AR
-    positionControlLineaire.vitesseMaxAr = 10000;
-    positionControlLineaire.accelerationMaxAr = 500; //acceleration max AV
-    positionControlLineaire.decelerationMaxAr = 500; //decelaration max AV
+    positionControlLineaire.vitesseMaxAv.setMaxValue(10000);
+    positionControlLineaire.accelerationMaxAv.setMaxValue(300);//acceleration max AR
+    positionControlLineaire.decelerationMaxAv.setMaxValue(300); //decelaration max AR
+    positionControlLineaire.vitesseMaxAr.setMaxValue(10000);
+    positionControlLineaire.accelerationMaxAr.setMaxValue(500); //acceleration max AV
+    positionControlLineaire.decelerationMaxAr.setMaxValue(500); //decelaration max AV
     positionControlLineaire.decelationLineair = true;
     positionControlLineaire.decelerationStop = 2000;
 
     //Réglage
-    positionControlAngulaire.vitesseMaxAv = 360;
-    positionControlAngulaire.accelerationMaxAv = 300;
-    positionControlAngulaire.decelerationMaxAv = 300;
-    positionControlAngulaire.vitesseMaxAr = 360;
-    positionControlAngulaire.accelerationMaxAr = 300;
-    positionControlAngulaire.decelerationMaxAr = 300;
+    positionControlAngulaire.vitesseMaxAv.setMaxValue(360);
+    positionControlAngulaire.accelerationMaxAv.setMaxValue(300);
+    positionControlAngulaire.decelerationMaxAv.setMaxValue(300);
+    positionControlAngulaire.vitesseMaxAr.setMaxValue(360);
+    positionControlAngulaire.accelerationMaxAr.setMaxValue(300);
+    positionControlAngulaire.decelerationMaxAr.setMaxValue(300);
     positionControlAngulaire.decelationLineair = true;
     positionControlLineaire.decelerationStop = 600;
 }
