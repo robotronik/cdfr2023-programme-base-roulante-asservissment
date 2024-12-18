@@ -1,4 +1,5 @@
 #include "movement.h"
+#include <atomic>
 
 movement::movement(position* pos):Asservissement(pos){
 }
@@ -146,6 +147,22 @@ bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_accele
     return 0;
 }
 
+bool movement::setConsigneStop(void){
+    commandBuffer.resetTail();
+    enableStop = true;
+    return true;
+}
+
+bool movement::setConsignePause(void){
+    enablePause = true;
+    return true;
+}
+
+bool movement::setConsigneResume(void){
+    enablePause = false;
+    return true;
+}
+
 
 void movement::launchCommande(void){
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
@@ -206,25 +223,40 @@ bool movement::currentCommandRun(void){
     }
 }
 
-bool movement::commandRun(void){
-    return run;
-}
-
 void movement::loop(void){
     Asservissement::loop();
-    if(!run && !commandBuffer.isEmpty()){
-        currentCommand = commandBuffer.pop();
-        launchCommande();
-        run = true;
+
+    if(enablePause && !pause){
+        Asservissement::setConsigneStop();
+        pause = true;
     }
-    else if(run && !currentCommandRun()){
-        if(!commandBuffer.isEmpty()){
+
+    if(!enablePause && pause){
+        launchCommande();
+        pause = false;
+    }
+
+    if(!pause){
+        if(!run && !commandBuffer.isEmpty()){
             currentCommand = commandBuffer.pop();
             launchCommande();
+            run = true;
         }
-        else{
-            run = false;
+        else if(run && !currentCommandRun()){
+            if(!commandBuffer.isEmpty()){
+                currentCommand = commandBuffer.pop();
+                launchCommande();
+            }
+            else{
+                run = false;
+            }
         }
+    }
+
+    if(enableStop == true){
+        enableStop = false;
+        commandBuffer.resetHead();
+        Asservissement::setConsigneStop();
     }
 }
 

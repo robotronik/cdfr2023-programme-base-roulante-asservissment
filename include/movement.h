@@ -22,6 +22,20 @@ private:
     Command currentCommand;
     bool run = false;
 
+    bool enableStop = false;
+    bool enablePause = false;
+    bool enableResume = false;
+    bool pause = false;
+
+    enum StatesMovement{
+        RUN,
+        STOP,
+        PAUSE,
+        RESUME
+    };
+
+    StatesMovement currentState = RUN;
+
 public:
     movement(position* pos);
     bool goToPoint(uint16_t x,uint16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
@@ -31,7 +45,11 @@ public:
     bool setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation);
     bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
     bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
-    bool commandRun(void);
+
+    bool setConsigneStop(void);
+    bool setConsignePause(void);
+    bool setConsigneResume(void);
+
     void loop();
     uint16_t getCommandBufferSize();
     ~movement();

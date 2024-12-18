@@ -3,47 +3,34 @@
 template <typename T, int N>
 class CircularBuffer {
 private:
-    T buffer[N];
+    T buffer[N+1];
     int head = 0;
     int tail = 0;
-    bool full = false;
+    bool headIsReset = false;
 
 public:
 
-    CircularBuffer() : head(0), tail(0), full(false) {}
+    CircularBuffer() : head(0), tail(0) {}
+
+//******************************************************
+// Interupt side
+//******************************************************
 
     void push(const T& item) {
-        if (full) {
-        }
-
         buffer[tail] = item;
-        tail = (tail + 1) % N;
-        full = (tail == head);
+        tail = (tail + 1) % (N+1);
     }
 
-    T pop() {
-        if (isEmpty()) {
-        }
-
-        T item = buffer[head];
-        head = (head + 1) % N;
-        full = false;
-        return item;
-    }
-
-    bool isEmpty() const {
-        return (!full && (head == tail));
-    }
-
-    bool isFull() const {
-        return full;
+    void resetTail(){
+        tail = 0;
+        headIsReset = true;
     }
 
     int getAvailableSpace() const {
-        if (full) {
-            return 0;
+        if(headIsReset){
+            return N - head;
         }
-        if (tail >= head) {
+        else if (tail >= head) {
             return N - (tail - head);
         } else {
             return head - tail;
@@ -51,13 +38,39 @@ public:
     }
 
     int getUsedSpace() const {
-        if (full) {
-            return N;
+        return N - getAvailableSpace();
+    }
+
+    bool isFull() const {
+        return getAvailableSpace() == 0;
+    }
+
+//******************************************************
+// loop side
+//******************************************************
+
+    T pop() {
+        T item = buffer[head];
+        head = (head + 1) % (N+1);
+        return item;
+    }
+
+    void resetHead(){
+        head = 0;
+        headIsReset = false;
+    }
+
+//******************************************************
+// All side
+//******************************************************
+
+    //not protected
+    bool isEmpty() const {
+        if(headIsReset){
+            return true;
         }
-        if (tail >= head) {
-            return tail - head;
-        } else {
-            return N - (head - tail);
+        else{
+            return (head == tail);
         }
     }
 
