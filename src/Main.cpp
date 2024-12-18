@@ -10,9 +10,8 @@
 #include "Asservissement.h"
 #include "movement.h"
 #include "i2c_interface.h"
+#include "button.h"
 
-
-//#define TESTROBOT
 //#define TESTMOTOR
 
 #ifdef SIMULATION
@@ -88,6 +87,7 @@ int main(void)
 	//SETUP
 	clock_setup();
 	ledSetup();
+    buttonSetup();
 	usartSetup();
 	motorSetup();
 	odometrieSetup();
@@ -150,6 +150,7 @@ int main(void)
 	sequence ledToggleSeq;
     sequence mySeq;
     sequence dbg;
+    bool enableDebug = false;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
@@ -158,9 +159,13 @@ int main(void)
 		robotPosition->loop();
         robotAsservisement->loop();
 
-#ifdef TESTROBOT
-        testloop(&mySeq);
-#endif
+        if(readButton2() && !enableDebug){
+            enableDebug = true;
+            mySeq.reset();
+        }
+        if(enableDebug){
+            testloop(&mySeq);
+        }
 
         dbg.interval([](){
 			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",robotPosition->getPosition_X(),robotPosition->getPosition_Y(),robotPosition->getPosition_Teta());;

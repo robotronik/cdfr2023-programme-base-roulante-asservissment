@@ -16,6 +16,7 @@ private:
 public:
     sequence(/* args */);
     void start(void);
+    void reset(void);
     void delay(FunctionPointer func, uint32_t delay);
     void interval(FunctionPointer func, uint32_t delay);
     ~sequence();

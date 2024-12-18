@@ -12,6 +12,10 @@ void sequence::start(void){
     count = 0;
 }
 
+void sequence::reset(void){
+    startTime = get_uptime_ms();
+}
+
 void sequence::delay(FunctionPointer func, uint32_t delay) {
     Time += delay;
     if(Time < get_uptime_ms()){

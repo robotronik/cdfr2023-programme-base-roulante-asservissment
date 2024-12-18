@@ -119,6 +119,19 @@
 #define port_I2CSda				GPIOB
 
 
+//Odometrie
+#ifdef OLDROBOT
+    #define NUMBERSTEPBYROTATION 360
+    #define DISTANCEWHEEL 300 // + = teat -
+    #define DIAMETERWHEELD 41.12                // +1 roue = +25 distance
+    #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
+#else
+    #define NUMBERSTEPBYROTATION 360
+    #define DISTANCEWHEEL 254.828 // + = teat -
+    #define DIAMETERWHEELD 41.12                // +1 roue = +25 distance
+    #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
+#endif
+
 enum class BaseCommand {
     ANGULAR_THETA,
     ANGULAR_LOOKAT,
