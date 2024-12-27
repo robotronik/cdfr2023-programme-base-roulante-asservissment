@@ -58,36 +58,53 @@ void Asservissement::loop(){
 
 
 void Asservissement::asservissementLoop(){
-    double test = calculAngle(consigne.x,consigne.y,posRobot->getPosition());
+    double targetAngle = calculAngle(consigne.x,consigne.y,posRobot->getPosition());
     bool reTargetAngle = false;
-    if(getLinearErrorReel() >= 100){
-        reTargetAngle = true;
-        setConsigneAngulaire(test,Rotation::SHORTEST);
-    }
-    else if(getLinearErrorReel() <= -100){
-        reTargetAngle = true;
-        setConsigneAngulaire(test+180,Rotation::SHORTEST);
-    }
-
     double valPidLineaire;
     double valPidAngulaire;
+    double realErrorAngular;
+    double reduceErrorAngular;
+    double realErrorLinear = getLinearErrorReel();
+    double reduceErrorLinear = realErrorLinear-positionControlLineaire.getPostion();
+    uint32_t timeLastPos = posRobot->getPosition_Time();
+
+    if(realErrorLinear >= 100){
+        reTargetAngle = true;
+        setConsigneAngulaire(targetAngle,Rotation::SHORTEST);
+    }
+    else if(realErrorLinear <= -100){
+        reTargetAngle = true;
+        setConsigneAngulaire(targetAngle+180,Rotation::SHORTEST);
+    }
+
+    realErrorAngular = getAngularErrorReel();
+    reduceErrorAngular = realErrorAngular-positionControlAngulaire.getPostion();
+
+#ifdef ENABLE_STATISTIC
+    statisticLinear.update(reduceErrorLinear,timeLastPos);
+    statisticAngular.update(reduceErrorAngular,timeLastPos);
+#endif
+
+    //Calculate Linear commande
     if(positionControlLineaire.getPostion()==0){
-        valPidLineaire = pidLineaireBlock.update(getLinearErrorReel()-positionControlLineaire.getPostion(),posRobot->getPosition_Time());
+        valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
         pidLineaire.reset();
     }
     else{
-        valPidLineaire = pidLineaire.update(getLinearErrorReel()-positionControlLineaire.getPostion(),posRobot->getPosition_Time());
+        valPidLineaire = pidLineaire.update(reduceErrorLinear,timeLastPos);
         pidLineaireBlock.reset();
     }
 
+    //Calculate Angular commande
     if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
-        valPidAngulaire = pidAngulaireBlock.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot->getPosition_Time());
+        valPidAngulaire = pidAngulaireBlock.update(reduceErrorAngular,timeLastPos);
         pidAngulaire.reset();
     }
     else{
-        valPidAngulaire = pidAngulaire.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot->getPosition_Time());
+        valPidAngulaire = pidAngulaire.update(reduceErrorAngular,timeLastPos);
         pidAngulaireBlock.reset();
     }
+
     //usartprintf(">speedL:%d\n>speedR:%d\n",(int)(valPidLineaire-valPidAngulaire),(int)(valPidLineaire+valPidAngulaire));
     motorSpeedSignedL((int)(valPidLineaire-valPidAngulaire));
 	motorSpeedSignedR((int)(valPidLineaire+valPidAngulaire));
@@ -194,6 +211,8 @@ void Asservissement::reset(void){
     pidLineaireBlock.reset();
     pidLineaire.reset();
     nextTime =  get_uptime_ms();
+    statisticLinear.reset();
+    statisticAngular.reset();
     motorSpeedSignedL(0);
     motorSpeedSignedR(0);
 }
@@ -232,14 +251,14 @@ double Asservissement::getLinearErrorReel(void){
 //Robot Status
 //******************************************************
 
-bool Asservissement::robotMovingIsFinish(void){
-    return robotTurningIsFinish() || robotRunningIsFinish();
+bool Asservissement::robotMoving(void){
+    return robotTurning() || robotRunning();
 }
-bool Asservissement::robotTurningIsFinish(void){
-    return positionControlAngulaire.getPostion()!=0 || (getAngularErrorReel()>1 || getAngularErrorReel()<-1);
+bool Asservissement::robotTurning(void){
+    return positionControlAngulaire.getPostion()!=0 || (getAngularErrorReel()>3 || getAngularErrorReel()<-3);
 }
-bool Asservissement::robotRunningIsFinish(void){
-    return positionControlLineaire.getPostion()!=0 || (getLinearError()>1 || getLinearError()<-1);
+bool Asservissement::robotRunning(void){
+    return positionControlLineaire.getPostion()!=0 || (getLinearError()>5 || getLinearError()<-5);
 }
 int Asservissement::getBrakingDistance(void){
     return -positionControlLineaire.getBrakingDistance();

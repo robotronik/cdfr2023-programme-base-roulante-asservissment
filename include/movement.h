@@ -50,6 +50,8 @@ public:
     bool setConsignePause(void);
     bool setConsigneResume(void);
 
+    void printStatistic(void);
+
     void loop();
     uint16_t getCommandBufferSize();
     ~movement();

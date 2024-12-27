@@ -6,6 +6,7 @@
 #include "positionControl.h"
 #include "position.h"
 #include "motor.h"
+#include "statistic.h"
 
 
 
@@ -31,6 +32,8 @@ public :
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
+    Statistic statisticLinear;
+    Statistic statisticAngular;
 
 public:
     Asservissement(position* pos);
@@ -47,9 +50,9 @@ public:
     double getAngularError(void);
     double getLinearError(void);
 
-    bool robotMovingIsFinish(void);
-    bool robotTurningIsFinish(void);
-    bool robotRunningIsFinish(void);
+    bool robotMoving(void);
+    bool robotTurning(void);
+    bool robotRunning(void);
     int getBrakingDistance(void);
     Rotation getRotationSide(void);
     Direction getDirectionSide(void);

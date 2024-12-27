@@ -102,15 +102,15 @@ void i2c_interface::get_current_target(int16_t &x, int16_t &y, int16_t &theta){
 }
 
 bool i2c_interface::get_moving_is_done(){
-    return robotAsservisement->robotMovingIsFinish();
+    return !robotAsservisement->robotMoving();
 }
 
 bool i2c_interface::get_running_is_done(){
-    return robotAsservisement->robotRunningIsFinish();
+    return !robotAsservisement->robotRunning();
 }
 
 bool i2c_interface::get_turning_is_done(){
-    return robotAsservisement->robotTurningIsFinish();
+    return !robotAsservisement->robotTurning();
 }
 
 int16_t i2c_interface::get_linear_error(){
