@@ -166,19 +166,21 @@ bool movement::setConsigneResume(void){
 void movement::printStatistic(void){
     if(currentCommand.baseCommand == BaseCommand::LINEAR){
         usartprintf("LINEAR STATISTIC :\n");
-        usartprintf("%lf\n",statisticLinear.getMinError());
-        usartprintf("%lf\n",statisticLinear.getMaxError());
-        usartprintf("%lf\n",statisticLinear.getIntegral());
-        usartprintf("%lf\n",statisticLinear.getQuadraticIntegral());
-        usartprintf("%lf\n\n\n",statisticLinear.getDerivateIntegral());
+        usartprintf("Time : %lf\n",statisticLinear.getTime());
+        usartprintf("Min Error : %lf\n",statisticLinear.getMinError());
+        usartprintf("Max Error : %lf\n",statisticLinear.getMaxError());
+        usartprintf("Integral : %lf\n",statisticLinear.getIntegral());
+        usartprintf("Quadratic Integra : %lf\n",statisticLinear.getQuadraticIntegral());
+        usartprintf("Derivate Integral : %lf\n\n\n",statisticLinear.getDerivateIntegral());
     }
     else if(currentCommand.baseCommand == BaseCommand::ANGULAR_THETA || currentCommand.baseCommand == BaseCommand::ANGULAR_LOOKAT){
         usartprintf("ANGULAR STATISTIC :\n");
-        usartprintf("%lf\n",statisticAngular.getMinError());
-        usartprintf("%lf\n",statisticAngular.getMaxError());
-        usartprintf("%lf\n",statisticAngular.getIntegral());
-        usartprintf("%lf\n",statisticAngular.getQuadraticIntegral());
-        usartprintf("%lf\n\n\n",statisticAngular.getDerivateIntegral());
+        usartprintf("Time : %lf\n",statisticAngular.getTime());
+        usartprintf("Min Error : %lf\n",statisticAngular.getMinError());
+        usartprintf("Max Error : %lf\n",statisticAngular.getMaxError());
+        usartprintf("Integral : %lf\n",statisticAngular.getIntegral());
+        usartprintf("Quadratic Integra : %lf\n",statisticAngular.getQuadraticIntegral());
+        usartprintf("Derivate Integral : %lf\n\n\n",statisticAngular.getDerivateIntegral());
     }
 }
 
@@ -237,12 +239,22 @@ void movement::launchCommande(void){
 }
 
 bool movement::currentCommandRun(void){
+//slower chaining of actions with statistics to have a more consistent time
+#ifdef ENABLE_STATISTIC
+    if(currentCommand.baseCommand == BaseCommand::LINEAR){
+        return !robotRunningIsFinish();
+    }
+    else{
+        return !robotTurningIsFinish();
+    }
+#else
     if(currentCommand.baseCommand == BaseCommand::LINEAR){
         return getLinearError()!=0;
     }
     else{
         return getAngularError()!=0;
     }
+#endif
 }
 
 void movement::loop(void){

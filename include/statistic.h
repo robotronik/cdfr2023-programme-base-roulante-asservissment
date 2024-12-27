@@ -29,6 +29,7 @@ public:
     double getIntegral();
     double getQuadraticIntegral();
     double getDerivateIntegral();
+    int32_t getTime();
 
     ~Statistic();
 };

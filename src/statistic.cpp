@@ -73,6 +73,10 @@ double Statistic::getDerivateIntegral(){
         return 0;
 }
 
+int32_t Statistic::getTime(){
+    return lastTime - startTime;
+}
+
 
 Statistic::~Statistic()
 {
