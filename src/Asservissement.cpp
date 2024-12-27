@@ -69,6 +69,12 @@ void Asservissement::asservissementLoop(){
         setConsigneAngulaire(test+180,Rotation::SHORTEST);
     }
 
+#ifdef ENABLE_STATISTIC
+    statisticLinear.update(getLinearErrorReel()-positionControlLineaire.getPostion(),posRobot->getPosition_Time());
+    statisticAngular.update(getAngularErrorReel()-positionControlAngulaire.getPostion(),posRobot->getPosition_Time());
+#endif
+
+
     double valPidLineaire;
     double valPidAngulaire;
     if(positionControlLineaire.getPostion()==0){

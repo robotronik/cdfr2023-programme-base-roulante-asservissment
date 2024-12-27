@@ -4,7 +4,7 @@
 #include "clock.h"
 #include "AsservissementMath.h"
 
-class statistic
+class Statistic
 {
 private:
     LowPassFilter lowPassFilter;
@@ -20,7 +20,7 @@ private:
     double quadraticIntegral;
     double derivateIntegral;
 public:
-    statistic(/* args */);
+    Statistic();
     void reset();
     void update(double error, int32_t time);
 
@@ -30,5 +30,5 @@ public:
     double getQuadraticIntegral();
     double getDerivateIntegral();
 
-    ~statistic();
+    ~Statistic();
 };

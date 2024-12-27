@@ -163,6 +163,25 @@ bool movement::setConsigneResume(void){
     return true;
 }
 
+void movement::printStatistic(void){
+    if(currentCommand.baseCommand == BaseCommand::LINEAR){
+        usartprintf("LINEAR STATISTIC :\n");
+        usartprintf("%lf\n",statisticLinear.getMinError());
+        usartprintf("%lf\n",statisticLinear.getMaxError());
+        usartprintf("%lf\n",statisticLinear.getIntegral());
+        usartprintf("%lf\n",statisticLinear.getQuadraticIntegral());
+        usartprintf("%lf\n\n\n",statisticLinear.getDerivateIntegral());
+    }
+    else if(currentCommand.baseCommand == BaseCommand::ANGULAR_THETA || currentCommand.baseCommand == BaseCommand::ANGULAR_LOOKAT){
+        usartprintf("ANGULAR STATISTIC :\n");
+        usartprintf("%lf\n",statisticAngular.getMinError());
+        usartprintf("%lf\n",statisticAngular.getMaxError());
+        usartprintf("%lf\n",statisticAngular.getIntegral());
+        usartprintf("%lf\n",statisticAngular.getQuadraticIntegral());
+        usartprintf("%lf\n\n\n",statisticAngular.getDerivateIntegral());
+    }
+}
+
 
 void movement::launchCommande(void){
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
@@ -171,6 +190,9 @@ void movement::launchCommande(void){
     usartprintf("theta %d\n",currentCommand.theta);
     usartprintf("direction %s\n",directionToChar(currentCommand.direction));
     usartprintf("rotation %s\n\n\n",rotationToChar(currentCommand.rotation));
+
+    statisticAngular.reset();
+    statisticLinear.reset();
 
     switch (currentCommand.baseCommand)
     {
@@ -243,6 +265,9 @@ void movement::loop(void){
             run = true;
         }
         else if(run && !currentCommandRun()){
+#ifdef ENABLE_STATISTIC
+            printStatistic();
+#endif
             if(!commandBuffer.isEmpty()){
                 currentCommand = commandBuffer.pop();
                 launchCommande();

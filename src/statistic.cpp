@@ -1,11 +1,11 @@
 #include "statistic.h"
 
 
-statistic::statistic(/* args */):lowPassFilter(0.1){
+Statistic::Statistic(/* args */):lowPassFilter(0.1){
 
 }
 
-void statistic::reset(){
+void Statistic::reset(){
     lowPassFilter.reset();
     integral = 0;
     derivateIntegral = 0;
@@ -16,7 +16,7 @@ void statistic::reset(){
     maxError = 0;
 }
 
-void statistic::update(double error, int32_t time){
+void Statistic::update(double error, int32_t time){
     double filteredValue = lowPassFilter.update(error, time);
     double derivate;
     int32_t deltaTime;
@@ -36,7 +36,7 @@ void statistic::update(double error, int32_t time){
     else{
         deltaTime = (time - lastTime);
         derivate = (filteredValue - prevfilteredValue); // to get real derivate : (filteredValue - prevfilteredValue)/deltaTime
-        derivateIntegral += derivate; // to get real derivate integral : derivate * deltaTime
+        derivateIntegral += abs(derivate); // to get real derivate integral : derivate * deltaTime
         integral += abs(error * deltaTime);
         quadraticIntegral += error * deltaTime * error * deltaTime;
     }
@@ -44,27 +44,36 @@ void statistic::update(double error, int32_t time){
     lastTime = time;
 }
 
-double statistic::getMinError(){
+double Statistic::getMinError(){
     return minError;
 }
 
-double statistic::getMaxError(){
+double Statistic::getMaxError(){
     return maxError;
 }
 
-double statistic::getIntegral(){
-    return integral;
+double Statistic::getIntegral(){
+    if(!enableReset)
+        return integral/(lastTime - startTime);
+    else
+        return 0;
 }
 
-double statistic::getQuadraticIntegral(){
-    return quadraticIntegral;
+double Statistic::getQuadraticIntegral(){
+    if(!enableReset)
+        return quadraticIntegral/(lastTime - startTime);
+    else
+        return 0;
 }
 
-double statistic::getDerivateIntegral(){
-    return derivateIntegral;
+double Statistic::getDerivateIntegral(){
+    if(!enableReset)
+        return derivateIntegral/(lastTime - startTime);
+    else
+        return 0;
 }
 
 
-statistic::~statistic()
+Statistic::~Statistic()
 {
 }
