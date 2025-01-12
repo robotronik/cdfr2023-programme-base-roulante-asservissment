@@ -8,3 +8,4 @@
 teleplot*
 
 bin/
+*.so

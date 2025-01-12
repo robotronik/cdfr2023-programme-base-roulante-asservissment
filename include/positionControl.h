@@ -3,44 +3,65 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "uart.h"
-#include "clock.h"
+#ifndef SIMULATION_POSITION_CONTROL
+    #include "clock.h"
+    #include "uart.h"
+#else
+    void SET_TIME_(uint32_t time);
+    extern uint32_t TIME_;
+#endif
 #include "protectedMaxValue.h"
 
 class positionControl{
-public:
+private:
     /* data */
     double position;
     double consigne;
     double vitesse;
 
-    protectedMaxValue<double> vitesseMaxAv = 45;
-    protectedMaxValue<double> accelerationMaxAv = 25;
-    protectedMaxValue<double> decelerationMaxAv = 25;
-    protectedMaxValue<double> vitesseMaxAr = 45;
-    protectedMaxValue<double> accelerationMaxAr = 25;
-    protectedMaxValue<double> decelerationMaxAr = 25;
-    double deltaTemps = 0;
-    bool decelationLineair = true;
-    double decelerationStop = 0;
+    double t_accel;
+    double t_cruise;
+    double t_decel;
 
-    uint32_t PreviousTime;
+    double d_accel;
+    double d_cruise;
+    double d_decel;
+
+    uint32_t startTimeMs;
+    double startPosition;
+    double startSpeed;
+
+    double maxSpeedOut = 0;
 
     bool stopStatus;
 
 public:
+    protectedMaxValue<double> vitesseMaxAv;
+    protectedMaxValue<double> accelerationMaxAv;
+    protectedMaxValue<double> decelerationMaxAv;
+    protectedMaxValue<double> vitesseMaxAr;
+    protectedMaxValue<double> accelerationMaxAr;
+    protectedMaxValue<double> decelerationMaxAr;
+
+public:
     positionControl(double positionDepart  = 0.0);
+    ~positionControl();
+
     void reset(double initialValue);
     void stop(void);
     void setPosition(double initialValue);
     void setConsigne(double setConsigne);
+    void setMaxSpeedOut(double max);
+
     double getPostion();
-    void setConsigne(double setConsigne, int timems);
-    double getPostion(int timems);
     bool getMove();
     int getBrakingDistance();
     bool getStatus(void);
-    ~positionControl();
+
 private:
-    void calculVitesse();
+    void updateSpeed();
+    void updatePosition();
+    double getMaxSpeedOut();
+    void computeStroke();
+    void computeDT(double distance,double vitesseMax, double acceleration, double deceleration);
 };

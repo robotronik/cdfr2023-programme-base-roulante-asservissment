@@ -8,30 +8,37 @@ Asservissement::Asservissement(position* pos):
     pidAngulaireBlock(2,0.001,200)
 {
     posRobot = pos;
-
     nextTime =  get_uptime_ms();
-
     currentState = Rotation::SHORTEST;
 
-    //Réglage
-    positionControlLineaire.vitesseMaxAv.setMaxValue(10000);
-    positionControlLineaire.accelerationMaxAv.setMaxValue(300);//acceleration max AR
-    positionControlLineaire.decelerationMaxAv.setMaxValue(300); //decelaration max AR
-    positionControlLineaire.vitesseMaxAr.setMaxValue(10000);
-    positionControlLineaire.accelerationMaxAr.setMaxValue(500); //acceleration max AV
-    positionControlLineaire.decelerationMaxAr.setMaxValue(500); //decelaration max AV
-    positionControlLineaire.decelationLineair = true;
-    positionControlLineaire.decelerationStop = 2000;
+    positionControlLineaire.vitesseMaxAv.setRange(0,10000);
+    positionControlLineaire.accelerationMaxAv.setRange(0,300);
+    positionControlLineaire.decelerationMaxAv.setRange(0,300);
+    positionControlLineaire.vitesseMaxAr.setRange(0,10000);
+    positionControlLineaire.accelerationMaxAr.setRange(0,500);
+    positionControlLineaire.decelerationMaxAr.setRange(0,500);
 
-    //Réglage
-    positionControlAngulaire.vitesseMaxAv.setMaxValue(360);
-    positionControlAngulaire.accelerationMaxAv.setMaxValue(300);
-    positionControlAngulaire.decelerationMaxAv.setMaxValue(300);
-    positionControlAngulaire.vitesseMaxAr.setMaxValue(360);
-    positionControlAngulaire.accelerationMaxAr.setMaxValue(300);
-    positionControlAngulaire.decelerationMaxAr.setMaxValue(300);
-    positionControlAngulaire.decelationLineair = true;
-    positionControlLineaire.decelerationStop = 600;
+    positionControlAngulaire.vitesseMaxAv.setRange(0,360);
+    positionControlAngulaire.accelerationMaxAv.setRange(0,300);
+    positionControlAngulaire.decelerationMaxAv.setRange(0,300);
+    positionControlAngulaire.vitesseMaxAr.setRange(0,360);
+    positionControlAngulaire.accelerationMaxAr.setRange(0,300);
+    positionControlAngulaire.decelerationMaxAr.setRange(0,300);
+
+
+    positionControlLineaire.vitesseMaxAv.setMax();
+    positionControlLineaire.accelerationMaxAv.setMax();
+    positionControlLineaire.decelerationMaxAv.setMax();
+    positionControlLineaire.vitesseMaxAr.setMax();
+    positionControlLineaire.accelerationMaxAr.setMax();
+    positionControlLineaire.decelerationMaxAr.setMax();
+
+    positionControlAngulaire.vitesseMaxAv.setMax();
+    positionControlAngulaire.accelerationMaxAv.setMax();
+    positionControlAngulaire.decelerationMaxAv.setMax();
+    positionControlAngulaire.vitesseMaxAr.setMax();
+    positionControlAngulaire.accelerationMaxAr.setMax();
+    positionControlAngulaire.decelerationMaxAr.setMax();
 }
 
 Asservissement::~Asservissement()

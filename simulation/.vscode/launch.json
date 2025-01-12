@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python avec débogage C++",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/python3",  // Chemin vers votre exécutable Python
+            "args": ["${workspaceFolder}/posiPlot.py"],  // Chemin vers le script Python
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "${workspaceFolder}"  // Où trouver votre bibliothèque C++
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Activer le formatage pretty pour GDB",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

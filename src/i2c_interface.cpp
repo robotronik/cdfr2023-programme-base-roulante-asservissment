@@ -158,21 +158,21 @@ void i2c_interface::set_max_torque(int16_t max_torque){
 }
 
 void i2c_interface::set_linear_position_control(int16_t max_speed_for, int16_t max_speed_back, int16_t max_acceleration_for, int16_t max_acceleration_back, int16_t max_deceleration_for, int16_t max_deceleration_back){
-    robotAsservisement->positionControlLineaire.vitesseMaxAv.setMaxValue(max_speed_for);
-    robotAsservisement->positionControlLineaire.vitesseMaxAr.setMaxValue(max_speed_back);
-    robotAsservisement->positionControlLineaire.accelerationMaxAv.setMaxValue(max_acceleration_for);
-    robotAsservisement->positionControlLineaire.accelerationMaxAr.setMaxValue(max_acceleration_back);
-    robotAsservisement->positionControlLineaire.decelerationMaxAv.setMaxValue(max_deceleration_for);
-    robotAsservisement->positionControlLineaire.decelerationMaxAr.setMaxValue(max_deceleration_back);
+    robotAsservisement->positionControlLineaire.vitesseMaxAv.setRange(0,max_speed_for);
+    robotAsservisement->positionControlLineaire.vitesseMaxAr.setRange(0,max_speed_back);
+    robotAsservisement->positionControlLineaire.accelerationMaxAv.setRange(0,max_acceleration_for);
+    robotAsservisement->positionControlLineaire.accelerationMaxAr.setRange(0,max_acceleration_back);
+    robotAsservisement->positionControlLineaire.decelerationMaxAv.setRange(0,max_deceleration_for);
+    robotAsservisement->positionControlLineaire.decelerationMaxAr.setRange(0,max_deceleration_back);
 }
 
 void i2c_interface::set_angular_position_control(int16_t max_speed_clock, int16_t max_speed_anti, int16_t max_acceleration_clock, int16_t max_acceleration_anti, int16_t max_deceleration_clock, int16_t max_deceleration_anti){
-    robotAsservisement->positionControlAngulaire.vitesseMaxAv.setMaxValue(max_speed_clock);
-    robotAsservisement->positionControlAngulaire.vitesseMaxAr.setMaxValue(max_speed_anti);
-    robotAsservisement->positionControlAngulaire.accelerationMaxAv.setMaxValue(max_acceleration_clock);
-    robotAsservisement->positionControlAngulaire.accelerationMaxAr.setMaxValue(max_acceleration_anti);
-    robotAsservisement->positionControlAngulaire.decelerationMaxAv.setMaxValue(max_deceleration_clock);
-    robotAsservisement->positionControlAngulaire.decelerationMaxAr.setMaxValue(max_deceleration_anti);
+    robotAsservisement->positionControlAngulaire.vitesseMaxAv.setRange(0,max_speed_clock);
+    robotAsservisement->positionControlAngulaire.vitesseMaxAr.setRange(0,max_speed_anti);
+    robotAsservisement->positionControlAngulaire.accelerationMaxAv.setRange(0,max_acceleration_clock);
+    robotAsservisement->positionControlAngulaire.accelerationMaxAr.setRange(0,max_acceleration_anti);
+    robotAsservisement->positionControlAngulaire.decelerationMaxAv.setRange(0,max_deceleration_clock);
+    robotAsservisement->positionControlAngulaire.decelerationMaxAr.setRange(0,max_deceleration_anti);
 }
 
 void i2c_interface::set_pid_linear_static(int16_t p, int16_t i, int16_t d){
