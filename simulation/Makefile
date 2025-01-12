@@ -1,11 +1,11 @@
 
 # Variables
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -DSIMULATION_POSITION_CONTROL
+CXXFLAGS = -Wall -shared -fPIC -Wextra -std=c++17 -DSIMULATION_POSITION_CONTROL
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 INCLUDES = -I../include
 SRC_DIR = ../src
-TARGET = positionControlTB
+TARGET = positionControlTB.so
 
 # Fichiers nécessaires
 SOURCES = $(SRC_DIR)/positionControl.cpp positionControlTB.cpp
