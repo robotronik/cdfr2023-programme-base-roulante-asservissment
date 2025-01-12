@@ -20,12 +20,8 @@ void positionControl::setPosition(double initialValue){
     position = initialValue;
 }
 
-void positionControl::setConsigne(double setConsigne, int timems){
-    consigne = setConsigne;
-    PreviousTime = timems;
-    stopStatus = false;
-}
-double positionControl::getPostion(int timems){
+
+double positionControl::getPostion(uint32_t timems){
     deltaTemps = ((double)(timems-PreviousTime)/1000);
     if((position<consigne && (position + vitesse*deltaTemps)>consigne) || (position>consigne && (position + vitesse*deltaTemps)<consigne) ){
         position = consigne;
@@ -33,8 +29,8 @@ double positionControl::getPostion(int timems){
     }
     else{
         position = position + vitesse*deltaTemps;
-        PreviousTime = timems;
     }
+    PreviousTime = timems;
 
     calculVitesse();
     return position;
@@ -42,24 +38,14 @@ double positionControl::getPostion(int timems){
 
 void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
-    //PreviousTime = get_uptime_ms();
     stopStatus = false;
 }
 
+#ifndef SIMULATION_POSITION_CONTROL
 double positionControl::getPostion(){
-    deltaTemps = ((double)(get_uptime_ms()-PreviousTime)/1000);
-    if((position<consigne && (position + vitesse*deltaTemps)>consigne) || (position>consigne && (position + vitesse*deltaTemps)<consigne) ){
-        position = consigne;
-        vitesse = 0;
-    }
-    else{
-        position = position + vitesse*deltaTemps;
-    }
-    PreviousTime = get_uptime_ms();
-
-    calculVitesse();
-    return position;
+    return getPostion(get_uptime_ms());
 }
+#endif
 
 void positionControl::calculVitesse(){
     double vitessePrecedente = vitesse;

@@ -3,8 +3,9 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "uart.h"
-#include "clock.h"
+#ifndef SIMULATION_POSITION_CONTROL
+    #include "clock.h"
+#endif
 #include "protectedMaxValue.h"
 
 class positionControl{
@@ -34,9 +35,10 @@ public:
     void stop(void);
     void setPosition(double initialValue);
     void setConsigne(double setConsigne);
+#ifndef SIMULATION_POSICONT
     double getPostion();
-    void setConsigne(double setConsigne, int timems);
-    double getPostion(int timems);
+#endif
+    double getPostion(uint32_t timems);
     bool getMove();
     int getBrakingDistance();
     bool getStatus(void);
