@@ -30,8 +30,8 @@ extern "C" {
         for (int i = 0; i < DATA_SIZE; ++i) {
             current = positionControlLineaire.getPostion(i*10)*1000;
             currentspeed = (previous - current);
-            values.push_back(((previousspeed - currentspeed)*20 + 4000));
-            values.push_back(current);
+            values.push_back(i);
+            //values.push_back(current);
             previous = current;
             previousspeed = currentspeed;
         }
