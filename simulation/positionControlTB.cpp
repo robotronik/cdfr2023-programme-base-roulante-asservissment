@@ -7,17 +7,16 @@
 
 extern "C" {
     // Fonction pour allouer un tableau dynamique depuis un std::vector
-    int* get_values(int* size) {
-
-
-        std::vector<int> values;
+    int get_values(int** data, int** time) {
+        std::vector<int> vecData;
+        std::vector<int> vecTime;
 
         positionControl positionControlLineaire;
         positionControlLineaire.vitesseMaxAv =  500;
-        positionControlLineaire.accelerationMaxAv = 250; 
+        positionControlLineaire.accelerationMaxAv = 250;
         positionControlLineaire.decelerationMaxAv = 250;
         positionControlLineaire.vitesseMaxAr = 500;
-        positionControlLineaire.accelerationMaxAr = 250; 
+        positionControlLineaire.accelerationMaxAr = 250;
         positionControlLineaire.decelerationMaxAr = 250;
         positionControlLineaire.setConsigne(1000);
         positionControlLineaire.decelationLineair = false;
@@ -30,26 +29,29 @@ extern "C" {
         for (int i = 0; i < DATA_SIZE; ++i) {
             current = positionControlLineaire.getPostion(i*10)*1000;
             currentspeed = (previous - current);
-            values.push_back(i);
-            //values.push_back(current);
+            vecData.push_back(i);
+            vecTime.push_back(i);
+            //vecData.push_back(current);
             previous = current;
             previousspeed = currentspeed;
         }
 
-        //static const std::vector<int> values = {1, 2, 3, 4, 5};
-        *size = values.size(); // Taille du tableau
+        int size = vecData.size(); // Taille du tableau
 
         // Allouer de la mémoire dynamique
-        int* result = (int*)malloc(*size * sizeof(int));
+        *data = (int*)malloc(size * sizeof(int));
+        *time = (int*)malloc(size * sizeof(int));
 
         // Copier les données du std::vector dans le tableau alloué
-        std::memcpy(result, values.data(), *size * sizeof(int));
+        std::memcpy(*data, vecData.data(), size * sizeof(int));
+        std::memcpy(*time, vecTime.data(), size * sizeof(int));
 
-        return result;
+        return size;
     }
 
     // Fonction pour libérer la mémoire allouée dynamiquement
-    void free_values(int* values) {
-        free(values);
+    void free_values(int* vecData,int* vecTime) {
+        free(vecData);
+        free(vecTime);
     }
 }
