@@ -1,4 +1,6 @@
 import ctypes
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Charger la bibliothèque partagée
 lib = ctypes.CDLL('./positionControlTB.so')
@@ -18,6 +20,18 @@ values = [values_ptr[i] for i in range(size.value)]  # Lire les valeurs
 
 # Afficher les valeurs
 print("Valeurs retournées par la fonction C++ :", values)
+
+
+t = np.arange(0.0, 1000, 1)
+
+fig, ax = plt.subplots()
+ax.plot(t, values)
+
+ax.set(xlabel='time (s)', ylabel='voltage (mV)',
+       title='About as simple as it gets, folks')
+ax.grid()
+
+plt.show()
 
 # Libérer la mémoire
 lib.free_values(values_ptr)
