@@ -3,7 +3,7 @@
 #include <vector>
 #include "../include/positionControl.h"
 
-#define DATA_SIZE 1000
+#define DATA_SIZE 10000
 
 extern "C" {
     // Fonction pour allouer un tableau dynamique depuis un std::vector
@@ -12,14 +12,15 @@ extern "C" {
         std::vector<int> vecTime;
 
         positionControl positionControlLineaire;
-        positionControlLineaire.vitesseMaxAv =  500;
-        positionControlLineaire.accelerationMaxAv = 250;
-        positionControlLineaire.decelerationMaxAv = 250;
-        positionControlLineaire.vitesseMaxAr = 500;
-        positionControlLineaire.accelerationMaxAr = 250;
-        positionControlLineaire.decelerationMaxAr = 250;
-        positionControlLineaire.setConsigne(1000);
+        positionControlLineaire.vitesseMaxAv.setMaxValue(360);
+        positionControlLineaire.accelerationMaxAv.setMaxValue(300);
+        positionControlLineaire.decelerationMaxAv.setMaxValue(300);
+        positionControlLineaire.vitesseMaxAr.setMaxValue(360);
+        positionControlLineaire.accelerationMaxAr.setMaxValue(300);
+        positionControlLineaire.decelerationMaxAr.setMaxValue(300);
         positionControlLineaire.decelationLineair = false;
+        positionControlLineaire.decelerationStop = 600;
+        positionControlLineaire.setConsigne(1000);
 
         int previous = 0;
         int current;
@@ -27,9 +28,9 @@ extern "C" {
         int currentspeed = 0;
         // Initialisation de vos données (exemple aléatoire)
         for (int i = 0; i < DATA_SIZE; ++i) {
-            current = positionControlLineaire.getPostion(i*10)*1000;
+            current = positionControlLineaire.getPostion(i);
             currentspeed = (previous - current);
-            vecData.push_back(i);
+            vecData.push_back(current);
             vecTime.push_back(i);
             //vecData.push_back(current);
             previous = current;
