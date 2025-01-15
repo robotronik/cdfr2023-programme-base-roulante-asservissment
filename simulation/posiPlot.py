@@ -31,9 +31,31 @@ def get_values_from_cpp():
 
     return data_list, time_list
 
+def calculate_speed(data, time):
+    # Vérifier que data et time ont la même taille
+    if len(data) != len(time):
+        raise ValueError("Les listes data et time doivent avoir la même taille")
+
+    # Calculer la vitesse entre chaque point
+    speeds = []
+    speeds.append(0)
+    for i in range(1, len(data)):
+        distance_diff = data[i] - data[i - 1]  # Différence de distance (en mm)
+        time_diff = (time[i] - time[i - 1])/1000      # Différence de temps (en ms)
+
+        if time_diff == 0:
+            speed = 0  # Éviter la division par zéro
+        else:
+            speed = distance_diff / time_diff  # Vitesse en mm/ms
+
+        speeds.append(speed)
+
+    return speeds
 
 if __name__ == "__main__":
     data, time = get_values_from_cpp()
+    print(data)
+    speed = calculate_speed(data,time)
     fig, ax = plt.subplots()
     ax.plot(time, data)
 
@@ -41,6 +63,13 @@ if __name__ == "__main__":
     ax.set(ylabel='distance (mm)')
     ax.set(title='poistion control')
     ax.grid()
+
+
+    ax2 = ax.twinx()
+    ax2.set(ylabel='speed')
+    ax.plot(time, speed)
+
+
 
     plt.show()
 
