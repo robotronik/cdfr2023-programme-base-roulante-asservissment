@@ -2,49 +2,45 @@ import ctypes
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Charger la bibliothèque partagée
+
+
 lib = ctypes.CDLL('./positionControlTB.so')
 
-# Définir les prototypes des fonctions C++
-lib.get_values.restype = ctypes.c_int  # get_values retourne un pointeur sur int
-lib.get_values.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_int)), ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]  # Prend un pointeur sur int comme argument
+# Définir les prototypes des fonctions
+lib.get_values.restype = ctypes.c_int
+lib.get_values.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_int)), ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]
+lib.free_values.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
 
-lib.free_values.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_int)), ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]  # free_values prend un pointeur sur int
+# Fonction pour appeler get_values
+def get_values_from_cpp():
+    data_ptr = ctypes.POINTER(ctypes.c_int)()
+    time_ptr = ctypes.POINTER(ctypes.c_int)()
 
-# # Appeler la fonction `get_values`
-# size = ctypes.c_int()  # Créer une variable pour stocker la taille du tableau
-# values_ptr = lib.get_values(ctypes.byref(size))  # Obtenir le pointeur et la taille
+    size = lib.get_values(ctypes.byref(data_ptr), ctypes.byref(time_ptr))
 
-data_ptr = ctypes.POINTER(ctypes.c_int)()
-time_ptr = ctypes.POINTER(ctypes.c_int)()
-size = lib.get_values(ctypes.byref(data_ptr), ctypes.byref(time_ptr))
-print(size)
+    if size <= 0:
+        raise ValueError("get_values a retourné une taille invalide ou nulle")
 
-if size <= 0:
-    raise ValueError("get_values a retourné une taille invalide ou nulle")
+    data_array = ctypes.cast(data_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
+    time_array = ctypes.cast(time_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
 
+    data_list = list(data_array)
+    time_list = list(time_array)
 
-# Convertir les pointeurs en tableaux Python accessibles
-data_array = ctypes.cast(data_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
-time_array = ctypes.cast(time_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
+    lib.free_values(data_ptr, time_ptr)
 
-# Convertir le pointeur en une liste Python
-values = [data_ptr[i] for i in range(size)]  # Lire les valeurs
-
-# Afficher les valeurs
-print("Valeurs retournées par la fonction C++ :", values)
+    return data_list, time_list
 
 
-t = np.arange(0.0, 1000, 1)
+if __name__ == "__main__":
+    data, time = get_values_from_cpp()
+    fig, ax = plt.subplots()
+    ax.plot(time, data)
 
-fig, ax = plt.subplots()
-ax.plot(t, values)
+    ax.set(xlabel='time (ms)')
+    ax.set(ylabel='distance (mm)')
+    ax.set(title='poistion control')
+    ax.grid()
 
-ax.set(xlabel='time (s)', ylabel='voltage (mV)',
-       title='About as simple as it gets, folks')
-ax.grid()
+    plt.show()
 
-plt.show()
-
-# Libérer la mémoire
-lib.free_values(data_ptr,time_ptr)
