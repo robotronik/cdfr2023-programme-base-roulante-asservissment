@@ -26,7 +26,7 @@ double positionControl::getPostion(uint32_t timems){
     deltaTemps = ((double)(timems-PreviousTime)/1000);
     if((position<consigne && (position + vitesse*deltaTemps)>consigne) || (position>consigne && (position + vitesse*deltaTemps)<consigne) ){
         position = consigne;
-        vitesse = 0;
+        vitesse = maxSpeedOut;
     }
     else{
         position = position + vitesse*deltaTemps;
@@ -40,6 +40,10 @@ double positionControl::getPostion(uint32_t timems){
 void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
     stopStatus = false;
+}
+
+void positionControl::setMaxSpeedOut(double max){
+    maxSpeedOut = max;
 }
 
 #ifndef SIMULATION_POSITION_CONTROL
@@ -66,7 +70,7 @@ void positionControl::calculVitesse(){
     if(consigne-position>0){
         if(decelerationMaxAv!=-1){
             if(decelationLineair){
-                vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2));
+                vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2)) + maxSpeedOut;
             }
             else{
                 vitesse = (consigne-position);
@@ -83,7 +87,7 @@ void positionControl::calculVitesse(){
     else if(consigne-position<0){
         if(decelerationMaxAr != -1){
             if(decelationLineair){
-                vitesse = -sqrt(4*(consigne-position)*(-decelerationMaxAr/2));
+                vitesse = -sqrt(4*(consigne-position)*(-decelerationMaxAr/2)) - maxSpeedOut;
             }
             else{
                 vitesse = (consigne-position);
@@ -98,7 +102,7 @@ void positionControl::calculVitesse(){
     }
     //gestion vitesse 0
     else{
-        vitesse = 0;
+        vitesse = maxSpeedOut;
     }
 
 
