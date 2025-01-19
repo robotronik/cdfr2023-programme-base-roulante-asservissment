@@ -9,6 +9,7 @@ void positionControl::reset(double initialValue){
     consigne = initialValue;
     position = initialValue;
     vitesse = 0.0;
+    PreviousTime = 0;
     stopStatus = false;
 }
 
