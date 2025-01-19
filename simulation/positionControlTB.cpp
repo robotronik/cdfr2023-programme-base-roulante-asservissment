@@ -20,21 +20,25 @@ extern "C" {
         positionControlLineaire.decelerationMaxAr.setMaxValue(300);
         positionControlLineaire.decelationLineair = true;
         positionControlLineaire.decelerationStop = 600;
-        positionControlLineaire.setConsigne(1000);
+        positionControlLineaire.setPosition(-1000);
+        positionControlLineaire.setConsigne(0);
+        positionControlLineaire.setMaxSpeedOut(150);
 
-        int previous = 0;
         double current;
-        int previousspeed = 0;
         int currentspeed = 0;
+        int numCommande = 0;
         // Initialisation de vos données (exemple aléatoire)
         for (int i = 0; i < DATA_SIZE; i+=1) {
             current = positionControlLineaire.getPostion(i*20);
-            currentspeed = (previous - current);
             vecData.push_back(current);
             vecTime.push_back(i*20);
-            //vecData.push_back(current);
-            previous = current;
-            previousspeed = currentspeed;
+            if(current == 0 && numCommande == 0){
+                positionControlLineaire.setPosition(0);
+                positionControlLineaire.setConsigne(500);
+                positionControlLineaire.setMaxSpeedOut(0);
+                positionControlLineaire.vitesseMaxAv = 150;
+                numCommande ++;
+            }
         }
 
         int size = vecData.size(); // Taille du tableau

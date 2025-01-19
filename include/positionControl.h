@@ -24,6 +24,7 @@ public:
     double deltaTemps = 0;
     bool decelationLineair = true;
     double decelerationStop = 0;
+    double maxSpeedOut = 0;
 
     uint32_t PreviousTime;
 
@@ -35,6 +36,7 @@ public:
     void stop(void);
     void setPosition(double initialValue);
     void setConsigne(double setConsigne);
+    void setMaxSpeedOut(double max);
 #ifndef SIMULATION_POSICONT
     double getPostion();
 #endif
