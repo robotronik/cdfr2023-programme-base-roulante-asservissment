@@ -24,9 +24,14 @@ void positionControl::setPosition(double initialValue){
 
 double positionControl::getPostion(uint32_t timems){
     deltaTemps = ((double)(timems-PreviousTime)/1000);
-    if((position<consigne && (position + vitesse*deltaTemps)>consigne) || (position>consigne && (position + vitesse*deltaTemps)<consigne) ){
+
+    if((position<consigne && (position + vitesse*deltaTemps)>consigne)){
         position = consigne;
         vitesse = maxSpeedOut;
+    }
+    else if((position>consigne && (position + vitesse*deltaTemps)<consigne)){
+        position = consigne;
+        vitesse = -maxSpeedOut;
     }
     else{
         position = position + vitesse*deltaTemps;
@@ -34,6 +39,7 @@ double positionControl::getPostion(uint32_t timems){
     PreviousTime = timems;
 
     calculVitesse();
+
     return position;
 }
 
@@ -70,7 +76,8 @@ void positionControl::calculVitesse(){
     if(consigne-position>0){
         if(decelerationMaxAv!=-1){
             if(decelationLineair){
-                vitesse = sqrt(4*(consigne-position)*(decelerationMaxAv/2)) + maxSpeedOut;
+                vitesse = sqrt((maxSpeedOut * maxSpeedOut) + 2*(consigne-position)*(decelerationMaxAv));
+                vitesse = vitesse - (decelerationMaxAv*deltaTemps);
             }
             else{
                 vitesse = (consigne-position);
@@ -87,7 +94,8 @@ void positionControl::calculVitesse(){
     else if(consigne-position<0){
         if(decelerationMaxAr != -1){
             if(decelationLineair){
-                vitesse = -sqrt(4*(consigne-position)*(-decelerationMaxAr/2)) - maxSpeedOut;
+                vitesse = -sqrt((maxSpeedOut * maxSpeedOut) + 2*(consigne-position)*(-decelerationMaxAr));
+                vitesse = vitesse + (decelerationMaxAr*deltaTemps);
             }
             else{
                 vitesse = (consigne-position);
@@ -99,10 +107,6 @@ void positionControl::calculVitesse(){
         if(accelerationMaxAr != -1 && vitesse < vitessePrecedente - accelerationMaxAr*deltaTemps){
             vitesse = vitessePrecedente - accelerationMaxAr*deltaTemps;
         }
-    }
-    //gestion vitesse 0
-    else{
-        vitesse = maxSpeedOut;
     }
 
 

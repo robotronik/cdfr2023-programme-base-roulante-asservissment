@@ -20,7 +20,7 @@ extern "C" {
         positionControlLineaire.decelerationMaxAr.setMaxValue(300);
         positionControlLineaire.decelationLineair = true;
         positionControlLineaire.decelerationStop = 600;
-        positionControlLineaire.setPosition(-1000);
+        positionControlLineaire.setPosition(1000);
         positionControlLineaire.setConsigne(0);
         positionControlLineaire.setMaxSpeedOut(150);
 
@@ -34,9 +34,9 @@ extern "C" {
             vecTime.push_back(i*20);
             if(current == 0 && numCommande == 0){
                 positionControlLineaire.setPosition(0);
-                positionControlLineaire.setConsigne(500);
+                positionControlLineaire.setConsigne(-500);
                 positionControlLineaire.setMaxSpeedOut(0);
-                positionControlLineaire.vitesseMaxAv = 150;
+                positionControlLineaire.vitesseMaxAr = 150;
                 numCommande ++;
             }
         }
