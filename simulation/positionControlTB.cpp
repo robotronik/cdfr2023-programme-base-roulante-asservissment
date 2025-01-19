@@ -7,23 +7,23 @@
 
 extern "C" {
     // Fonction pour allouer un tableau dynamique depuis un std::vector
-    int get_values(int** data, int** time) {
-        std::vector<int> vecData;
+    int get_values(double** data, int** time) {
+        std::vector<double> vecData;
         std::vector<int> vecTime;
 
         positionControl positionControlLineaire;
-        positionControlLineaire.vitesseMaxAv.setMaxValue(360);
+        positionControlLineaire.vitesseMaxAv.setMaxValue(365);
         positionControlLineaire.accelerationMaxAv.setMaxValue(300);
         positionControlLineaire.decelerationMaxAv.setMaxValue(300);
-        positionControlLineaire.vitesseMaxAr.setMaxValue(360);
+        positionControlLineaire.vitesseMaxAr.setMaxValue(365);
         positionControlLineaire.accelerationMaxAr.setMaxValue(300);
         positionControlLineaire.decelerationMaxAr.setMaxValue(300);
-        positionControlLineaire.decelationLineair = false;
+        positionControlLineaire.decelationLineair = true;
         positionControlLineaire.decelerationStop = 600;
         positionControlLineaire.setConsigne(1000);
 
         int previous = 0;
-        int current;
+        double current;
         int previousspeed = 0;
         int currentspeed = 0;
         // Initialisation de vos données (exemple aléatoire)
@@ -40,18 +40,18 @@ extern "C" {
         int size = vecData.size(); // Taille du tableau
 
         // Allouer de la mémoire dynamique
-        *data = (int*)malloc(size * sizeof(int));
+        *data = (double*)malloc(size * sizeof(double));
         *time = (int*)malloc(size * sizeof(int));
 
         // Copier les données du std::vector dans le tableau alloué
-        std::memcpy(*data, vecData.data(), size * sizeof(int));
+        std::memcpy(*data, vecData.data(), size * sizeof(double));
         std::memcpy(*time, vecTime.data(), size * sizeof(int));
 
         return size;
     }
 
     // Fonction pour libérer la mémoire allouée dynamiquement
-    void free_values(int* vecData,int* vecTime) {
+    void free_values(double* vecData,int* vecTime) {
         free(vecData);
         free(vecTime);
     }

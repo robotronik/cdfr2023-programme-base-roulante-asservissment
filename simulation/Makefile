@@ -1,7 +1,7 @@
 
 # Variables
 CXX = g++
-CXXFLAGS = -Wall -shared -fPIC -Wextra -std=c++17 -DSIMULATION_POSITION_CONTROL
+CXXFLAGS = -Wall -g -O0 -shared -fPIC -Wextra -std=c++17 -DSIMULATION_POSITION_CONTROL
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 INCLUDES = -I../include
 SRC_DIR = ../src

@@ -8,12 +8,12 @@ lib = ctypes.CDLL('./positionControlTB.so')
 
 # Définir les prototypes des fonctions
 lib.get_values.restype = ctypes.c_int
-lib.get_values.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_int)), ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]
-lib.free_values.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+lib.get_values.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_double)), ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]
+lib.free_values.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_int)]
 
 # Fonction pour appeler get_values
 def get_values_from_cpp():
-    data_ptr = ctypes.POINTER(ctypes.c_int)()
+    data_ptr = ctypes.POINTER(ctypes.c_double)()
     time_ptr = ctypes.POINTER(ctypes.c_int)()
 
     size = lib.get_values(ctypes.byref(data_ptr), ctypes.byref(time_ptr))
@@ -21,7 +21,7 @@ def get_values_from_cpp():
     if size <= 0:
         raise ValueError("get_values a retourné une taille invalide ou nulle")
 
-    data_array = ctypes.cast(data_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
+    data_array = ctypes.cast(data_ptr, ctypes.POINTER(ctypes.c_double * size)).contents
     time_array = ctypes.cast(time_ptr, ctypes.POINTER(ctypes.c_int * size)).contents
 
     data_list = list(data_array)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     print(data)
     speed = calculate_speed(data,time)
     fig, ax = plt.subplots()
-    ax.plot(time, data)
+    ax.plot(time, data,marker = 'o')
 
     ax.set(xlabel='time (ms)')
     ax.set(ylabel='distance (mm)')
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     ax2 = ax.twinx()
     ax2.set(ylabel='speed')
-    ax.plot(time, speed)
+    ax.plot(time, speed, marker = 'o')
 
 
 
