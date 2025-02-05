@@ -143,15 +143,15 @@ void i2c_interface::set_motor_state(bool motorEnable){
 
 void i2c_interface::set_brake_state(bool brakeEnable){
     if(brakeEnable){
+        motorBrakeL(true);
+        motorBrakeR(true);
+    }
+    else{
         robotAsservisement->reset();
         motorSpeedSignedL(0);
         motorSpeedSignedR(0);
         motorBrakeL(false);
         motorBrakeR(false);
-    }
-    else{
-        motorBrakeL(true);
-        motorBrakeR(true);
     }
 }
 

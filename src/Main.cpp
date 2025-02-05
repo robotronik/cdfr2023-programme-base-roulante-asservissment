@@ -169,7 +169,7 @@ int main(void)
 
         dbg.interval([](){
 			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",robotPosition->getPosition_X(),robotPosition->getPosition_Y(),robotPosition->getPosition_Teta());;
-		},100);
+		},1000);
 
 		//BLINK LED
 		ledToggleSeq.interval([](){

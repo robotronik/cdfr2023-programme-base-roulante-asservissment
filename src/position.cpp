@@ -21,10 +21,11 @@ void position::setPosition(position_t inCommingposition){
     needChangePos = true;
 }
 void position::setPosition(double x, double y, double teta){
-    positionRobot.x = x;
-    positionRobot.y = y;
-    positionRobot.teta =  mod_angle(teta);
-    positionRobot.time = get_uptime_ms();
+    newPosition.x = x;
+    newPosition.y = y;
+    newPosition.teta =  mod_angle(teta);
+    newPosition.time = get_uptime_ms();
+    needChangePos = true;
 }
 
 position_t position::getPosition(){
