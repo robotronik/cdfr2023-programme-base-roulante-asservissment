@@ -151,6 +151,7 @@ int main(void)
     sequence mySeq;
     sequence dbg;
     bool enableDebug = false;
+    int calibration = 0;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
@@ -165,6 +166,17 @@ int main(void)
         }
         if(enableDebug){
             testloop(&mySeq);
+        }
+
+        if(readButton1() && calibration == 0){
+            calibration = 1;
+            startCalibration();
+            delay_ms(1000);
+        }
+        else if(readButton1() && calibration == 1){
+            calibration = 2;
+            stopCalibration();
+            computeCalibration();
         }
 
         dbg.interval([](){

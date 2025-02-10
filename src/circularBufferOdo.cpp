@@ -168,7 +168,7 @@ bool CircularBufferOdo::recordIsEmpty() const {
 
 uint8_t CircularBufferOdo::popRecod(void){
     uint8_t data;
-    this->pop(data);
+    this->popRecod(data);
     return data;
 }
 void CircularBufferOdo::resetPopRecord(void){

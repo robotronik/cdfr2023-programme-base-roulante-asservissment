@@ -101,3 +101,102 @@ void odometrieLoop(position_t &position){
 	}
 }
 
+void odometrieCalc(position_t &position, odometrieTrigger_t typeTrigger, odometrieParam_t param){
+    switch (typeTrigger)
+    {
+    case fordwardL:
+            position.y -= param.stepForrwardG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
+            position.x -= param.stepForrwardG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+            position.teta -= param.stepForrwardG;
+        break;
+    case backwardL:
+            position.y += param.stepForrwardG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
+            position.x += param.stepForrwardG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+            position.teta += param.stepForrwardG;
+        break;
+    case fordwardR:
+            position.y -= param.stepForrwardD * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
+            position.x -= param.stepForrwardD * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+            position.teta += param.stepForrwardD;
+        break;
+    case backwardR:
+            position.y += param.stepForrwardD * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
+            position.x += param.stepForrwardD * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
+            position.teta -= param.stepForrwardD;
+        break;
+    default:
+        break;
+    }
+}
+
+
+void startCalibration(void){
+	circularBufferOdo->startRecording();
+}
+
+void stopCalibration(void){
+	circularBufferOdo->stopRecording();
+}
+
+bool computeCalibration(void){
+    if(!circularBufferOdo->recordIsValid()){
+        usartprintf("Buffer not valid : Overflow\n");
+        usartprintf("Create a smaller path to calibrate\n");
+        return false;
+    }
+    odometrieParam_t param;
+    position_t position;
+    odometrieTrigger_t typeTrigger;
+
+    double bestWheelG = -1;
+    double bestWheelD = -1;
+    double bestdistance  = -1;
+
+    double best = 100000000;
+    double Compromis = 1;
+
+    int totalIteration = 0;
+    // int lastPourcent = 0;
+
+    for(double wheelG = DIAMETERWHEELG - 1; wheelG < DIAMETERWHEELG + 1; wheelG+=0.1){
+        for(double wheelD = DIAMETERWHEELD - 1; wheelD < DIAMETERWHEELD + 1; wheelD+=0.1){
+            for(double distance = DISTANCEWHEEL - 1; distance < DISTANCEWHEEL + 1; distance+=0.1){
+
+                // int currentPourcent = (double)totalIteration/(20*20*20);
+                // if(lastPourcent != currentPourcent){
+                //     lastPourcent = currentPourcent;
+                //     usartprintf("[%d%] Compute best param Odo \twheelG : %.5lf wheelD : %.5lf distance : %.5lf\n",currentPourcent,bestWheelG,bestWheelD,bestdistance);
+                // }
+                totalIteration++;
+
+                circularBufferOdo->resetPopRecord();
+                param.stepAngleD = COMPUTE_STEPANGLE(wheelD,distance);
+                param.stepAngleG = COMPUTE_STEPANGLE(wheelG,distance);
+                param.stepForrwardD = COMPUTE_STEPAVANCE(wheelD);
+                param.stepForrwardG = COMPUTE_STEPAVANCE(wheelG);
+                position.teta = 0;
+                position.x = 0;
+                position.y = 0;
+
+                while (!circularBufferOdo->recordIsEmpty()){
+                    typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
+                    odometrieCalc(position,typeTrigger,param);
+                }
+
+                usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelG,wheelD,distance);
+
+                double quality = abs(position.teta) * Compromis + abs(position.x);
+                if(quality < best){
+                    best = quality;
+                    bestWheelG = wheelG;
+                    bestWheelD = wheelD;
+                    bestdistance = distance;
+                }
+
+            }
+        }
+    }
+    usartprintf("\n\nBEST :\n\twheelG : %lf\n\twheelD : %lf\n\tdistance : %lf\n",bestWheelG,bestWheelD,bestdistance);
+    return true;
+}
+
