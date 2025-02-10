@@ -121,6 +121,9 @@
 #define port_I2CSda				GPIOB
 
 
+#define CALIBRATION_IT 10
+#define CALIBRATION_DIV 4
+
 //Odometrie
 #ifdef OLDROBOT
     #define NUMBERSTEPBYROTATION 360
@@ -132,6 +135,11 @@
     #define DISTANCEWHEEL 253.9794921875 // + = teat -
     #define DIAMETERWHEELD 41.3525390625                // +1 roue = +25 distance
     #define DIAMETERWHEELG 41.3330078125// + = y -     // +1 roue = +25 distance
+
+    #define CALIBRATION_START_DISTANCEWHEEL 250.0
+    #define CALIBRATION_START_DIAMETERWHEEL 40.0
+    #define CALIBRATION_PLAGE_DISTANCEWHEEL 100.0
+    #define CALIBRATION_PLAGE_DIAMETERWHEEL 20.0
 #endif
 
 #define PI 3.14159265359

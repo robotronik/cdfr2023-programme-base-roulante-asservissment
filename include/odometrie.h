@@ -13,6 +13,7 @@
 #include "config.h"
 #include "clock.h"
 #include "uart.h"
+#include "AsservissementMath.h"
 
 #define _BUFFERSIZE 50000
 
@@ -23,12 +24,31 @@
 // STEPANGLE = (RayonRoueCodeuse * 360) / (NbDePasRoueCodeuse * LargeurEntraxeDes2RoueCodeuses * 2)
 // STEPAVANCE = (RayonRoueCodeuse * 360)/(NbDePasRoueCodeuse*2)
 
-#define STEPANGLED ((DIAMETERWHEELD*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
-#define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
-#define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
-#define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
+#define STEPANGLED (((DIAMETERWHEELD)*180)/((NUMBERSTEPBYROTATION)*(DISTANCEWHEEL)))
+#define STEPANGLEG (((DIAMETERWHEELG)*180)/((NUMBERSTEPBYROTATION)*(DISTANCEWHEEL)))
+#define STEPAVANCED (((DIAMETERWHEELD)*(PI))/((NUMBERSTEPBYROTATION)*2))
+#define STEPAVANCEG (((DIAMETERWHEELG)*(PI))/((NUMBERSTEPBYROTATION)*2))
+
+#define COMPUTE_STEPANGLE(DIAMETER,DISTANCE)    (((DIAMETER)*180)/((NUMBERSTEPBYROTATION)*(DISTANCE)))
+#define COMPUTE_STEPAVANCE(DIAMETER)            (((DIAMETER)*PI)/((NUMBERSTEPBYROTATION)*2))
+
+
+#define COEFCONVDEGRETORADIAN (PI/180)
 
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
+typedef struct
+{
+    double stepAngleD;
+    double stepAngleG;
+    double stepForrwardG;
+    double stepForrwardD;
+}odometrieParam_t;
+
 void odometrieSetup(void);
 void odometrieLoop(position_t &position);
+
+void startCalibration(void);
+void sectionCalibration(void);
+void stopCalibration(void);
+void computeCalibration(void);
