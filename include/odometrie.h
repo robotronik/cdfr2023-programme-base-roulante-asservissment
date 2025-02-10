@@ -29,9 +29,25 @@
 #define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
 #define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
 
+#define COMPUTE_STEPANGLE(DIAMETER,DISTANCE)    (((DIAMETER)*180)/(NUMBERSTEPBYROTATION*(DISTANCE)))
+#define COMPUTE_STEPAVANCE(DIAMETER)            (((DIAMETER)*PI)/(NUMBERSTEPBYROTATION*2))
+
+
 #define COEFCONVDEGRETORADIAN PI/180
 
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 
+typedef struct
+{
+    double stepAngleD;
+    double stepAngleG;
+    double stepForrwardG;
+    double stepForrwardD;
+}odometrieParam_t;
+
 void odometrieSetup(void);
 void odometrieLoop(position_t &position);
+
+void startCalibration(void);
+void stopCalibration(void);
+bool computeCalibration(void);
