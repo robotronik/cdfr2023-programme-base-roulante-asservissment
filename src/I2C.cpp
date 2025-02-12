@@ -28,6 +28,8 @@ void i2c_setup(void){
 
 	nvic_enable_irq(NVIC_I2C1_EV_IRQ);
 	nvic_enable_irq(NVIC_I2C1_ER_IRQ);
+    nvic_set_priority(NVIC_I2C1_ER_IRQ, 16);
+    nvic_set_priority(NVIC_I2C1_EV_IRQ, 17);
 
 	/* HSI is at 8Mhz */
 	i2c_set_speed(I2C1, i2c_speed_sm_100k, 8);
