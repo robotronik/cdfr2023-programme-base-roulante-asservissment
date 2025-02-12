@@ -107,22 +107,22 @@ void odometrieCalc(position_t &position, odometrieTrigger_t typeTrigger, odometr
     case fordwardL:
             position.y -= param.stepForrwardG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
             position.x -= param.stepForrwardG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-            position.teta -= param.stepForrwardG;
+            position.teta -= param.stepAngleG;
         break;
     case backwardL:
             position.y += param.stepForrwardG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
             position.x += param.stepForrwardG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-            position.teta += param.stepForrwardG;
+            position.teta += param.stepAngleG;
         break;
     case fordwardR:
             position.y -= param.stepForrwardD * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
             position.x -= param.stepForrwardD * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-            position.teta += param.stepForrwardD;
+            position.teta += param.stepAngleD;
         break;
     case backwardR:
             position.y += param.stepForrwardD * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
             position.x += param.stepForrwardD * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-            position.teta -= param.stepForrwardD;
+            position.teta -= param.stepAngleD;
         break;
     default:
         break;
@@ -158,9 +158,9 @@ bool computeCalibration(void){
     int totalIteration = 0;
     // int lastPourcent = 0;
 
-    for(double wheelG = DIAMETERWHEELG - 1; wheelG < DIAMETERWHEELG + 1; wheelG+=0.1){
-        for(double wheelD = DIAMETERWHEELD - 1; wheelD < DIAMETERWHEELD + 1; wheelD+=0.1){
-            for(double distance = DISTANCEWHEEL - 1; distance < DISTANCEWHEEL + 1; distance+=0.1){
+    for(double wheelG = DIAMETERWHEELG - 1; wheelG < DIAMETERWHEELG + 1; wheelG+=0.2){
+        for(double wheelD = DIAMETERWHEELD - 1; wheelD < DIAMETERWHEELD + 1; wheelD+=0.2){
+            for(double distance = DISTANCEWHEEL - 1; distance < DISTANCEWHEEL + 1; distance+=0.2){
 
                 // int currentPourcent = (double)totalIteration/(20*20*20);
                 // if(lastPourcent != currentPourcent){
@@ -183,7 +183,9 @@ bool computeCalibration(void){
                     odometrieCalc(position,typeTrigger,param);
                 }
 
-                usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelG,wheelD,distance);
+                position.teta = mod_angle(position.teta);
+
+                usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
 
                 double quality = abs(position.teta) * Compromis + abs(position.x);
                 if(quality < best){
