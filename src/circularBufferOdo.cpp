@@ -131,7 +131,7 @@ void CircularBufferOdo::stopRecording(void){
 }
 
 bool CircularBufferOdo::popRecod(uint8_t &data){
-    if (isEmpty()) {
+    if (recordIsEmpty()) {
         usartprintf("Erreur: Buffer vide.\n");
         return false;
     }

@@ -170,11 +170,13 @@ int main(void)
 
         if(readButton1() && calibration == 0){
             calibration = 1;
+            usartprintf("Start calibration\n");
             startCalibration();
             delay_ms(1000);
         }
         else if(readButton1() && calibration == 1){
             calibration = 2;
+            usartprintf("Stopand compute calibration\n");
             stopCalibration();
             computeCalibration();
         }

@@ -13,6 +13,7 @@
 #include "config.h"
 #include "clock.h"
 #include "uart.h"
+#include "AsservissementMath.h"
 
 #define _BUFFERSIZE 50000
 #define PI 3.14159265359
