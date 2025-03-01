@@ -4,7 +4,7 @@
 movement::movement(position* pos):Asservissement(pos){
 }
 
-bool movement::goToPoint(uint16_t x,uint16_t y,Rotation rotation, Direction direction){
+bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direction){
     if(commandBuffer.getAvailableSpace()>=2){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
@@ -29,7 +29,7 @@ bool movement::goToPoint(uint16_t x,uint16_t y,Rotation rotation, Direction dire
     return 0;
 }
 
-bool movement::goToPoint(uint16_t x,uint16_t y,uint16_t theta, Rotation rotationFirst, Direction direction, Rotation rotationSecond){
+bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst, Direction direction, Rotation rotationSecond){
     if(commandBuffer.getAvailableSpace()>=3){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
@@ -62,7 +62,7 @@ bool movement::goToPoint(uint16_t x,uint16_t y,uint16_t theta, Rotation rotation
     return 0;
 }
 
-bool movement::setConsigneAngulaire(uint16_t angle,Rotation rotation){
+bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
     if(!commandBuffer.isFull()){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_THETA,
@@ -79,7 +79,7 @@ bool movement::setConsigneAngulaire(uint16_t angle,Rotation rotation){
     return 0;
 }
 
-bool movement::setConsigneLookAtForward(uint16_t x,uint16_t y,Rotation rotation){
+bool movement::setConsigneLookAtForward(int16_t x,int16_t y,Rotation rotation){
     if(!commandBuffer.isFull()){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
@@ -96,7 +96,7 @@ bool movement::setConsigneLookAtForward(uint16_t x,uint16_t y,Rotation rotation)
     return 0;
 }
 
-bool movement::setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation){
+bool movement::setConsigneLookAtBackward(int16_t x,int16_t y,Rotation rotation){
     if(!commandBuffer.isFull()){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,

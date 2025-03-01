@@ -158,47 +158,52 @@ bool computeCalibration(void){
     int totalIteration = 0;
     // int lastPourcent = 0;
 
-    for(double wheelG = DIAMETERWHEELG - 1; wheelG < DIAMETERWHEELG + 1; wheelG+=0.2){
-        for(double wheelD = DIAMETERWHEELD - 1; wheelD < DIAMETERWHEELD + 1; wheelD+=0.2){
-            for(double distance = DISTANCEWHEEL - 1; distance < DISTANCEWHEEL + 1; distance+=0.2){
-
-                // int currentPourcent = (double)totalIteration/(20*20*20);
-                // if(lastPourcent != currentPourcent){
-                //     lastPourcent = currentPourcent;
-                //     usartprintf("[%d%] Compute best param Odo \twheelG : %.5lf wheelD : %.5lf distance : %.5lf\n",currentPourcent,bestWheelG,bestWheelD,bestdistance);
-                // }
-                totalIteration++;
-
-                circularBufferOdo->resetPopRecord();
-                param.stepAngleD = COMPUTE_STEPANGLE(wheelD,distance);
-                param.stepAngleG = COMPUTE_STEPANGLE(wheelG,distance);
-                param.stepForrwardD = COMPUTE_STEPAVANCE(wheelD);
-                param.stepForrwardG = COMPUTE_STEPAVANCE(wheelG);
-                position.teta = 0;
-                position.x = 0;
-                position.y = 0;
-
-                while (!circularBufferOdo->recordIsEmpty()){
-                    typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
-                    odometrieCalc(position,typeTrigger,param);
-                }
-
-                position.teta = mod_angle(position.teta);
-
-                usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
-
-                double quality = abs(position.teta) * Compromis + abs(position.x);
-                if(quality < best){
-                    best = quality;
-                    bestWheelG = wheelG;
-                    bestWheelD = wheelD;
-                    bestdistance = distance;
-                }
-
-            }
-        }
+    circularBufferOdo->resetPopRecord();
+    int trigCount = 0;
+    while (!circularBufferOdo->recordIsEmpty()){
+        typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
+        usartprintf("%d,%d,\n",trigCount,typeTrigger);
+        trigCount++;
     }
-    usartprintf("\n\nBEST :\n\twheelG : %lf\n\twheelD : %lf\n\tdistance : %lf\n",bestWheelG,bestWheelD,bestdistance);
+
+    // for(double wheelG = DIAMETERWHEELG - 5; wheelG < DIAMETERWHEELG + 5; wheelG+=2){
+    //     for(double wheelD = DIAMETERWHEELD - 5; wheelD < DIAMETERWHEELD + 5; wheelD+=2){
+    //         for(double distance = DISTANCEWHEEL - 5; distance < DISTANCEWHEEL + 5; distance+=2){
+
+    //             // int currentPourcent = (double)totalIteration/(20*20*20);
+    //             // if(lastPourcent != currentPourcent){
+    //             //     lastPourcent = currentPourcent;
+    //             //     usartprintf("[%d%] Compute best param Odo \twheelG : %.5lf wheelD : %.5lf distance : %.5lf\n",currentPourcent,bestWheelG,bestWheelD,bestdistance);
+    //             // }
+    //             totalIteration++;
+
+                
+    //             param.stepAngleD = COMPUTE_STEPANGLE(wheelD,distance);
+    //             param.stepAngleG = COMPUTE_STEPANGLE(wheelG,distance);
+    //             param.stepForrwardD = COMPUTE_STEPAVANCE(wheelD);
+    //             param.stepForrwardG = COMPUTE_STEPAVANCE(wheelG);
+    //             position.teta = 0;
+    //             position.x = 0;
+    //             position.y = 0;
+
+                
+
+    //             position.teta = mod_angle(position.teta);
+
+    //             usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
+
+    //             double quality = abs(position.teta) * Compromis + abs(position.x);
+    //             if(quality < best){
+    //                 best = quality;
+    //                 bestWheelG = wheelG;
+    //                 bestWheelD = wheelD;
+    //                 bestdistance = distance;
+    //             }
+
+    //         }
+    //     }
+    // }
+    // usartprintf("\n\nBEST :\n\twheelG : %lf\n\twheelD : %lf\n\tdistance : %lf\n",bestWheelG,bestWheelD,bestdistance);
     return true;
 }
 

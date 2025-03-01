@@ -81,6 +81,13 @@ void testloop(sequence* seq){
 	// },7000);
 }
 
+void Calibration(){
+    enableMotor();
+    robotAsservisement->goToPoint(1000,0);
+    robotAsservisement->goToPoint(250,0,Rotation::CLOCKWISE);
+    robotAsservisement->goToPoint(-50,0,Rotation::CLOCKWISE,Direction::BACKWARD);
+}
+
 int main(void)
 {
 
@@ -149,9 +156,11 @@ int main(void)
 //
 	sequence ledToggleSeq;
     sequence mySeq;
+    sequence seqCalibration;
     sequence dbg;
     bool enableDebug = false;
     int calibration = 0;
+    uint32_t startTime;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
@@ -170,13 +179,21 @@ int main(void)
 
         if(readButton1() && calibration == 0){
             calibration = 1;
+        }
+        else if(!readButton1() && calibration == 1){
+            calibration = 2;
+            startTime = get_uptime_ms() + 2000;
             usartprintf("Start calibration\n");
             startCalibration();
-            delay_ms(1000);
         }
-        else if(readButton1() && calibration == 1){
-            calibration = 2;
+        else if(calibration == 2 && get_uptime_ms()>startTime){
+            calibration = 3;
+            Calibration();
+        }
+        else if( robotAsservisement->getCommandBufferSize() == 0 && calibration == 3){
+            calibration = 4;
             usartprintf("Stopand compute calibration\n");
+            disableMotor();
             stopCalibration();
             computeCalibration();
         }
