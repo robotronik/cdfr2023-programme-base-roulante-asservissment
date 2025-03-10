@@ -64,7 +64,6 @@ double positionControl::getPostion(){
 void positionControl::calculVitesse(){
     double vitessePrecedente = vitesse;
 
-    //genstion du mouvement Avant
     if(stopStatus){
         vitesse = 0;
         if(decelerationStop != -1 && vitesse > vitessePrecedente + decelerationStop*deltaTemps){
@@ -76,6 +75,7 @@ void positionControl::calculVitesse(){
         return;
     }
 
+    //genstion du mouvement Avant
     if(consigne-position>0){
         if(decelerationMaxAv!=-1){
             if(decelationLineair){
