@@ -45,14 +45,14 @@ def compute_calibration():
     graphData = []
 
 
-    for i in range(1):  # Première itération large, seconde itération affinée
+    for i in range(5):  # Première itération large, seconde itération affinée
 
-        min_wheel_g  = best_results[0][1] - 20 if best_results else DIAMETERWHEELG - 20
-        max_wheel_g  = best_results[0][1] + 20 if best_results else DIAMETERWHEELG + 20
-        min_wheel_d  = best_results[0][2] - 20 if best_results else DIAMETERWHEELD - 20
-        max_wheel_d  = best_results[0][2] + 20 if best_results else DIAMETERWHEELD + 20
-        min_distance = best_results[0][3] - 20 if best_results else DISTANCEWHEEL - 100
-        max_distance = best_results[0][3] + 20 if best_results else DISTANCEWHEEL + 100
+        min_wheel_g  = best_results[0][1] - 20/pow(10,i) if best_results else DIAMETERWHEELG - 20
+        max_wheel_g  = best_results[0][1] + 20/pow(10,i) if best_results else DIAMETERWHEELG + 20
+        min_wheel_d  = best_results[0][2] - 20/pow(10,i) if best_results else DIAMETERWHEELD - 20
+        max_wheel_d  = best_results[0][2] + 20/pow(10,i) if best_results else DIAMETERWHEELD + 20
+        min_distance = best_results[0][3] - 100/pow(10,i) if best_results else DISTANCEWHEEL - 100
+        max_distance = best_results[0][3] + 100/pow(10,i) if best_results else DISTANCEWHEEL + 100
 
         paramMinMax.append((min_wheel_g, max_wheel_g, min_wheel_d, max_wheel_d, min_distance, max_distance))
         print("\nPram : ")
@@ -114,15 +114,17 @@ def compute_calibration():
                     position2['teta'] = mod_angle(position2['teta'])
                     position3['teta'] = mod_angle(position3['teta'])
                     #quality = abs(position1['x'])
-                    quality = abs(position1['teta']) * compromis + abs(position1['x']) + abs(position0['teta']) * compromis + abs(position0['x']) #+ abs(position2['teta']) * compromis + abs(position3['teta']) * compromis
+                    qualityTeta = + abs(position1['x']) + abs(position0['x']) + abs(position3['x']+1544) #+ abs(position2['teta']) * compromis + abs(position3['teta']) * compromis
+                    qualityX = abs(position1['teta']) +  abs(position0['teta']) + abs(position3['teta'])
+                    quality = qualityTeta * compromis + qualityX
 
                     graphData.append((quality, abs(wheel_d-40), abs(distance-250)))
 
                     if len(best_results) < 10:
-                        best_results.append((quality, wheel_g, wheel_d, distance, abs(position1['teta']) * compromis + abs(position0['teta']) * compromis, abs(position1['x']) + abs(position0['x'])))
+                        best_results.append((quality, wheel_g, wheel_d, distance, qualityTeta, qualityX))
                         best_results.sort(key=lambda x: x[0])
                     elif quality < best_results[-1][0]:
-                        best_results[-1] = (quality, wheel_g, wheel_d, distance, abs(position1['teta']) * compromis + abs(position0['teta']) * compromis, abs(position1['x']) + abs(position0['x']))
+                        best_results[-1] = (quality, wheel_g, wheel_d, distance,qualityTeta, qualityX)
                         best_results.sort(key=lambda x: x[0])
 
                     print(f"{total_iteration},{wheel_g},{wheel_d},{distance}")
