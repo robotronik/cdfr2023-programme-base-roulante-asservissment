@@ -38,11 +38,11 @@ private:
 
 public:
     movement(position* pos);
-    bool goToPoint(uint16_t x,uint16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
-    bool goToPoint(uint16_t x,uint16_t y,uint16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::FORWARD, Rotation rotationSecond = Rotation::SHORTEST);
-    bool setConsigneAngulaire(uint16_t angle,Rotation rotation);
-    bool setConsigneLookAtForward(uint16_t x,uint16_t y,Rotation rotation);
-    bool setConsigneLookAtBackward(uint16_t x,uint16_t y,Rotation rotation);
+    bool goToPoint(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
+    bool goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::FORWARD, Rotation rotationSecond = Rotation::SHORTEST);
+    bool setConsigneAngulaire(int16_t angle,Rotation rotation);
+    bool setConsigneLookAtForward(int16_t x,int16_t y,Rotation rotation);
+    bool setConsigneLookAtBackward(int16_t x,int16_t y,Rotation rotation);
     bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
     bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
 
