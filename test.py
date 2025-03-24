@@ -44,18 +44,19 @@ def compute_calibration():
     paramMinMax = []
     graphData = []
     qualityGraphData = []
+    division = 4
 
-    for i in range(20):  # Première itération large, seconde itération affinée
+    for i in range(10):
 
         if best_results:
             qualityGraphData.append(best_results[0][0])
 
-        min_wheel_g  = best_results[0][1] - 20/pow(2,i) if best_results else DIAMETERWHEELG - 20
-        max_wheel_g  = best_results[0][1] + 20/pow(2,i) if best_results else DIAMETERWHEELG + 20
-        min_wheel_d  = best_results[0][2] - 20/pow(2,i) if best_results else DIAMETERWHEELD - 20
-        max_wheel_d  = best_results[0][2] + 20/pow(2,i) if best_results else DIAMETERWHEELD + 20
-        min_distance = best_results[0][3] - 100/pow(2,i) if best_results else DISTANCEWHEEL - 100
-        max_distance = best_results[0][3] + 100/pow(2,i) if best_results else DISTANCEWHEEL + 100
+        min_wheel_g  = best_results[0][1] - (20/(division*pow(2,i-1))) if best_results else DIAMETERWHEELG - 20
+        max_wheel_g  = best_results[0][1] + (20/(division*pow(2,i-1))) if best_results else DIAMETERWHEELG + 20
+        min_wheel_d  = best_results[0][2] - (20/(division*pow(2,i-1))) if best_results else DIAMETERWHEELD - 20
+        max_wheel_d  = best_results[0][2] + (20/(division*pow(2,i-1))) if best_results else DIAMETERWHEELD + 20
+        min_distance = best_results[0][3] - (100/(division*pow(2,i-1))) if best_results else DISTANCEWHEEL - 100
+        max_distance = best_results[0][3] + (100/(division*pow(2,i-1))) if best_results else DISTANCEWHEEL + 100
 
         paramMinMax.append((min_wheel_g, max_wheel_g, min_wheel_d, max_wheel_d, min_distance, max_distance))
         print("\nPram : ")
@@ -66,16 +67,16 @@ def compute_calibration():
         print(min_distance)
         print(max_distance)
         print("\nTOP 10 BEST :")
-        # for i, (q, wg, wd, d) in enumerate(best_results):
-        #     print(f"{i+1}. quality: {q}, wheelG: {wg}, wheelD: {wd}, distance: {d}")
+        for i, (q, wg, wd, d, e, f) in enumerate(best_results):
+            print(f"{i+1}. quality: {q}, wheelG: {wg}, wheelD: {wd}, distance: {d}")
         print("\n\n")
 
 
         best_results.clear()
         graphData.clear()
-        for wheel_g in [min_wheel_g + (i+1) * (max_wheel_g - min_wheel_g) / 4 for i in range(3)]:
-            for wheel_d in [min_wheel_d + (i+1) * (max_wheel_d - min_wheel_d) / 4 for i in range(3)]:
-                for distance in [min_distance + (i+1) * (max_distance - min_distance) / 4 for i in range(3)]:
+        for wheel_g in [min_wheel_g + (i+0.5) * ((max_wheel_g - min_wheel_g) / division) for i in range(division)]:
+            for wheel_d in [min_wheel_d + (i+0.5) * ((max_wheel_d - min_wheel_d) / division) for i in range(division)]:
+                for distance in [min_distance + (i+0.5) * ((max_distance - min_distance) / division) for i in range(division)]:
                     total_iteration += 1
                     param = {
                         'stepAngleD': compute_step_angle(wheel_d, distance),
