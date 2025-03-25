@@ -50,5 +50,6 @@ void odometrieSetup(void);
 void odometrieLoop(position_t &position);
 
 void startCalibration(void);
+void sectionCalibration(void);
 void stopCalibration(void);
 bool computeCalibration(void);

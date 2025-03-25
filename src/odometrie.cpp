@@ -134,6 +134,10 @@ void startCalibration(void){
 	circularBufferOdo->startRecording();
 }
 
+void sectionCalibration(void){
+	circularBufferOdo->addSection();
+}
+
 void stopCalibration(void){
 	circularBufferOdo->stopRecording();
 }
@@ -145,26 +149,15 @@ bool computeCalibration(void){
         return false;
     }
     odometrieParam_t param;
-    position_t position;
     position_t positionSection[NB_RECORD_SECTION];
-    odometrieTrigger_t typeTrigger;
 
-    double bestWheelG = -1;
-    double bestWheelD = -1;
-    double bestdistance  = -1;
+    double bestWheelG;
+    double bestWheelD;
+    double bestdistance;
 
     double best = 100000000;
     double Compromis = 1;
-
     int totalIteration = 0;
-    // int lastPourcent = 0;
-
-    circularBufferOdo->resetPopRecord();
-    int trigCount = 0;
-
-    position.teta = 0;
-    position.x = 0;
-    position.y = 0;
 
     double minWheelG = CALIBRATION_START_DIAMETERWHEEL - CALIBRATION_PLAGE_DIAMETERWHEEL;
     double maxWheelG = CALIBRATION_START_DIAMETERWHEEL + CALIBRATION_PLAGE_DIAMETERWHEEL;
@@ -175,10 +168,13 @@ bool computeCalibration(void){
 
     double start = minWheelG + 0.5 * ((maxWheelG - minWheelG) / CALIBRATION_DIV);
 
+    usartprintf("Buffer size : %d/%d\n",circularBufferOdo->getEndPointSection(circularBufferOdo->getNumberSetion()),_BUFFERSIZE);
+
     for(int a = 0; a < CALIBRATION_IT;a++){
         for(int wg = 0; wg < CALIBRATION_DIV; wg++){
             for(int wd = 0; wd < CALIBRATION_DIV; wd++){
                 for(int dist = 0; dist < CALIBRATION_DIV; dist++){
+                    position_t position;
 
                     double wheelG = minWheelG + (wg+0.5) * ((maxWheelG - minWheelG) / CALIBRATION_DIV);
                     double wheelD = minWheelD + (wd+0.5) * ((maxWheelD - minWheelD) / CALIBRATION_DIV);
@@ -192,24 +188,29 @@ bool computeCalibration(void){
                     position.x = 0;
                     position.y = 0;
 
+                    circularBufferOdo->resetPopRecord();
                     for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
                         for(int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);i++){
-                            typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
+                            odometrieTrigger_t typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
                             odometrieCalc(position,typeTrigger,param);
                         }
                         position.teta = mod_angle(position.teta);
                         positionSection[i] = position;
                     }
 
-                    usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
+                    double quality = abs(positionSection[0].teta-90) * Compromis +
+                                     abs(positionSection[1].teta) * Compromis + abs(positionSection[1].x) +
+                                     abs(positionSection[2].teta) * Compromis + abs(positionSection[2].x) +
+                                     abs(positionSection[0].teta-90) * Compromis + abs(positionSection[1].y - positionSection[3].y);
 
-                    double quality = abs(position.teta) * Compromis + abs(position.x);
                     if(quality < best){
                         best = quality;
                         bestWheelG = wheelG;
                         bestWheelD = wheelD;
                         bestdistance = distance;
                     }
+
+                    usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
                     totalIteration++;
 
                 }
