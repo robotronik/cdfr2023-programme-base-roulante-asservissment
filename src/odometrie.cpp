@@ -146,6 +146,7 @@ bool computeCalibration(void){
     }
     odometrieParam_t param;
     position_t position;
+    position_t positionSection[NB_RECORD_SECTION];
     odometrieTrigger_t typeTrigger;
 
     double bestWheelG = -1;
@@ -160,50 +161,68 @@ bool computeCalibration(void){
 
     circularBufferOdo->resetPopRecord();
     int trigCount = 0;
-    while (!circularBufferOdo->recordIsEmpty()){
-        typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
-        usartprintf("%d,%d,\n",trigCount,typeTrigger);
-        trigCount++;
+
+    position.teta = 0;
+    position.x = 0;
+    position.y = 0;
+
+    double minWheelG = CALIBRATION_START_DIAMETERWHEEL - CALIBRATION_PLAGE_DIAMETERWHEEL;
+    double maxWheelG = CALIBRATION_START_DIAMETERWHEEL + CALIBRATION_PLAGE_DIAMETERWHEEL;
+    double minWheelD = CALIBRATION_START_DIAMETERWHEEL - CALIBRATION_PLAGE_DIAMETERWHEEL;
+    double maxWheelD = CALIBRATION_START_DIAMETERWHEEL + CALIBRATION_PLAGE_DIAMETERWHEEL;
+    double minDistance = CALIBRATION_START_DISTANCEWHEEL - CALIBRATION_PLAGE_DISTANCEWHEEL;
+    double maxDistance = CALIBRATION_START_DISTANCEWHEEL + CALIBRATION_PLAGE_DISTANCEWHEEL;
+
+    double start = minWheelG + 0.5 * ((maxWheelG - minWheelG) / CALIBRATION_DIV);
+
+    for(int a = 0; a < CALIBRATION_IT;a++){
+        for(int wg = 0; wg < CALIBRATION_DIV; wg++){
+            for(int wd = 0; wd < CALIBRATION_DIV; wd++){
+                for(int dist = 0; dist < CALIBRATION_DIV; dist++){
+
+                    double wheelG = minWheelG + (wg+0.5) * ((maxWheelG - minWheelG) / CALIBRATION_DIV);
+                    double wheelD = minWheelD + (wd+0.5) * ((maxWheelD - minWheelD) / CALIBRATION_DIV);
+                    double distance = minDistance + (dist+0.5) * ((maxDistance - minDistance) / CALIBRATION_DIV);
+
+                    param.stepAngleD = COMPUTE_STEPANGLE(wheelD,distance);
+                    param.stepAngleG = COMPUTE_STEPANGLE(wheelG,distance);
+                    param.stepForrwardD = COMPUTE_STEPAVANCE(wheelD);
+                    param.stepForrwardG = COMPUTE_STEPAVANCE(wheelG);
+                    position.teta = 0;
+                    position.x = 0;
+                    position.y = 0;
+
+                    for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
+                        for(int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);i++){
+                            typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
+                            odometrieCalc(position,typeTrigger,param);
+                        }
+                        position.teta = mod_angle(position.teta);
+                        positionSection[i] = position;
+                    }
+
+                    usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
+
+                    double quality = abs(position.teta) * Compromis + abs(position.x);
+                    if(quality < best){
+                        best = quality;
+                        bestWheelG = wheelG;
+                        bestWheelD = wheelD;
+                        bestdistance = distance;
+                    }
+                    totalIteration++;
+
+                }
+            }
+        }
+        minWheelG  = bestWheelG - (CALIBRATION_START_DIAMETERWHEEL/(CALIBRATION_DIV*pow(2,a)));
+        maxWheelG  = bestWheelG + (CALIBRATION_START_DIAMETERWHEEL/(CALIBRATION_DIV*pow(2,a)));
+        minWheelD  = bestWheelD - (CALIBRATION_START_DIAMETERWHEEL/(CALIBRATION_DIV*pow(2,a)));
+        maxWheelD  = bestWheelD + (CALIBRATION_START_DIAMETERWHEEL/(CALIBRATION_DIV*pow(2,a)));
+        minDistance = bestdistance - (CALIBRATION_START_DISTANCEWHEEL/(CALIBRATION_DIV*pow(2,a)));
+        maxDistance = bestdistance + (CALIBRATION_START_DISTANCEWHEEL/(CALIBRATION_DIV*pow(2,a)));
     }
-
-    // for(double wheelG = DIAMETERWHEELG - 5; wheelG < DIAMETERWHEELG + 5; wheelG+=2){
-    //     for(double wheelD = DIAMETERWHEELD - 5; wheelD < DIAMETERWHEELD + 5; wheelD+=2){
-    //         for(double distance = DISTANCEWHEEL - 5; distance < DISTANCEWHEEL + 5; distance+=2){
-
-    //             // int currentPourcent = (double)totalIteration/(20*20*20);
-    //             // if(lastPourcent != currentPourcent){
-    //             //     lastPourcent = currentPourcent;
-    //             //     usartprintf("[%d%] Compute best param Odo \twheelG : %.5lf wheelD : %.5lf distance : %.5lf\n",currentPourcent,bestWheelG,bestWheelD,bestdistance);
-    //             // }
-    //             totalIteration++;
-
-                
-    //             param.stepAngleD = COMPUTE_STEPANGLE(wheelD,distance);
-    //             param.stepAngleG = COMPUTE_STEPANGLE(wheelG,distance);
-    //             param.stepForrwardD = COMPUTE_STEPAVANCE(wheelD);
-    //             param.stepForrwardG = COMPUTE_STEPAVANCE(wheelG);
-    //             position.teta = 0;
-    //             position.x = 0;
-    //             position.y = 0;
-
-                
-
-    //             position.teta = mod_angle(position.teta);
-
-    //             usartprintf("%d,%lf,%lf,%lf,%lf,%lf,\n",totalIteration,position.teta,position.x,wheelD,wheelG,distance);
-
-    //             double quality = abs(position.teta) * Compromis + abs(position.x);
-    //             if(quality < best){
-    //                 best = quality;
-    //                 bestWheelG = wheelG;
-    //                 bestWheelD = wheelD;
-    //                 bestdistance = distance;
-    //             }
-
-    //         }
-    //     }
-    // }
-    // usartprintf("\n\nBEST :\n\twheelG : %lf\n\twheelD : %lf\n\tdistance : %lf\n",bestWheelG,bestWheelD,bestdistance);
+    usartprintf("\n\nBEST :\n\twheelG : %lf\n\twheelD : %lf\n\tdistance : %lf\n",bestWheelG,bestWheelD,bestdistance);
     return true;
 }
 

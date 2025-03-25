@@ -137,6 +137,7 @@ bool CircularBufferOdo::recordIsValid(void){
 
 void CircularBufferOdo::stopRecording(void){
     m_freezePush = true;
+    addSection();
 }
 
 bool CircularBufferOdo::popRecod(uint8_t &data){
@@ -175,21 +176,31 @@ bool CircularBufferOdo::recordIsEmpty() const {
 #endif
 }
 
-int CircularBufferOdo::getSection(){
+int CircularBufferOdo::getEndPointSection(int section){
 #ifdef OPTIMIZE_BUFFER
-    for(int i = m_record_section - 1; i>=0; i--){
-        if((m_endPopRecord <= m_endSection[m_record_section]) && (m_endbitPopRecord < m_endbitSection[m_record_section])){
-            return i;
-        }
-    }
+    return m_endSection[section]*4 + m_endbitSection[section];
 #else
-    for(int i = m_record_section - 1; i>=0; i--){
-        if(m_endPopRecord < m_endSection[m_record_section]){
-            return i;
-        }
-    }
+    return m_endSection[section];
 #endif
     return 0;
+}
+
+int CircularBufferOdo::getSartPointSection(int section){
+#ifdef OPTIMIZE_BUFFER
+    if(section == 0)
+        return 0;
+    return m_endSection[section-1]*4 + m_endbitSection[section-1];
+#else
+    if(section == 0)
+            return 0;
+    return m_endSection[section];
+#endif
+    return 0;
+}
+
+
+int CircularBufferOdo::getNumberSetion(){
+    return m_record_section;
 }
 
 uint8_t CircularBufferOdo::popRecod(void){

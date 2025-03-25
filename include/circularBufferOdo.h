@@ -40,7 +40,9 @@ public:
     bool popRecod(uint8_t &data);
     uint8_t popRecod(void);
     bool recordIsEmpty() const;
-    int getSection();
+    int getEndPointSection(int section);
+    int getNumberSetion();
+    int getSartPointSection(int section);
     void resetPopRecord(void);
 
 };
