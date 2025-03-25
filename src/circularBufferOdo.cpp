@@ -119,7 +119,16 @@ void CircularBufferOdo::startRecording(void){
     this->init();
     m_endPopRecord = 0;
     m_endbitPopRecord = 0;
+    m_record_section = 0;
     m_validRedord = true;
+}
+
+void CircularBufferOdo::addSection(void){
+    do{
+        m_endSection[m_record_section] = m_startBuffer;
+        m_endbitSection[m_record_section] = m_startbitCount;
+    }while(m_endSection[m_record_section] != m_startBuffer);
+    m_record_section++;
 }
 
 bool CircularBufferOdo::recordIsValid(void){
@@ -164,6 +173,23 @@ bool CircularBufferOdo::recordIsEmpty() const {
 #else
     return (m_startBuffer == m_endPopRecord);
 #endif
+}
+
+int CircularBufferOdo::getSection(){
+#ifdef OPTIMIZE_BUFFER
+    for(int i = m_record_section - 1; i>=0; i--){
+        if((m_endPopRecord <= m_endSection[m_record_section]) && (m_endbitPopRecord < m_endbitSection[m_record_section])){
+            return i;
+        }
+    }
+#else
+    for(int i = m_record_section - 1; i>=0; i--){
+        if(m_endPopRecord < m_endSection[m_record_section]){
+            return i;
+        }
+    }
+#endif
+    return 0;
 }
 
 uint8_t CircularBufferOdo::popRecod(void){
