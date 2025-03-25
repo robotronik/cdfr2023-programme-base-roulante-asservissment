@@ -119,6 +119,7 @@ void i2c1_ev_isr(void){
 		}
 		else{
 			i2c_get_data(I2C1);
+            usartprintf("error i2c\n");
 		}
 	}
 	else if(sr1 & I2C_SR1_STOPF){
