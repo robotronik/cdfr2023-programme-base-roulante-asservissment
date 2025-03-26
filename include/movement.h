@@ -11,7 +11,7 @@ struct Command {
     int x = 0;
     int y = 0;
     int theta = 0;
-    Direction direction = Direction::FORWARD;
+    Direction direction = Direction::SHORTEST;
     Rotation rotation = Rotation::SHORTEST;
 };
 
@@ -38,11 +38,10 @@ private:
 
 public:
     movement(position* pos);
-    bool goToPoint(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::FORWARD);
-    bool goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::FORWARD, Rotation rotationSecond = Rotation::SHORTEST);
+    bool goToPoint(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::SHORTEST);
+    bool goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::SHORTEST, Rotation rotationSecond = Rotation::SHORTEST);
     bool setConsigneAngulaire(int16_t angle,Rotation rotation);
-    bool setConsigneLookAtForward(int16_t x,int16_t y,Rotation rotation);
-    bool setConsigneLookAtBackward(int16_t x,int16_t y,Rotation rotation);
+    bool setConsigneLookAt(int16_t x,int16_t y,Rotation rotation,Direction direction);
     bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
     bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
 

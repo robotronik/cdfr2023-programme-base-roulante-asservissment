@@ -4,6 +4,8 @@ const char* directionToChar(Direction dir) {
     switch (dir) {
         case Direction::NONE:
             return "NONE";
+        case Direction::SHORTEST:
+            return "SHORTEST";
         case Direction::FORWARD:
             return "FORWARD";
         case Direction::BACKWARD:

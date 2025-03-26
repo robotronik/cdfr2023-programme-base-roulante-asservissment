@@ -19,7 +19,7 @@ bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direct
             x,
             y,
             0,                  //useless
-            Direction::FORWARD, //useless
+            Direction::SHORTEST, //useless
             Rotation::SHORTEST    //useless
         });
     }
@@ -44,7 +44,7 @@ bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFir
             x,
             y,
             0,                  //useless
-            Direction::FORWARD, //useless
+            Direction::SHORTEST, //useless
             Rotation::SHORTEST    //useless
         });
         commandBuffer.push(Command{
@@ -52,7 +52,7 @@ bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFir
             0,                  //useless
             0,                  //useless
             theta,
-            Direction::FORWARD, //useless
+            Direction::SHORTEST, //useless
             rotationSecond
         });
     }
@@ -69,7 +69,7 @@ bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
             0,                  //useless
             0,                  //useless
             angle,
-            Direction::FORWARD, //useless
+            Direction::SHORTEST, //useless
             rotation
         });
     }
@@ -79,31 +79,14 @@ bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
     return 0;
 }
 
-bool movement::setConsigneLookAtForward(int16_t x,int16_t y,Rotation rotation){
+bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Direction direction){
     if(!commandBuffer.isFull()){
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
             x,
             y,
             0,                  //useless
-            Direction::FORWARD,
-            rotation
-        });
-    }
-    else{
-        return -1;
-    }
-    return 0;
-}
-
-bool movement::setConsigneLookAtBackward(int16_t x,int16_t y,Rotation rotation){
-    if(!commandBuffer.isFull()){
-        commandBuffer.push(Command{
-            BaseCommand::ANGULAR_LOOKAT,
-            x,
-            y,
-            0,                  //useless
-            Direction::BACKWARD,
+            direction,
             rotation
         });
     }
@@ -203,7 +186,10 @@ void movement::launchCommande(void){
         break;
 
     case BaseCommand::ANGULAR_LOOKAT:
-        if(currentCommand.direction == Direction::FORWARD){
+        if(currentCommand.direction == Direction::SHORTEST){
+            Asservissement::setConsigneLookAt(currentCommand.x,currentCommand.y,currentCommand.rotation);
+        }
+        else if(currentCommand.direction == Direction::FORWARD){
             Asservissement::setConsigneLookAtForward(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
         else{

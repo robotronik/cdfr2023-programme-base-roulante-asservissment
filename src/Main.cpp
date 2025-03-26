@@ -150,7 +150,7 @@ int main(void)
 	sequence ledToggleSeq;
     sequence mySeq;
     sequence dbg;
-    bool enableDebug = false;
+    bool enableDebug = true;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();

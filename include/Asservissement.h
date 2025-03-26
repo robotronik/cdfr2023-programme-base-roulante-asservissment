@@ -66,6 +66,7 @@ private:
 
 protected:
     void setProtectedConsigneLineaire(double x, double y);
+    void setConsigneLookAt(double x, double y, Rotation rotation);
     void setConsigneLookAtForward(double x, double y, Rotation rotation);
     void setConsigneLookAtBackward(double x, double y, Rotation rotation);
     void setProtectedConsigneAngulaire(double angle, Rotation rotation);

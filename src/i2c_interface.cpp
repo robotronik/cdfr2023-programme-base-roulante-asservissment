@@ -64,10 +64,7 @@ void i2c_interface::consigne_angulaire(int16_t angle, Rotation rotation){
 }
 
 void i2c_interface::consigne_angulaire(int16_t x, int16_t y, Rotation rotation, Direction direction){
-    if(direction == Direction::FORWARD)
-        robotAsservisement->setConsigneLookAtForward(x ,y ,rotation);
-    else
-        robotAsservisement->setConsigneLookAtBackward(x ,y ,rotation);
+    robotAsservisement->setConsigneLookAt(x ,y ,rotation,direction);
 }
 
 void i2c_interface::set_linear_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration){

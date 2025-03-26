@@ -150,6 +150,32 @@ void Asservissement::setConsigneLineaire(double x, double y){
     positionControlLineaire.setConsigne(0);
 }
 
+void Asservissement::setConsigneLookAt(double x, double y, Rotation rotation){
+    double angleErreur = mod_angle(calculAngle(x,y,posRobot->getPosition())-posRobot->getPosition_Teta());
+    if(angleErreur>0 && rotation == Rotation::CLOCKWISE){
+        angleErreur -= 360;
+    }
+    else if(angleErreur<0 && rotation == Rotation::ANTICLOCKWISE){
+        angleErreur += 360;
+    }
+
+    if(rotation == Rotation::SHORTEST)
+        if(angleErreur<90 && angleErreur>-90){
+            setProtectedConsigneAngulaire(calculAngle(x,y,posRobot->getPosition()),rotation);
+        }
+        else{
+            setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,posRobot->getPosition())+180),rotation);
+        }
+    else{
+        if(angleErreur<180 && angleErreur>-180){
+            setProtectedConsigneAngulaire(calculAngle(x,y,posRobot->getPosition()),rotation);
+        }
+        else{
+            setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,posRobot->getPosition())+180),rotation);
+        }
+    }
+}
+
 void Asservissement::setConsigneLookAtForward(double x, double y, Rotation rotation){
     setProtectedConsigneAngulaire(calculAngle(x,y,posRobot->getPosition()),rotation);
 }
