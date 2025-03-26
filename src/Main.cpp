@@ -11,6 +11,7 @@
 #include "movement.h"
 #include "i2c_interface.h"
 #include "button.h"
+#include "calibration.h"
 
 //#define TESTMOTOR
 
@@ -156,11 +157,9 @@ int main(void)
 //
 	sequence ledToggleSeq;
     sequence mySeq;
-    sequence seqCalibration;
     sequence dbg;
     bool enableDebug = false;
-    int calibration = 0;
-    uint32_t startTime;
+    bool enableCalibration = true;
 
     //reset because the stm has been booted for 3 seconds
 	robotAsservisement->reset();
@@ -173,29 +172,15 @@ int main(void)
             enableDebug = true;
             mySeq.reset();
         }
-        if(enableDebug){
+        else if(enableDebug){
             testloop(&mySeq);
         }
 
-        if(readButton1() && calibration == 0){
-            calibration = 1;
+        if(readButton1() && !enableCalibration){
+            enableCalibration = true;
         }
-        else if(!readButton1() && calibration == 1){
-            calibration = 2;
-            startTime = get_uptime_ms() + 2000;
-            usartprintf("Start calibration\n");
-            startCalibration();
-        }
-        else if(calibration == 2 && get_uptime_ms()>startTime){
-            calibration = 3;
-            Calibration();
-        }
-        else if( robotAsservisement->getCommandBufferSize() == 0 && calibration == 3){
-            calibration = 4;
-            usartprintf("Stopand compute calibration\n");
-            disableMotor();
-            stopCalibration();
-            computeCalibration();
+        else if(enableCalibration){
+            loopCalibration(robotI2cInterface);
         }
 
         dbg.interval([](){
