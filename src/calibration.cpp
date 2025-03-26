@@ -7,7 +7,7 @@ bool loopCalibration(i2c_interface* robot){
     switch (fsmCalibration)
     {
     case WAIT_START:
-        startTime = get_uptime_ms()+5000;
+        startTime = get_uptime_ms()+2000;
         fsmCalibration = START;
         break;
 
@@ -25,7 +25,7 @@ bool loopCalibration(i2c_interface* robot){
 
     case STEP1:
         robot->go_to_point(250,0);
-        robot->go_to_point(250,300,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
+        robot->go_to_point(250,-300,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
         fsmCalibration = WAIT_END_STEP1;
         break;
     case WAIT_END_STEP1:
@@ -42,8 +42,8 @@ bool loopCalibration(i2c_interface* robot){
 
     case STEP2:
         sectionCalibration();
-        robot->go_to_point(250,-1000);
-        robot->go_to_point(-50,-1000,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
+        robot->go_to_point(250,1000);
+        robot->go_to_point(-50,1000,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
         fsmCalibration = WAIT_END_STEP2;
         break;
     case WAIT_END_STEP2:
@@ -60,7 +60,7 @@ bool loopCalibration(i2c_interface* robot){
 
     case STEP3:
         sectionCalibration();
-        robot->go_to_point(250,-1000);
+        robot->go_to_point(250,1000);
         robot->go_to_point(250,0,Rotation::CLOCKWISE);
         robot->go_to_point(-50,0,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
         fsmCalibration = WAIT_END_STEP3;

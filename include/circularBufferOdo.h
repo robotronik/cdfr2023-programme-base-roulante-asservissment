@@ -11,17 +11,17 @@ private:
     volatile uint8_t* m_buffer;
     volatile int m_startBuffer;
     volatile int m_startbitCount;
-    int m_endBuffer;
-    int m_endbitCount;
-    int m_size;
+    long int m_endBuffer;
+    long int m_endbitCount;
+    long int m_size;
     bool m_freezePush;
 
-    int m_endPopRecord;
-    int m_endbitPopRecord;
+    long int m_endPopRecord;
+    long int m_endbitPopRecord;
     int m_record_section;
     bool m_validRedord;
-    int m_endbitSection[NB_RECORD_SECTION];
-    int m_endSection[NB_RECORD_SECTION];
+    long int m_endbitSection[NB_RECORD_SECTION];
+    long int m_endSection[NB_RECORD_SECTION];
 
 public:
     CircularBufferOdo(int size,uint8_t* buffer);
@@ -40,9 +40,9 @@ public:
     bool popRecod(uint8_t &data);
     uint8_t popRecod(void);
     bool recordIsEmpty() const;
-    int getEndPointSection(int section);
+    long int getEndPointSection(int section);
     int getNumberSetion();
-    int getSartPointSection(int section);
+    long int getSartPointSection(int section);
     void resetPopRecord(void);
 
 };

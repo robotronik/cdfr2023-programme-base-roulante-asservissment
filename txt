@@ -1,0 +1,44 @@
+
+x : 250.860688, y : -62.312782, theta : 450.186204
+x : 250.494501, y : -273.671525, theta : 450.358281
+x : 250.499084, y : -295.267757, theta : 449.258892
+x : 250.455530, y : -298.507143, theta : 449.102081
+x : 250.441948, y : -299.406670, theta : 449.022537
+Section 0 : start 0, end 4208
+Section 1 : start 4208, end 16336
+Section 2 : start 16336, end 27440
+Section 3 : start 27440, end 31906
+x : 250.392191, y : -299.541349, theta : 89.460852
+x : -49.418361, y : 998.780939, theta : -0.883066
+x : -49.905381, y : -1.146285, theta : -0.520017
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+x : 250.438887, y : -299.586064, theta : 88.941855
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+0,38.785714,-183.714620,25.000000,25.000000,175.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+1,-49.833333,-288.524805,25.000000,25.000000,225.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+2,-106.227273,40.879819,25.000000,25.000000,275.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+3,-145.269231,356.322516,25.000000,25.000000,325.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+4,-86.128571,-243.787549,35.000000,25.000000,175.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+5,133.011111,601.137394,35.000000,25.000000,225.000000,
+Erreur: Buffer vide.
+Erreur: Buffer vide.
+Erreur: Buffer vide.

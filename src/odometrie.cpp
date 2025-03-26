@@ -166,9 +166,25 @@ bool computeCalibration(void){
     double minDistance = CALIBRATION_START_DISTANCEWHEEL - CALIBRATION_PLAGE_DISTANCEWHEEL;
     double maxDistance = CALIBRATION_START_DISTANCEWHEEL + CALIBRATION_PLAGE_DISTANCEWHEEL;
 
-    double start = minWheelG + 0.5 * ((maxWheelG - minWheelG) / CALIBRATION_DIV);
+    for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
+        usartprintf("Section %d : start %ld, end %ld\n",i,circularBufferOdo->getSartPointSection(i),circularBufferOdo->getEndPointSection(i));
+    }
 
-    usartprintf("Buffer size : %d/%d\n",circularBufferOdo->getEndPointSection(circularBufferOdo->getNumberSetion()),_BUFFERSIZE);
+    param.stepAngleD = COMPUTE_STEPANGLE(DIAMETERWHEELD,DISTANCEWHEEL);
+    param.stepAngleG = COMPUTE_STEPANGLE(DIAMETERWHEELG,DISTANCEWHEEL);
+    param.stepForrwardD = COMPUTE_STEPAVANCE(DIAMETERWHEELD);
+    param.stepForrwardG = COMPUTE_STEPAVANCE(DIAMETERWHEELG);
+    position_t position2;
+
+    circularBufferOdo->resetPopRecord();
+    for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
+        for(long int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);j++){
+            odometrieTrigger_t typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
+            odometrieCalc(position2,typeTrigger,param);
+        }
+        position2.teta = mod_angle(position2.teta);
+        usartprintf("x : %lf, y : %lf, theta : %lf\n",position2.x,position2.y,position2.teta);
+    }
 
     for(int a = 0; a < CALIBRATION_IT;a++){
         for(int wg = 0; wg < CALIBRATION_DIV; wg++){
@@ -190,7 +206,7 @@ bool computeCalibration(void){
 
                     circularBufferOdo->resetPopRecord();
                     for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
-                        for(int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);i++){
+                        for(long int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);j++){
                             odometrieTrigger_t typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
                             odometrieCalc(position,typeTrigger,param);
                         }
