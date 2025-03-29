@@ -2,8 +2,8 @@
 
 void buttonSetup(void){
     rcc_periph_clock_enable(RCC_GPIOC);
-	gpio_mode_setup(port_endstopL, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_endStopL);
-	gpio_mode_setup(port_endStopR, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_endStopR);
+	gpio_mode_setup(port_endstopL, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN, pin_endStopL);
+	gpio_mode_setup(port_endStopR, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN, pin_endStopR);
 }
 
 bool readButton1(void){
