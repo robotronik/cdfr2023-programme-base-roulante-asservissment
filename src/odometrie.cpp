@@ -178,7 +178,7 @@ bool computeCalibration(void){
 
     circularBufferOdo->resetPopRecord();
     for(int i = 0; i < circularBufferOdo->getNumberSetion();i++){
-        for(long int j = circularBufferOdo->getSartPointSection(i); j < circularBufferOdo->getEndPointSection(i);j++){
+        for(long int j = circularBufferOdo->getSartPointSection(i); j <= circularBufferOdo->getEndPointSection(i);j++){
             odometrieTrigger_t typeTrigger = (odometrieTrigger_t)circularBufferOdo->popRecod();
             odometrieCalc(position2,typeTrigger,param);
         }

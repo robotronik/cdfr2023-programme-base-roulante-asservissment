@@ -178,9 +178,9 @@ bool CircularBufferOdo::recordIsEmpty() const {
 
 long int CircularBufferOdo::getEndPointSection(int section){
 #ifdef OPTIMIZE_BUFFER
-    return m_endSection[section]*4 + m_endbitSection[section];
+    return (m_endSection[section]*4 + m_endbitSection[section])-1;
 #else
-    return m_endSection[section];
+    return m_endSection[section]-1;
 #endif
     return 0;
 }
