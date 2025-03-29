@@ -76,28 +76,27 @@ void odometrieLoop(position_t &position){
 		switch (circularBufferOdo->pop())
 		{
 		case fordwardL:
-				position.y -= STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLEG;
+				position.y += STEPAVANCEG * sin(position.teta); //Voir pour optimisation
+				position.x += STEPAVANCEG * cos(position.teta); //Voir pour optimisation
+				position.teta -= STEPANGLEG*DEG_TO_RAD;
 			break;
 		case backwardL:
-				position.y += STEPAVANCEG * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x += STEPAVANCEG * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLEG;
+				position.y -= STEPAVANCEG * sin(position.teta); //Voir pour optimisation
+				position.x -= STEPAVANCEG * cos(position.teta); //Voir pour optimisation
+				position.teta += STEPANGLEG*DEG_TO_RAD;
 			break;
 		case fordwardR:
-				position.y -= STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x -= STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta += STEPANGLED;
+				position.y += STEPAVANCED * sin(position.teta); //Voir pour optimisation
+				position.x += STEPAVANCED * cos(position.teta); //Voir pour optimisation
+				position.teta += STEPANGLED*DEG_TO_RAD;
 			break;
 		case backwardR:
-				position.y += STEPAVANCED * cos(COEFCONVDEGRETORADIAN*(position.teta+90)); //Voir pour optimisation
-				position.x += STEPAVANCED * sin(COEFCONVDEGRETORADIAN*(position.teta-90)); //Voir pour optimisation
-				position.teta -= STEPANGLED;
+				position.y -= STEPAVANCED * sin(position.teta); //Voir pour optimisation
+				position.x -= STEPAVANCED * cos(position.teta); //Voir pour optimisation
+				position.teta -= STEPANGLED*DEG_TO_RAD;
 			break;
 		default:
 			break;
 		}
 	}
 }
-

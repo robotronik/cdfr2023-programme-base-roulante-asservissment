@@ -8,7 +8,9 @@ position::position(){
 void position::loop(){
     odometrieLoop(positionRobot);
     if(needChangePos){
-        positionRobot = newPosition;
+        positionRobot.x = newPosition.x;
+        positionRobot.y = newPosition.y;
+        positionRobot.teta = newPosition.teta*DEG_TO_RAD;
         needChangePos = false;
         positionChanged = true;
     }
@@ -29,6 +31,8 @@ void position::setPosition(double x, double y, double teta){
 }
 
 position_t position::getPosition(){
+    position_t retPos = positionRobot;
+    retPos.teta = positionRobot.teta*RAD_TO_DEG;
     return positionRobot;
 }
 double position::getPosition_X(){
@@ -38,7 +42,7 @@ double position::getPosition_Y(){
     return positionRobot.y;
 }
 double position::getPosition_Teta(){
-    return positionRobot.teta;
+    return positionRobot.teta*RAD_TO_DEG;
 }
 double position::getPosition_Time(){
     return positionRobot.time;
