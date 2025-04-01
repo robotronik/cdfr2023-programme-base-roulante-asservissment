@@ -15,7 +15,6 @@
 #include "uart.h"
 
 #define _BUFFERSIZE 50000
-#define PI 3.14159265359
 
 // theorical distance between the 2 wheel : 298.765mm
 // theorical diametre of the wheel : 39mm
@@ -28,9 +27,6 @@
 #define STEPANGLEG ((DIAMETERWHEELG*180)/(NUMBERSTEPBYROTATION*DISTANCEWHEEL))
 #define STEPAVANCED ((DIAMETERWHEELD*PI)/(NUMBERSTEPBYROTATION*2))
 #define STEPAVANCEG ((DIAMETERWHEELG*PI)/(NUMBERSTEPBYROTATION*2))
-
-#define DEG_TO_RAD PI/180
-#define RAD_TO_DEG 180/PI
 
 typedef enum{fordwardL=0,backwardL,fordwardR,backwardR}odometrieTrigger_t;
 

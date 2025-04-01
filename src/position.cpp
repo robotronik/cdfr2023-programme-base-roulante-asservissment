@@ -33,7 +33,7 @@ void position::setPosition(double x, double y, double teta){
 position_t position::getPosition(){
     position_t retPos = positionRobot;
     retPos.teta = positionRobot.teta*RAD_TO_DEG;
-    return positionRobot;
+    return retPos;
 }
 double position::getPosition_X(){
     return positionRobot.x;

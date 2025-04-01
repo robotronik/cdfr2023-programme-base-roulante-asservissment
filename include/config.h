@@ -134,6 +134,10 @@
     #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
 #endif
 
+#define PI 3.14159265359
+#define DEG_TO_RAD PI/180
+#define RAD_TO_DEG 180/PI
+
 enum class BaseCommand {
     ANGULAR_THETA,
     ANGULAR_LOOKAT,
