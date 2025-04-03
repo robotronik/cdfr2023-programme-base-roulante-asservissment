@@ -207,7 +207,7 @@ void movement::launchCommande(void){
         positionControlLineaire.accelerationMaxAv = currentCommand.y;
         positionControlLineaire.accelerationMaxAr = currentCommand.y;
         positionControlLineaire.decelerationMaxAv = currentCommand.theta;
-        positionControlLineaire.decelerationMaxAv = currentCommand.theta;
+        positionControlLineaire.decelerationMaxAr = currentCommand.theta;
         break;
 
     case BaseCommand::MAX_SPEED_ANGULAR:
@@ -216,7 +216,7 @@ void movement::launchCommande(void){
         positionControlAngulaire.accelerationMaxAv = currentCommand.y;
         positionControlAngulaire.accelerationMaxAr = currentCommand.y;
         positionControlAngulaire.decelerationMaxAv = currentCommand.theta;
-        positionControlAngulaire.decelerationMaxAv = currentCommand.theta;
+        positionControlAngulaire.decelerationMaxAr = currentCommand.theta;
         break;
 
     default:

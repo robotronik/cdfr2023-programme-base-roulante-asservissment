@@ -44,11 +44,11 @@ void i2c_interface::stop(){
 }
 
 void i2c_interface::pause(){
-    robotAsservisement->setConsigneStop();
+    robotAsservisement->setConsignePause();
 }
 
 void i2c_interface::resume(){
-    robotAsservisement->setConsigneStop();
+    robotAsservisement->setConsigneResume();
 }
 
 void i2c_interface::go_to_point(int16_t x,int16_t y,Rotation rotation, Direction direction){
