@@ -19,7 +19,9 @@ positionControl::positionControl(double initialValue):
     decelerationMaxAv(0,1000),
     vitesseMaxAr(0,1000),
     accelerationMaxAr(0,1000),
-    decelerationMaxAr(0,1000)
+    decelerationMaxAr(0,1000),
+    decelerationStopAv(0,1000),
+    decelerationStopAr(0,1000)
 {
     this->reset(initialValue);
     vitesseMaxAv.setOnChangeCallback        ([this](auto value) {(void)value; this->computeStroke();});
@@ -28,6 +30,8 @@ positionControl::positionControl(double initialValue):
     vitesseMaxAr.setOnChangeCallback        ([this](auto value) {(void)value; this->computeStroke();});
     accelerationMaxAr.setOnChangeCallback   ([this](auto value) {(void)value; this->computeStroke();});
     decelerationMaxAr.setOnChangeCallback   ([this](auto value) {(void)value; this->computeStroke();});
+    decelerationStopAv.setOnChangeCallback  ([this](auto value) {(void)value; this->computeStroke();});
+    decelerationStopAr.setOnChangeCallback  ([this](auto value) {(void)value; this->computeStroke();});
 }
 
 positionControl::~positionControl(){
@@ -38,7 +42,6 @@ void positionControl::reset(double initialValue){
     consigne = initialValue;
     position = initialValue;
     vitesse = 0.0;
-    stopStatus = false;
     t_accel = 0;
     t_cruise = 0;
     t_decel = 0;
@@ -56,7 +59,6 @@ void positionControl::reset(double initialValue){
 //******************************************************
 void positionControl::stop(void){
     maxSpeedOut = 0;
-    stopStatus = true;
     setConsigne(position+getBrakingDistance());
 }
 
@@ -67,7 +69,6 @@ void positionControl::setPosition(double initialValue){
 
 void positionControl::setConsigne(double setConsigne){
     consigne = setConsigne;
-    stopStatus = false;
     computeStroke();
 }
 
@@ -77,15 +78,17 @@ void positionControl::setMaxSpeedOut(double max){
 }
 
 
-void positionControl::computeStroke() {
+void positionControl::computeStroke(bool forceStop) {
+    double decelerationAv = forceStop ? decelerationStopAv : decelerationMaxAv;
+    double decelerationAr = forceStop ? decelerationStopAr : decelerationMaxAr;
     //genstion du mouvement Avant
     if(consigne != position){
         if(consigne-position>0){
-            computeDT(abs(consigne - position),vitesseMaxAv,accelerationMaxAv,decelerationMaxAv);
+            computeDT(abs(consigne - position),vitesseMaxAv,accelerationMaxAv,decelerationAv);
         }
         //genstion du mouvement Arrière
         else if(consigne-position<0){
-            computeDT(abs(consigne - position),vitesseMaxAr,accelerationMaxAr,decelerationMaxAr);
+            computeDT(abs(consigne - position),vitesseMaxAr,accelerationMaxAr,decelerationAr);
         }
         startSpeed = vitesse;
         startTimeMs = get_uptime_ms();
@@ -240,9 +243,4 @@ int positionControl::getBrakingDistance(){
         return -(vitesse*vitesse)/(decelerationMaxAr);
     }
 }
-
-bool positionControl::getStatus(void){
-    return stopStatus;
-}
-
 

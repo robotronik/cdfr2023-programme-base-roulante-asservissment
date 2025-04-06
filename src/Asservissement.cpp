@@ -15,8 +15,10 @@ Asservissement::Asservissement(position* pos):
     positionControlLineaire.accelerationMaxAv.setRange(0,300);
     positionControlLineaire.decelerationMaxAv.setRange(0,300);
     positionControlLineaire.vitesseMaxAr.setRange(0,10000);
-    positionControlLineaire.accelerationMaxAr.setRange(0,500);
-    positionControlLineaire.decelerationMaxAr.setRange(0,500);
+    positionControlLineaire.accelerationMaxAr.setRange(0,300);
+    positionControlLineaire.decelerationMaxAr.setRange(0,300);
+    positionControlAngulaire.decelerationStopAv.setRange(0,1000);
+    positionControlAngulaire.decelerationStopAr.setRange(0,1000);
 
     positionControlAngulaire.vitesseMaxAv.setRange(0,360);
     positionControlAngulaire.accelerationMaxAv.setRange(0,300);
@@ -24,6 +26,8 @@ Asservissement::Asservissement(position* pos):
     positionControlAngulaire.vitesseMaxAr.setRange(0,360);
     positionControlAngulaire.accelerationMaxAr.setRange(0,300);
     positionControlAngulaire.decelerationMaxAr.setRange(0,300);
+    positionControlAngulaire.decelerationStopAv.setRange(positionControlAngulaire.decelerationMaxAv);
+    positionControlAngulaire.decelerationStopAr.setRange(positionControlAngulaire.decelerationMaxAr);
 
 
     positionControlLineaire.vitesseMaxAv.setMax();

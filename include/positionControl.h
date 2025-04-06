@@ -33,8 +33,6 @@ private:
 
     double maxSpeedOut = 0;
 
-    bool stopStatus;
-
 public:
     protectedMaxValue<double> vitesseMaxAv;
     protectedMaxValue<double> accelerationMaxAv;
@@ -42,6 +40,9 @@ public:
     protectedMaxValue<double> vitesseMaxAr;
     protectedMaxValue<double> accelerationMaxAr;
     protectedMaxValue<double> decelerationMaxAr;
+
+    protectedMaxValue<double> decelerationStopAv;
+    protectedMaxValue<double> decelerationStopAr;
 
 public:
     positionControl(double positionDepart  = 0.0);
@@ -62,6 +63,6 @@ private:
     void updateSpeed();
     void updatePosition();
     double getMaxSpeedOut();
-    void computeStroke();
+    void computeStroke(bool forceStop = false);
     void computeDT(double distance,double vitesseMax, double acceleration, double deceleration);
 };

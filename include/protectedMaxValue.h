@@ -13,6 +13,10 @@ public:
     protectedMaxValue(T minValue, T maxValue, T value = 0)
         : MinValue(minValue), MaxValue(maxValue), Value(value) {}
 
+    void setRange(protectedMaxValue rangeCp) {
+        setRange(rangeCp.getMinValue(), rangeCp.getMaxValue());
+    }
+
     void setRange(T minValue, T maxValue) {
         MinValue = minValue;
         MaxValue = maxValue;
