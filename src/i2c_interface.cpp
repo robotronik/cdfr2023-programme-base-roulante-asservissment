@@ -6,6 +6,13 @@ robotAsservisement(inRobotAsservisement){
 
 }
 
+void i2c_interface::get_version(uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4) {
+    part1 = GIT_COMMIT_SHA_PART1;
+    part2 = GIT_COMMIT_SHA_PART2;
+    part3 = GIT_COMMIT_SHA_PART3;
+    part4 = GIT_COMMIT_SHA_PART4;
+}
+
 void i2c_interface::setReponseBuffer(uint8_t* data, int size){
     I2CSetBuffer(data,size);
 }

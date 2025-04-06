@@ -14,6 +14,7 @@ private:
 public:
     i2c_interface(position* inRobotPosition, movement* inRobotAsservisement);
 
+    void get_version(uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4);
     void set_led_1(bool status);
     void set_led_2(bool status);
     void get_coordinates(int16_t &x, int16_t &y, int16_t &theta);
