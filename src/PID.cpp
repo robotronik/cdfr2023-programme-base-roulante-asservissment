@@ -46,6 +46,9 @@ double PID::update(double error, uint32_t time) {
     valD = 0;
     if(deltaTime>0){
         valD = kd * ((error - lastError)/deltaTime);
+        if(valD>0){
+            valD = 0;
+        }
     }
 
     lastError = error;

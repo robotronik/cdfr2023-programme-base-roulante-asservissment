@@ -3,7 +3,7 @@
 
 Asservissement::Asservissement(position* pos):
     pidLineaire(1,0.000,100),
-    pidAngulaire(2,0.0,200),
+    pidAngulaire(1.5,-0.005,0),
     pidLineaireBlock(1,0.001,100),
     pidAngulaireBlock(2,0.001,200)
 {
@@ -20,12 +20,12 @@ Asservissement::Asservissement(position* pos):
     positionControlLineaire.decelerationStopAv.setRange(0,2000);
     positionControlLineaire.decelerationStopAr.setRange(0,2000);
 
-    positionControlAngulaire.vitesseMaxAv.setRange(0,360);
-    positionControlAngulaire.accelerationMaxAv.setRange(0,300);
-    positionControlAngulaire.decelerationMaxAv.setRange(0,300);
-    positionControlAngulaire.vitesseMaxAr.setRange(0,360);
-    positionControlAngulaire.accelerationMaxAr.setRange(0,300);
-    positionControlAngulaire.decelerationMaxAr.setRange(0,300);
+    positionControlAngulaire.vitesseMaxAv.setRange(0,1000);
+    positionControlAngulaire.accelerationMaxAv.setRange(0,600);
+    positionControlAngulaire.decelerationMaxAv.setRange(0,600);
+    positionControlAngulaire.vitesseMaxAr.setRange(0,1000);
+    positionControlAngulaire.accelerationMaxAr.setRange(0,600);
+    positionControlAngulaire.decelerationMaxAr.setRange(0,600);
     positionControlAngulaire.decelerationStopAv.setRange(positionControlAngulaire.decelerationMaxAv);
     positionControlAngulaire.decelerationStopAr.setRange(positionControlAngulaire.decelerationMaxAr);
 
@@ -111,7 +111,15 @@ void Asservissement::asservissementLoop(){
     }
 
     //Calculate Angular commande
-    if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
+    if(positionControlAngulaire.getPostion()==0 && print == true){
+        usartprintf("angular error>%lf\n",getAngularErrorReel());
+        print = false;
+    }
+    else if(positionControlAngulaire.getPostion()!=0){
+        print = true;
+    }
+
+    if(false || reTargetAngle){
         valPidAngulaire = pidAngulaireBlock.update(reduceErrorAngular,timeLastPos);
         pidAngulaire.reset();
     }

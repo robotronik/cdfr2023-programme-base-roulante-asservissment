@@ -24,6 +24,7 @@ private:
     int loopPeriod = 50;
 
     position* posRobot;
+    bool print = false;
 
 public :
     positionControl positionControlLineaire;

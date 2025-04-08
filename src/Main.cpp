@@ -87,6 +87,34 @@ void testloop(sequence* seq){
 	// },7000);
 }
 
+void testloop2(sequence* seq){
+
+	seq->start();
+
+	seq->delay([](){
+        robotI2cInterface->set_coordinates(0,0,0);
+        robotI2cInterface->set_motor_state(true);
+		robotI2cInterface->consigne_angulaire(45,Rotation::ANTICLOCKWISE);
+	},0);
+
+	seq->delay([](){
+	    robotI2cInterface->consigne_angulaire(-45,Rotation::CLOCKWISE);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->consigne_angulaire(135,Rotation::ANTICLOCKWISE);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->consigne_angulaire(-135,Rotation::CLOCKWISE);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->consigne_angulaire(0,Rotation::ANTICLOCKWISE);
+	},3000);
+
+}
+
 int main(void)
 {
 
@@ -156,7 +184,7 @@ int main(void)
 	sequence ledToggleSeq;
     sequence mySeq;
     sequence dbg;
-    bool enableDebug = false;
+    bool enableDebug = true;
     bool enableCalibration = false;
 
     //reset because the stm has been booted for 3 seconds
@@ -171,7 +199,7 @@ int main(void)
             mySeq.reset();
         }
         else if(enableDebug){
-            testloop(&mySeq);
+            testloop2(&mySeq);
         }
 
         if(readButton1() && !enableCalibration){
@@ -181,9 +209,9 @@ int main(void)
             loopCalibration(robotI2cInterface);
         }
 
-        dbg.interval([](){
-			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",robotPosition->getPosition_X(),robotPosition->getPosition_Y(),robotPosition->getPosition_Teta());;
-		},1000);
+        // dbg.interval([](){
+		// 	usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",robotPosition->getPosition_X(),robotPosition->getPosition_Y(),robotPosition->getPosition_Teta());;
+		// },1000);
 
 		//BLINK LED
 		ledToggleSeq.interval([](){
