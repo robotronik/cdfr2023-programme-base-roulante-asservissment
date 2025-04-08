@@ -31,6 +31,8 @@ private:
     double startPosition;
     double startSpeed;
 
+    double decelerationAv;
+    double decelerationAr;
     double maxSpeedOut = 0;
 
 public:
@@ -57,7 +59,6 @@ public:
     double getPostion();
     bool getMove();
     int getBrakingDistance();
-    bool getStatus(void);
 
 private:
     void updateSpeed();
@@ -65,4 +66,5 @@ private:
     double getMaxSpeedOut();
     void computeStroke(bool forceStop = false);
     void computeDT(double distance,double vitesseMax, double acceleration, double deceleration);
+    int getBrakingDistanceSigned();
 };

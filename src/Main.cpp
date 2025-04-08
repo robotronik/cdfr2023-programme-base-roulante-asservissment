@@ -33,8 +33,9 @@ void testloop(sequence* seq){
 	seq->start();
 
 	seq->delay([](){
-        enableMotor();
-		robotAsservisement->setConsigneAngulaire(90,Rotation::SHORTEST);
+        robotI2cInterface->set_coordinates(0,0,0);
+        robotI2cInterface->set_motor_state(true);
+		robotI2cInterface->consigne_angulaire(90,Rotation::SHORTEST);
 	},0);
 
 	// seq->delay([](){
@@ -46,23 +47,27 @@ void testloop(sequence* seq){
 	// },3000);
 
 	seq->delay([](){
-	robotAsservisement->setConsigneAngulaire(0,Rotation::SHORTEST);
+	robotI2cInterface->consigne_angulaire(0,Rotation::SHORTEST);
 	},3000);
 
 	seq->delay([](){
-		robotAsservisement->goToPoint(1000,1000);
+		robotI2cInterface->go_to_point(1000,1000);
 	},3000);
 
+    seq->delay([](){
+		robotI2cInterface->stop();
+	},2000);
+
 	seq->delay([](){
-		robotAsservisement->goToPoint(0,0,0);
+		robotI2cInterface->go_to_point(0,0,0);
 	},7000);
 
 	seq->delay([](){
-		robotAsservisement->goToPoint(1000,1000,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
+		robotI2cInterface->go_to_point(1000,1000,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
 	},7000);
 
 	seq->delay([](){
-		robotAsservisement->goToPoint(0,0,0,Rotation::CLOCKWISE,Direction::BACKWARD,Rotation::ANTICLOCKWISE);
+		robotI2cInterface->go_to_point(0,0,0,Rotation::CLOCKWISE,Direction::BACKWARD,Rotation::ANTICLOCKWISE);
 	},7000);
 
 	// seq->delay([](){

@@ -59,7 +59,8 @@ void positionControl::reset(double initialValue){
 //******************************************************
 void positionControl::stop(void){
     maxSpeedOut = 0;
-    setConsigne(position+getBrakingDistance());
+    consigne = position+getBrakingDistance();
+    computeStroke(true);
 }
 
 void positionControl::setPosition(double initialValue){
@@ -79,8 +80,8 @@ void positionControl::setMaxSpeedOut(double max){
 
 
 void positionControl::computeStroke(bool forceStop) {
-    double decelerationAv = forceStop ? decelerationStopAv : decelerationMaxAv;
-    double decelerationAr = forceStop ? decelerationStopAr : decelerationMaxAr;
+    decelerationAv = forceStop ? decelerationStopAv : decelerationMaxAv;
+    decelerationAr = forceStop ? decelerationStopAr : decelerationMaxAr;
     //genstion du mouvement Avant
     if(consigne != position){
         if(consigne-position>0){
@@ -156,7 +157,7 @@ void positionControl::updatePosition(){
         }
         else if (time < t_accel + t_cruise + t_decel) {
             double t_d = (t_accel + t_cruise + t_decel) - time;
-            double distance = getMaxSpeedOut() * t_d + 0.5 * decelerationMaxAv * t_d * t_d;
+            double distance = getMaxSpeedOut() * t_d + 0.5 * decelerationAv * t_d * t_d;
             position = consigne - distance;
         }
         else {
@@ -175,7 +176,7 @@ void positionControl::updatePosition(){
         }
         else if (time < t_accel + t_cruise + t_decel) {
             double t_d = (t_accel + t_cruise + t_decel) - time;
-            double distance = getMaxSpeedOut() * t_d + 0.5 * decelerationMaxAr * t_d * t_d;
+            double distance = getMaxSpeedOut() * t_d + 0.5 * decelerationAr * t_d * t_d;
             position = consigne + distance;
         }
         else {
@@ -196,7 +197,7 @@ void positionControl::updateSpeed(){
         }
         else if (time < t_accel + t_cruise + t_decel) {
             double t_d = (t_accel + t_cruise + t_decel) - time;
-            vitesse = getMaxSpeedOut() + decelerationMaxAv * t_d;
+            vitesse = getMaxSpeedOut() + decelerationAv * t_d;
         }
     }
     //genstion du mouvement Arrière
@@ -209,7 +210,7 @@ void positionControl::updateSpeed(){
         }
         else if (time < t_accel + t_cruise + t_decel) {
             double t_d = (t_accel + t_cruise + t_decel) - time;
-            vitesse = getMaxSpeedOut() + decelerationMaxAr * t_d;
+            vitesse = getMaxSpeedOut() + decelerationAr * t_d;
         }
     }
 }
@@ -235,12 +236,21 @@ bool positionControl::getMove(){
     return (consigne != position);
 }
 
-int positionControl::getBrakingDistance(){
+int positionControl::getBrakingDistanceSigned(){
     if(consigne-position>0){
-        return (vitesse*vitesse)/(decelerationMaxAv);
+        return (vitesse*vitesse)/(decelerationStopAv);
     }
     else{
-        return -(vitesse*vitesse)/(decelerationMaxAr);
+        return (vitesse*vitesse)/(decelerationStopAr);
+    }
+}
+
+int positionControl::getBrakingDistance(){
+    if(consigne-position>0){
+        return (vitesse*vitesse)/(decelerationStopAv);
+    }
+    else{
+        return -(vitesse*vitesse)/(decelerationStopAr);
     }
 }
 

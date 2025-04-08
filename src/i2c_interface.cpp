@@ -125,11 +125,11 @@ int16_t i2c_interface::get_angular_error(){
     return (int16_t)robotAsservisement->getAngularError();
 }
 
-void i2c_interface::get_current(int16_t &currentRigth, int16_t &currentLeft){
+void i2c_interface::get_current(int16_t &currentRight, int16_t &currentLeft){
     // TODO
 }
 
-void i2c_interface::get_speed(int16_t &speedRigth, int16_t &speedLeft){
+void i2c_interface::get_speed(int16_t &speedRight, int16_t &speedLeft){
     // TODO
 }
 
@@ -198,7 +198,7 @@ void i2c_interface::set_pid_angular_dynamic(int16_t p, int16_t i, int16_t d){
     robotAsservisement->pidAngulaire.setPID(p,i,d);
 }
 
-void i2c_interface::set_odometry_metric(int16_t sizeWheelLeft, int16_t sizeWheelRigth, int16_t spaceInterWheel){
+void i2c_interface::set_odometry_metric(int16_t sizeWheelLeft, int16_t sizeWheelRight, int16_t spaceInterWheel){
 
 }
 
@@ -239,7 +239,7 @@ void i2c_interface::get_pid_angular_dynamic(int16_t &p, int16_t &i, int16_t &d){
     robotAsservisement->pidAngulaire.setPID(p,i,d);
 }
 
-void i2c_interface::get_odometry_metric(int16_t &sizeWheelLeft, int16_t &sizeWheelRigth, int16_t &spaceInterWheel){
+void i2c_interface::get_odometry_metric(int16_t &sizeWheelLeft, int16_t &sizeWheelRight, int16_t &spaceInterWheel){
     // TODO
 }
 
