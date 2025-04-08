@@ -236,15 +236,6 @@ bool positionControl::getMove(){
     return (consigne != position);
 }
 
-int positionControl::getBrakingDistanceSigned(){
-    if(consigne-position>0){
-        return (vitesse*vitesse)/(decelerationStopAv);
-    }
-    else{
-        return (vitesse*vitesse)/(decelerationStopAr);
-    }
-}
-
 int positionControl::getBrakingDistance(){
     if(consigne-position>0){
         return (vitesse*vitesse)/(decelerationStopAv);

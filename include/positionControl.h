@@ -66,5 +66,4 @@ private:
     double getMaxSpeedOut();
     void computeStroke(bool forceStop = false);
     void computeDT(double distance,double vitesseMax, double acceleration, double deceleration);
-    int getBrakingDistanceSigned();
 };
