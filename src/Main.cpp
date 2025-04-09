@@ -38,14 +38,6 @@ void testloop(sequence* seq){
 		robotI2cInterface->consigne_angulaire(90,Rotation::SHORTEST);
 	},0);
 
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneAngulaire(-90,ROTATION_TRIGO);
-	// },3000);
-
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneAngulaire(90,ROTATION_HORRAIRE);
-	// },3000);
-
 	seq->delay([](){
 	robotI2cInterface->consigne_angulaire(0,Rotation::SHORTEST);
 	},3000);
@@ -69,22 +61,6 @@ void testloop(sequence* seq){
 	seq->delay([](){
 		robotI2cInterface->go_to_point(0,0,0,Rotation::CLOCKWISE,Direction::BACKWARD,Rotation::ANTICLOCKWISE);
 	},7000);
-
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneStop();
-	// },1500);
-
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneLineaire(0,0);
-	// },10000);
-
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneAngulaire(90,ROTATION_TRIGO);
-	// },7000);
-
-	// seq->delay([](){
-	// 	robotAsservisement->setConsigneAngulaire(0,ROTATION_HORRAIRE);
-	// },7000);
 }
 
 void testloop2(sequence* seq){
