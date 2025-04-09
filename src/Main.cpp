@@ -181,7 +181,7 @@ int main(void)
         usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
         usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
     }
-    while (1);
+    while(1);
 #endif
 
 
@@ -192,7 +192,7 @@ int main(void)
 	sequence ledToggleSeq;
     sequence mySeq;
     sequence dbg;
-    bool enableDebug = true;
+    bool enableDebug = false;
     bool enableCalibration = false;
 
     //reset because the stm has been booted for 3 seconds
