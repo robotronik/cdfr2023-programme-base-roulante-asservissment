@@ -81,8 +81,8 @@ void Asservissement::asservissementLoop(){
 
     realErrorLinear = getLinearErrorReel();
     reduceErrorLinear = realErrorLinear-positionControlLineaire.getPostion();
-    usartprintf(">consignLin:%lf\n",positionControlLineaire.getPostion());
-    usartprintf(">errorLin:%lf\n",realErrorLinear);
+    // usartprintf(">consignLin:%lf\n",positionControlLineaire.getPostion());
+    // usartprintf(">errorLin:%lf\n",realErrorLinear);
 
     if(realErrorLinear >= 100){
         reTargetAngle = true;
