@@ -104,7 +104,7 @@ void Asservissement::asservissementLoop(){
 #endif
 
     //Calculate Linear commande
-    if(false){
+    if(positionControlLineaire.getPostion()==0){
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
         pidLineaire.reset();
     }
