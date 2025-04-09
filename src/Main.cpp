@@ -115,6 +115,38 @@ void testloop2(sequence* seq){
 
 }
 
+void testloop3(sequence* seq){
+
+	seq->start();
+
+	seq->delay([](){
+        robotI2cInterface->set_coordinates(0,0,0);
+        robotI2cInterface->set_motor_state(true);
+		robotI2cInterface->go_to_point(-200,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},0);
+
+	seq->delay([](){
+		robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->go_to_point(-600,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->go_to_point(-1000,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},3000);
+
+    seq->delay([](){
+	    robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
+	},5000);
+
+}
+
 int main(void)
 {
 
@@ -199,7 +231,7 @@ int main(void)
             mySeq.reset();
         }
         else if(enableDebug){
-            testloop2(&mySeq);
+            testloop3(&mySeq);
         }
 
         if(readButton1() && !enableCalibration){

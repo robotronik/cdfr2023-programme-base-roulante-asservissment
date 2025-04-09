@@ -2,7 +2,7 @@
 
 
 Asservissement::Asservissement(position* pos):
-    pidLineaire(1,0.000,100),
+    pidLineaire(2,0.000,200),
     pidAngulaire(4,0.0,400),
     pidLineaireBlock(1,0.001,100),
     pidAngulaireBlock(2,0.001,200)
@@ -11,14 +11,14 @@ Asservissement::Asservissement(position* pos):
     nextTime =  get_uptime_ms();
     currentState = Rotation::SHORTEST;
 
-    positionControlLineaire.vitesseMaxAv.setRange(0,10000);
-    positionControlLineaire.accelerationMaxAv.setRange(0,300);
-    positionControlLineaire.decelerationMaxAv.setRange(0,300);
-    positionControlLineaire.vitesseMaxAr.setRange(0,10000);
-    positionControlLineaire.accelerationMaxAr.setRange(0,300);
-    positionControlLineaire.decelerationMaxAr.setRange(0,300);
-    positionControlLineaire.decelerationStopAv.setRange(0,2000);
-    positionControlLineaire.decelerationStopAr.setRange(0,2000);
+    positionControlLineaire.vitesseMaxAv.setRange(0,700);
+    positionControlLineaire.accelerationMaxAv.setRange(0,600);
+    positionControlLineaire.decelerationMaxAv.setRange(0,600);
+    positionControlLineaire.vitesseMaxAr.setRange(0,700);
+    positionControlLineaire.accelerationMaxAr.setRange(0,600);
+    positionControlLineaire.decelerationMaxAr.setRange(0,600);
+    positionControlLineaire.decelerationStopAv.setRange(0,1400);
+    positionControlLineaire.decelerationStopAr.setRange(0,1400);
 
     positionControlAngulaire.vitesseMaxAv.setRange(0,10000);
     positionControlAngulaire.accelerationMaxAv.setRange(0,300);
@@ -75,9 +75,14 @@ void Asservissement::asservissementLoop(){
     double valPidAngulaire;
     double realErrorAngular;
     double reduceErrorAngular;
-    double realErrorLinear = getLinearErrorReel();
-    double reduceErrorLinear = realErrorLinear-positionControlLineaire.getPostion();
+    double realErrorLinear;
+    double reduceErrorLinear;
     uint32_t timeLastPos = posRobot->getPosition_Time();
+
+    realErrorLinear = getLinearErrorReel();
+    reduceErrorLinear = realErrorLinear-positionControlLineaire.getPostion();
+    usartprintf(">consignLin:%lf\n",positionControlLineaire.getPostion());
+    usartprintf(">errorLin:%lf\n",realErrorLinear);
 
     if(realErrorLinear >= 100){
         reTargetAngle = true;
@@ -99,7 +104,7 @@ void Asservissement::asservissementLoop(){
 #endif
 
     //Calculate Linear commande
-    if(positionControlLineaire.getPostion()==0){
+    if(false){
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
         pidLineaire.reset();
     }
