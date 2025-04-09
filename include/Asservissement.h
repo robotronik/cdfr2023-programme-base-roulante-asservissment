@@ -21,7 +21,7 @@ private:
     double getLinearErrorReel(void);
 
     uint32_t nextTime;
-    int loopPeriod = 50;
+    int loopPeriod = 20;
 
     position* posRobot;
     bool print = false;

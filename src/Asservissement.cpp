@@ -3,7 +3,7 @@
 
 Asservissement::Asservissement(position* pos):
     pidLineaire(1,0.000,100),
-    pidAngulaire(1.5,-0.005,0),
+    pidAngulaire(4,0.0,400),
     pidLineaireBlock(1,0.001,100),
     pidAngulaireBlock(2,0.001,200)
 {
@@ -20,12 +20,12 @@ Asservissement::Asservissement(position* pos):
     positionControlLineaire.decelerationStopAv.setRange(0,2000);
     positionControlLineaire.decelerationStopAr.setRange(0,2000);
 
-    positionControlAngulaire.vitesseMaxAv.setRange(0,1000);
-    positionControlAngulaire.accelerationMaxAv.setRange(0,600);
-    positionControlAngulaire.decelerationMaxAv.setRange(0,600);
-    positionControlAngulaire.vitesseMaxAr.setRange(0,1000);
-    positionControlAngulaire.accelerationMaxAr.setRange(0,600);
-    positionControlAngulaire.decelerationMaxAr.setRange(0,600);
+    positionControlAngulaire.vitesseMaxAv.setRange(0,10000);
+    positionControlAngulaire.accelerationMaxAv.setRange(0,300);
+    positionControlAngulaire.decelerationMaxAv.setRange(0,300);
+    positionControlAngulaire.vitesseMaxAr.setRange(0,10000);
+    positionControlAngulaire.accelerationMaxAr.setRange(0,300);
+    positionControlAngulaire.decelerationMaxAr.setRange(0,300);
     positionControlAngulaire.decelerationStopAv.setRange(positionControlAngulaire.decelerationMaxAv);
     positionControlAngulaire.decelerationStopAr.setRange(positionControlAngulaire.decelerationMaxAr);
 
@@ -58,17 +58,13 @@ void Asservissement::setAsservissementLoopPeriod(int period){
 }
 
 void Asservissement::loop(){
-    // if(nextTime < get_uptime_ms()){
-    //     if(posRobot->getPositionChanged()){
-    //         setConsigne(posRobot->getPosition());
-    //     }
-    //     nextTime = get_uptime_ms() + loopPeriod;
-    //     asservissementLoop();
-    // }
     if(posRobot->getPositionChanged()){
         setConsigne(posRobot->getPosition());
     }
-    asservissementLoop();
+    if(nextTime < get_uptime_ms()){
+        nextTime = get_uptime_ms() + loopPeriod;
+        asservissementLoop();
+    }
 }
 
 
@@ -94,6 +90,8 @@ void Asservissement::asservissementLoop(){
 
     realErrorAngular = getAngularErrorReel();
     reduceErrorAngular = realErrorAngular-positionControlAngulaire.getPostion();
+    //usartprintf(">consignTheta:%lf\n",positionControlAngulaire.getPostion());
+    //usartprintf(">errorTheta:%lf\n",realErrorAngular);
 
 #ifdef ENABLE_STATISTIC
     statisticLinear.update(reduceErrorLinear,timeLastPos);
@@ -111,15 +109,7 @@ void Asservissement::asservissementLoop(){
     }
 
     //Calculate Angular commande
-    if(positionControlAngulaire.getPostion()==0 && print == true){
-        usartprintf("angular error>%lf\n",getAngularErrorReel());
-        print = false;
-    }
-    else if(positionControlAngulaire.getPostion()!=0){
-        print = true;
-    }
-
-    if(false || reTargetAngle){
+    if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
         valPidAngulaire = pidAngulaireBlock.update(reduceErrorAngular,timeLastPos);
         pidAngulaire.reset();
     }
