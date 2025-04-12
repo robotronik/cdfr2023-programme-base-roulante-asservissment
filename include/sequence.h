@@ -22,3 +22,20 @@ public:
     ~sequence();
 };
 
+
+#define SEQUENCE_BEGIN() static int _seq_state = 0; switch(_seq_state) { case 0:
+
+#define DELAY(ms) { \
+        static uint32_t _last = 0; \
+        _last = get_uptime_ms(); \
+        _seq_state = __LINE__; case __LINE__: \
+        if (get_uptime_ms() - _last < (ms)) return EXIT_TASKNOTFINISH; \
+    }
+
+#define WAIT_UNTIL(cond) do { \
+        _seq_state = __LINE__; case __LINE__: \
+        if (!(cond)) return EXIT_TASKNOTFINISH; \
+    } while(0)
+
+#define SEQUENCE_END() }
+

@@ -1,17 +1,14 @@
 #include "config.h"
 #include "motor.h"
 #include "uart.h"
-#include "odometrie.h"
 #include "clock.h"
-#include "I2C.h"
 #include "led.h"
 #include "sequence.h"
-#include "position.h"
 #include "Asservissement.h"
-#include "movement.h"
 #include "i2c_interface.h"
 #include "button.h"
 #include "calibration.h"
+#include "test.h"
 
 //#define TESTMOTOR
 
@@ -28,100 +25,6 @@ void I2CRecieveData(uint8_t* data, int size){
     robotI2cInterface->I2CDataSwitch(data,size);
 }
 
-void testloop(sequence* seq){
-
-	seq->start();
-
-	seq->delay([](){
-        robotI2cInterface->set_coordinates(0,0,0);
-        robotI2cInterface->set_motor_state(true);
-		robotI2cInterface->consigne_angulaire(90,Rotation::SHORTEST);
-	},0);
-
-	seq->delay([](){
-	robotI2cInterface->consigne_angulaire(0,Rotation::SHORTEST);
-	},3000);
-
-	seq->delay([](){
-		robotI2cInterface->go_to_point(1000,1000);
-	},3000);
-
-    seq->delay([](){
-		robotI2cInterface->stop();
-	},2000);
-
-	seq->delay([](){
-		robotI2cInterface->go_to_point(0,0,0);
-	},7000);
-
-	seq->delay([](){
-		robotI2cInterface->go_to_point(1000,1000,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
-	},7000);
-
-	seq->delay([](){
-		robotI2cInterface->go_to_point(0,0,0,Rotation::CLOCKWISE,Direction::BACKWARD,Rotation::ANTICLOCKWISE);
-	},7000);
-}
-
-void testloop2(sequence* seq){
-
-	seq->start();
-
-	seq->delay([](){
-        robotI2cInterface->set_coordinates(0,0,0);
-        robotI2cInterface->set_motor_state(true);
-		robotI2cInterface->consigne_angulaire(45,Rotation::ANTICLOCKWISE);
-	},0);
-
-	seq->delay([](){
-	    robotI2cInterface->consigne_angulaire(-45,Rotation::CLOCKWISE);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->consigne_angulaire(135,Rotation::ANTICLOCKWISE);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->consigne_angulaire(-135,Rotation::CLOCKWISE);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->consigne_angulaire(0,Rotation::ANTICLOCKWISE);
-	},3000);
-
-}
-
-void testloop3(sequence* seq){
-
-	seq->start();
-
-	seq->delay([](){
-        robotI2cInterface->set_coordinates(0,0,0);
-        robotI2cInterface->set_motor_state(true);
-		robotI2cInterface->go_to_point(-200,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},0);
-
-	seq->delay([](){
-		robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->go_to_point(-600,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->go_to_point(-1000,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},3000);
-
-    seq->delay([](){
-	    robotI2cInterface->go_to_point(0,0,Rotation::SHORTEST,Direction::SHORTEST);
-	},5000);
-
-}
 
 int main(void)
 {
@@ -207,7 +110,7 @@ int main(void)
             mySeq.reset();
         }
         else if(enableDebug){
-            testloop3(&mySeq);
+            testloop(robotI2cInterface);
         }
 
         if(readButton1() && !enableCalibration){
