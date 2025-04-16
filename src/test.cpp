@@ -93,3 +93,21 @@ int testloop(i2c_interface* robotI2cInterface){
     SEQUENCE_END();
     return EXIT_SUCCESS;
 }
+
+
+int rotation10(i2c_interface* robotI2cInterface){
+    SEQUENCE_BEGIN();
+
+    robotI2cInterface->set_coordinates(0,0,0);
+    robotI2cInterface->set_motor_state(true);
+
+    for(int i = 0; i<10; i++){
+        robotI2cInterface->consigne_angulaire(180,Rotation::ANTICLOCKWISE);
+        robotI2cInterface->consigne_angulaire(0,Rotation::ANTICLOCKWISE);
+    }
+
+    DELAY(1);
+
+    SEQUENCE_END();
+    return EXIT_SUCCESS;
+}
