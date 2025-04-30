@@ -5,9 +5,8 @@
 #include "uart.h"
 #include "positionControl.h"
 #include "position.h"
-#include "motor.h"
+#include "Motor.h"
 #include "statistic.h"
-
 
 
 class Asservissement
@@ -23,7 +22,7 @@ private:
     uint32_t nextTime;
     int loopPeriod = 50;
 
-    position* posRobot;
+    position posRobot;
 
 public :
     positionControl positionControlLineaire;
@@ -36,7 +35,8 @@ public :
     Statistic statisticAngular;
 
 public:
-    Asservissement(position* pos);
+    Asservissement(position& pos);
+    ~Asservissement();
 
     void loop();
     void asservissementLoop();
@@ -57,8 +57,6 @@ public:
     Rotation getRotationSide(void);
     Direction getDirectionSide(void);
     position_t getCurrentConsigne(void);
-
-    ~Asservissement();
 
 private:
     void setConsigneAngulaire(double angle,Rotation rotation);

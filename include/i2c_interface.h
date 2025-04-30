@@ -2,17 +2,17 @@
 
 #include "robot_interface.h"
 #include "movement.h"
-#include "motor.h"
+#include "Motor.h"
 #include "led.h"
 #include "I2C.h"
 
 class i2c_interface : public Robot_interface
 {
 private:
-    position* robotPosition;
-    movement* robotAsservisement;
+    position posRobot;
+    movement robotAsserv;
 public:
-    i2c_interface(position* inRobotPosition, movement* inRobotAsservisement);
+    i2c_interface(position& inRobotPosition, movement& inRobotAsservisement);
 
     void get_version(uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4);
     void set_led_1(bool status);

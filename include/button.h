@@ -12,5 +12,5 @@
 
 
 void buttonSetup(void);
-bool readButton1(void);
-bool readButton2(void);
+bool readPushButton(void);
+bool readTestButton(void);

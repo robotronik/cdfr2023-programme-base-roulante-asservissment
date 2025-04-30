@@ -1,241 +1,192 @@
-#include "motor.h"
+#include "Motor.h"
 #include "uart.h"
 #include "clock.h"
+#include "math.h"
 
-//local variables
-int modeL;
-int modeR;
-uint16_t adc_value_L = 0;
-uint16_t adc_value_R = 0;
-uint8_t current_channel = adc_channelL;
-int maxTorqueR = 4096;
-int maxTorqueL = 4096;
-bool motorEnR = true;
-bool motorEnL = true;
-int maxSpeedR = 100;
-int maxSpeedL = 100;
-bool enableMaxTorque = false;
+// BLDC motor driver
+// https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-DGA5/483784.pdf
 
 //local fonctions
+static uint8_t current_channel_indx = 0;
+static uint8_t adc_channels[] = {adc_channelA, adc_channelB, adc_channelC};
+static uint16_t * adc_values_registers[] = {NULL, NULL, NULL};
 void setuptimer(void);
 void adc_setup(void);
-void setupGPIO(void);
-void motorSetSpeedL(int speed);
-void motorSetSpeedR(int speed);
 
+Motor::Motor(int motorID)
+{
+	id = motorID;
+	name = 'A' + motorID;
+	adc_values_registers[id] = &adc_value;
+}
 
-void motorSetup(void){
+void Motor::Setup(){
 	setupGPIO();
 	setuptimer();
 	adc_setup();
 }
 
-//direction inverted for the left motor
-void motorDirectionL(int direction){
-	if(direction == 0){
-		gpio_set(port_directionL,pin_directionL);
+void Motor::SetSpeedSigned(int speed){
+	SetSpeedUnsigned(abs(speed), speed<0);
+}
+
+void Motor::SetSpeedUnsigned(int speed, bool reverse){
+	SetDirection(reverse);
+	SetSpeed(speed);
+}
+
+void Motor::SetDirection(bool reverse){
+	if (reverse)
+		gpio_set(port_Direction,pin_Direction);
+	else
+		gpio_clear(port_Direction,pin_Direction);
+}
+
+void Motor::Brake(bool brake){
+	if (brake)
+		gpio_clear(port_Brake,pin_Brake);	
+	else
+		gpio_set(port_Brake,pin_Brake);
+}
+
+/*
+Sets the current-decay method. Referring to table 3, when
+in slow-decay mode, MODE = 1, only the high-side MOSFET
+is switched off during a PWM-off cycle. In the fast-decay mode,
+MODE = 0, the device switches both the high-side and low-side
+MOSFETs. 
+*/
+void Motor::SetMode(int motorMode){
+	if (motorMode == 1) {
+		gpio_set(port_Mode,pin_Mode);
+		mode = 1;
 	}
-	else{
-		gpio_clear(port_directionL,pin_directionL);
+	else {
+		gpio_clear(port_Mode,pin_Mode);
+		mode = 0;
 	}
 }
 
-void motorSpeedSignedL(int speed){
-	if(speed<1){
-		motorDirectionL(1);
-		motorSetSpeedL(-speed);
-	}
-	else{
-		motorDirectionL(0);
-		motorSetSpeedL(speed);
-	}
+void Motor::SetSpeed(int speed){
+	speed = CLAMP(speed,0,maxSpeed);
+
+	int pwm;
+	if (mode == 0)
+		pwm = speed/2 + 50;
+	else
+		pwm = speed;
+		
+	int pwmVal = pwm * COEFMULT;
+
+	timer_set_oc_value(TIM1, TIM_OC2, pwmVal);
 }
-
-
-void motorSpeedUnsignedL(int speed,int direction){
-	if(direction == 1){
-		motorDirectionL(1);
-	}
-	else if(direction == 0){
-		motorDirectionL(0);
-	}
-	motorSetSpeedL(speed);
-}
-
-
-void motorDirectionR(int direction){
-	if(direction == 0){
-		gpio_clear(port_directionR,pin_directionR);
-	}
-	else{
-		gpio_set(port_directionR,pin_directionR);
-	}
-}
-
-void motorSpeedSignedR(int speed){
-	if(speed<1){
-		motorDirectionR(1);
-		motorSetSpeedR(-speed);
-	}
-	else{
-		motorDirectionR(0);
-		motorSetSpeedR(speed);
-	}
-}
-
-
-void motorSpeedUnsignedR(int speed,int direction){
-	if(direction == 1){
-		motorDirectionR(1);
-	}
-	else if(direction == 0){
-		motorDirectionR(0);
-	}
-	motorSetSpeedR(speed);
-
-}
-
-void motorBrakeL(int brake){
-	if(brake == 0){
-		gpio_set(port_brakeL,pin_brakeL);
-	}
-	else{
-		gpio_clear(port_brakeL,pin_brakeL);
-	}
-}
-
-void motorBrakeR(int brake){
-	if(brake == 0){
-		gpio_set(port_brakeR,pin_brakeR);
-	}
-	else{
-		gpio_clear(port_brakeR,pin_brakeR);
-	}
-}
-
-
-void motorSetModeL(int mode){
-	if(mode == 1){
-		gpio_set(port_ModeL,pin_ModeL);
-		modeL = 1;
-	}
-	else{
-		gpio_clear(port_ModeL,pin_ModeL);
-		modeL = 0;
-	}
-}
-void motorSetModeR(int mode){
-	if(mode == 1){
-		gpio_set(port_ModeR,pin_ModeR);
-		modeR = 1;
-	}
-	else{
-		gpio_clear(port_ModeR,pin_ModeR);
-		modeR = 0;
-	}
-}
-
-void motorSetSpeedL(int speed){
+/*
+void motorSetSpeed(int speed){
 	if(speed<0){
 		speed = 0;
 	}
 	else if(speed>100){
 		speed = 100;
 	}
-	speed = CLIP(speed,(maxSpeedL/2)-50,(maxSpeedL/2)+50);
-	if(modeL==0){
-		speed =	speed/2 + 50;
-	}
-	timer_set_oc_value(TIM1, TIM_OC2, speed*COEFMULT);
-}
-void motorSetSpeedR(int speed){
-	if(speed<0){
-		speed = 0;
-	}
-	else if(speed>100){
-		speed = 100;
-	}
-	speed = CLIP(speed,(maxSpeedR/2)-50,(maxSpeedR/2)+50);
+	speed = CLAMP(speed,(maxSpeedR/2)-50,(maxSpeedR/2)+50);
 	if(modeR==0){
 		speed = speed/2 + 50;
 	}
 	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
 }
+*/
 
-void disableMotor(void){
-	gpio_clear(port_CoastL,pin_CoastL);
-	gpio_clear(port_CoastR,pin_CoastR);
-	motorEnR = false;
-	motorEnL = false;
+void Motor::Disable(){
+	gpio_clear(port_Coast,pin_Coast);
+	motorEn = false;
 }
-void enableMotor(void){
-	gpio_set(port_CoastL,pin_CoastL);
-	gpio_set(port_CoastR,pin_CoastR);
-	motorEnR = true;
-	motorEnL = true;
+void Motor::Enable(){
+	gpio_set(port_Coast,pin_Coast);
+	motorEn = true;
+}
+void Motor::SetMaxSpeed(int max){
+	maxSpeed = CLAMP(max,0,100);
 }
 
-void setupGPIO(void){
+void Motor::SetMaxTorque(int torque){
+	maxTorque = (torque*4096)/100;
+	if (maxTorque > 4095) {
+		doesLimitTorque = false;
+	}
+	else {
+		doesLimitTorque = true;
+		adc_start_conversion_regular(ADC1);
+	}
+}
+
+// Returns the current in A
+double Motor::GetCurrent() {
+	// ADC value between 0 and 4095
+	// Resistor value = 0.018 Ohm
+	// Vref = 3.3V
+
+	// Convert ADC value to voltage
+	double voltage = (double)(adc_value) / 4095.0 * 3.3;
+	double CSOutVoltage = voltage * (4.7+2.2) / 2.2; // Voltage divider
+
+	// VCSOUT ≈ (ILOAD × AV × RSENSE) + VOOS
+	double current = (CSOutVoltage - 0.320) / (19 * 0.018);
+
+    return current;
+}
+
+void Motor::PrintValues() {
+    usartprintf(">ADC of %c: %4d /4095\n", adc_value);
+    usartprintf(">Current of %c: %lf A\n", GetCurrent());
+}
+
+void Motor::setupGPIO(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOC);
     rcc_periph_clock_enable(RCC_ADC1);
 
+
+	gpio_mode_setup(port_Reset, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Reset);
+	gpio_mode_setup(port_Coast, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Coast);
+	gpio_mode_setup(port_Mode, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Mode);
+	gpio_mode_setup(port_Direction, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Direction);
+	gpio_mode_setup(port_Brake, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Brake);
+	gpio_mode_setup(port_ESF, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ESF);
+
+	gpio_mode_setup(port_Err1, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err1);
+	gpio_mode_setup(port_Err2, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err2);
+
     /* Configure PA5 en entrée analogique */
-    gpio_mode_setup(port_infoSpeedL, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedL);
-	gpio_mode_setup(port_infoSpeedR, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_infoSpeedR);
+    gpio_mode_setup(port_Tacho, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_Tacho);
 
-	gpio_mode_setup(port_ModeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeL);
-	gpio_mode_setup(port_brakeL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_brakeL);
-	gpio_mode_setup(port_directionL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_directionL);
-	gpio_mode_setup(port_resetL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_resetL);
-	gpio_mode_setup(port_CoastL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_CoastL);
-	gpio_mode_setup(port_esfL, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_esfL);
-	gpio_mode_setup(port_info1L, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_info1L);
-	gpio_mode_setup(port_info2L, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_info2L);
+	SetMode(0);
+	Brake(true);
+	SetDirection(false);
 
-	gpio_mode_setup(port_ModeR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeR);
-	gpio_mode_setup(port_brakeR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_brakeR);
-	gpio_mode_setup(port_directionR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_directionR);
-	gpio_mode_setup(port_resetR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_resetR);
-	gpio_mode_setup(port_CoastR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_CoastR);
-	gpio_mode_setup(port_esfR, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_esfR);
-	gpio_mode_setup(port_info1R, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_info1R);
-	gpio_mode_setup(port_info2R, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_info2R);
+	// disble reset = 1 (When RESET is low, all internal circuitry is disabled)
+	gpio_set(port_Reset, pin_Reset);
 
+	// coast disable = 1 (coast : reset only the gate)
+	gpio_set(port_Coast, pin_Coast);
+	Enable();
 
-	//Select the mode
-	gpio_set(port_ModeL,pin_ModeL);
-	gpio_set(port_ModeR,pin_ModeR);
-	modeL = 1;
-	modeR = 1;
-	//Brake disable = 1 (0 by default to brake the robot when booting)
-	gpio_clear(port_brakeL,pin_brakeL);
-	gpio_clear(port_brakeR,pin_brakeR);
-	//Select Direction
-	gpio_clear(port_directionL,pin_directionL);
-	gpio_clear(port_directionR,pin_directionR);
-	//disble reset = 1 (reset : reset all the chip)
-	gpio_set(port_resetL,pin_resetL);
-	gpio_set(port_resetR,pin_resetR);
-	//coast disable = 1 (coast : reset only the gate)
-	gpio_set(port_CoastL,pin_CoastL);
-	gpio_set(port_CoastR,pin_CoastR);
-	motorEnR = true;
-	motorEnL = true;
-	//esf = 1 (in case of fault, disable the driver)
-	gpio_clear(port_esfL,pin_esfL);
-	gpio_clear(port_esfR,pin_esfR);
-	//setup AF for the speed control
-	gpio_mode_setup(port_SpeedControlL, GPIO_MODE_AF, GPIO_PUPD_NONE, pin_SpeedControlL);
-	gpio_mode_setup(port_SpeedControlR, GPIO_MODE_AF, GPIO_PUPD_NONE, pin_SpeedControlR);
-	gpio_set_af(port_SpeedControlL, GPIO_AF1, pin_SpeedControlL);
-	gpio_set_af(port_SpeedControlR, GPIO_AF1, pin_SpeedControlR);
-	gpio_set_output_options(port_SpeedControlL, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, pin_SpeedControlL);
-	gpio_set_output_options(port_SpeedControlR, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, pin_SpeedControlR);
+	// Disable ESF
+	gpio_clear(port_ESF, pin_ESF);
+
+	// setup PWM AF for the speed control
+	gpio_mode_setup(port_SpeedControl, GPIO_MODE_AF, GPIO_PUPD_NONE, pin_SpeedControl);
+	gpio_set_af(port_SpeedControl, GPIO_AF1, pin_SpeedControl);
+	gpio_set_output_options(port_SpeedControl, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, pin_SpeedControl);
+	SetSpeed(0);
 }
 
 void setuptimer(void){
+	// Make sure this function is only called once.
+	static bool first = false;
+	if (first) return;
+	first = true;
+
 	// Enable TIM1 clock.
 	rcc_periph_clock_enable(RCC_TIM1);
 
@@ -268,30 +219,40 @@ void setuptimer(void){
 	/* Disable outputs. */
 	timer_disable_oc_output(TIM1, TIM_OC2N);
 	timer_disable_oc_output(TIM1, TIM_OC1N);
+	timer_disable_oc_output(TIM1, TIM_OC3N);
 
 	/* Configure global mode of line 3. */
 	timer_disable_oc_clear(TIM1, TIM_OC2);
 	timer_enable_oc_preload(TIM1, TIM_OC2);
 	timer_set_oc_slow_mode(TIM1, TIM_OC2);
 	timer_set_oc_mode(TIM1, TIM_OC2, TIM_OCM_PWM1);
+
 	timer_disable_oc_clear(TIM1, TIM_OC1);
 	timer_enable_oc_preload(TIM1, TIM_OC1);
 	timer_set_oc_slow_mode(TIM1, TIM_OC1);
 	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
 
+	timer_disable_oc_clear(TIM1, TIM_OC3);
+	timer_enable_oc_preload(TIM1, TIM_OC3);
+	timer_set_oc_slow_mode(TIM1, TIM_OC3);
+	timer_set_oc_mode(TIM1, TIM_OC3, TIM_OCM_PWM1);
+
 
 	/* Configure OC3N. */
 	timer_set_oc_polarity_high(TIM1, TIM_OC2N);
 	timer_set_oc_polarity_high(TIM1, TIM_OC1N);
+	timer_set_oc_polarity_high(TIM1, TIM_OC3N);
 
 	/* Set the capture compare value to 0 when the robot booting */
 	timer_set_oc_value(TIM1, TIM_OC2, 0);
 	timer_set_oc_value(TIM1, TIM_OC1, 0);
+	timer_set_oc_value(TIM1, TIM_OC3, 0);
 
 
 	/* Reenable outputs. */
 	timer_enable_oc_output(TIM1, TIM_OC2N);
 	timer_enable_oc_output(TIM1, TIM_OC1N);
+	timer_enable_oc_output(TIM1, TIM_OC3N);
 
 	/* ARR reload enable. */
 	timer_enable_preload(TIM1);
@@ -303,16 +264,19 @@ void setuptimer(void){
 	timer_enable_counter(TIM1);
 }
 
-
-
-
 void adc_setup(void) {
+	// Make sure this function is only called once.
+	static bool first = false;
+	if (first) return;
+	first = true;
+
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOC);
     rcc_periph_clock_enable(RCC_ADC1);
 
-    gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1); // PA1 = ADC_Channel_2
-    gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO3); // PC3 = ADC_Channel_13
+    gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1); // A - PA1 = ADC_Channel_1
+    gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO3); // B - PC3 = ADC_Channel_11
+    gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0); // C - PC0 = ADC_Channel_10
 
 
     adc_power_off(ADC1);
@@ -328,83 +292,22 @@ void adc_setup(void) {
     //delay_ms(1);
 
     // Démarrer la première conversion sur le canal 2
-    adc_set_regular_sequence(ADC1, 1, &current_channel);
+    adc_set_regular_sequence(ADC1, 1, adc_channels);
     adc_start_conversion_regular(ADC1);
 }
 
 // Fonction d'interruption pour l'ADC
 void adc_isr(void) {
     if (adc_eoc(ADC1)) { // Vérifier si la conversion est terminée
-        if (current_channel == adc_channelL) {
-            adc_value_L = adc_read_regular(ADC1);
-			if((adc_value_L > maxTorqueL) || motorEnL == false){
-				gpio_clear(port_CoastL,pin_CoastL);
-			}
-			else{
-				gpio_set(port_CoastL,pin_CoastL);
-			}
-            current_channel = adc_channelR;
-        } else if (current_channel == adc_channelR) {
-            adc_value_R = adc_read_regular(ADC1);
-			if((adc_value_R > maxTorqueR) || motorEnR == false){
-				gpio_clear(port_CoastR,pin_CoastR);
-			}
-			else{
-				gpio_set(port_CoastR,pin_CoastR);
-			}
-            current_channel = adc_channelL;
-        }
+		if (adc_values_registers[current_channel_indx] != NULL) {
+			*adc_values_registers[current_channel_indx] = adc_read_regular(ADC1);
+		}
         // Configurer le prochain canal et relancer la conversion
-        adc_set_regular_sequence(ADC1, 1, &current_channel);
-
-        if(enableMaxTorque){
-			adc_start_conversion_regular(ADC1);
-		}
-		else{
-			gpio_set(port_CoastR,pin_CoastR);
-			gpio_set(port_CoastL,pin_CoastL);
-		}
+		current_channel_indx++;
+		if (current_channel_indx >= sizeof(adc_channels)/sizeof(adc_channels[0])) 
+			current_channel_indx = 0;
+		
+        adc_set_regular_sequence(ADC1, 1, adc_channels + current_channel_indx);
+		adc_start_conversion_regular(ADC1);
     }
-}
-
-void setMaxSpeedR(int speed){
-	maxSpeedR = speed;
-}
-void setMaxSpeedL(int speed){
-	maxSpeedL = speed;
-}
-
-void setMaxTorqueR(int torque){
-	maxTorqueR = (torque*4096)/100;
-	if(maxTorqueR == 4096 && maxTorqueL == 4096){
-		enableMaxTorque = false;
-	}
-	else{
-		enableMaxTorque = true;
-		adc_start_conversion_regular(ADC1);
-	}
-}
-
-void setMaxTorqueL(int torque){
-	maxTorqueL = (torque*4096)/100;
-	if(maxTorqueR == 4096 && maxTorqueL == 4096){
-		enableMaxTorque = false;
-	}
-	else{
-		enableMaxTorque = true;
-		adc_start_conversion_regular(ADC1);
-	}
-}
-
-int getMotorCurrentL() {
-    return adc_value_L;
-}
-
-int getMotorCurrentR() {
-    return adc_value_R;
-}
-
-void prinAdcValue() {
-    usartprintf(">courant_13 : %4d\n",adc_value_R);
-	usartprintf(">courant_2 : %4d\n",adc_value_L);
 }

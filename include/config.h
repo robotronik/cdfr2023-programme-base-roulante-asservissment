@@ -12,88 +12,94 @@
 
 //#define ENABLE_STATISTIC
 
-//PIN and Port to control the first MotorL
-#define pin_ModeL 			GPIO0
-#define port_ModeL 				GPIOA
-#define pin_SpeedControlL	GPIO0
-#define port_SpeedControlL		GPIOB
-#define pin_brakeL 			GPIO6
-#define port_brakeL 			GPIOA
-#define pin_directionL 		GPIO4
-#define port_directionL 		GPIOA
-#define pin_resetL 			GPIO5
-#define port_resetL				GPIOC
-#define pin_CoastL 			GPIO1
-#define port_CoastL				GPIOB
-#define pin_esfL 			GPIO10
-#define port_esfL   			GPIOB
-#define pin_info1L			GPIO4
-#define port_info1L				GPIOC
-#define pin_info2L			GPIO7
-#define port_info2L				GPIOA
-#define pin_infoSpeedL		GPIO1
-#define port_infoSpeedL			GPIOA
-#define adc_channelL		1
+// ESF : Enable Stop on Fault
+//PIN and Port to control MotorA
+// TODO check the pin and port
+#define pin_ModeA 			GPIO0
+#define port_ModeA 				GPIOA
+#define pin_SpeedControlA	GPIO0
+#define port_SpeedControlA		GPIOB
+#define pin_brakeA 			GPIO6
+#define port_brakeA 			GPIOA
+#define pin_directionA 		GPIO4
+#define port_directionA 		GPIOA
+#define pin_resetA 			GPIO5
+#define port_resetA				GPIOC
+#define pin_CoastA 			GPIO1
+#define port_CoastA				GPIOB
+#define pin_esfA 			GPIO10
+#define port_esfA   			GPIOB
+#define pin_info1A			GPIO4
+#define port_info1A				GPIOC
+#define pin_info2A			GPIO7
+#define port_info2A				GPIOA
+#define pin_infoSpeedA		GPIO1
+#define port_infoSpeedA			GPIOA
+#define adc_channelA		1
 
 
-//PIN and Port to control the second MotorR
-#define pin_ModeR 			GPIO12
-#define port_ModeR 				GPIOB
-#define pin_SpeedControlR	GPIO13
-#define port_SpeedControlR		GPIOB
-#define pin_brakeR 			GPIO15
-#define port_brakeR 			GPIOB
-#define pin_directionR 		GPIO14
-#define port_directionR 		GPIOB
-#define pin_resetR 			GPIO9
-#define port_resetR				GPIOC
-#define pin_CoastR 			GPIO8
-#define port_CoastR				GPIOA
-#define pin_esfR 			GPIO10
-#define port_esfR   			GPIOA
-#define pin_info1R			GPIO8
-#define port_info1R				GPIOC
-#define pin_info2R			GPIO7
-#define port_info2R				GPIOC
-#define pin_infoSpeedR		GPIO3
-#define port_infoSpeedR			GPIOC
-#define adc_channelR		13
+//PIN and Port to control MotorB
+// TODO check the pin and port
+#define pin_ModeB 			GPIO12
+#define port_ModeB 				GPIOB
+#define pin_SpeedControlB	GPIO13
+#define port_SpeedControlB		GPIOB
+#define pin_brakeB 			GPIO15
+#define port_brakeB 			GPIOB
+#define pin_directionB 		GPIO14
+#define port_directionB 		GPIOB
+#define pin_resetB 			GPIO9
+#define port_resetB				GPIOC
+#define pin_CoastB 			GPIO8
+#define port_CoastB				GPIOA
+#define pin_esfB 			GPIO10
+#define port_esfB   			GPIOA
+#define pin_info1B			GPIO8
+#define port_info1B				GPIOC
+#define pin_info2B			GPIO7
+#define port_info2B				GPIOC
+#define pin_infoSpeedB		GPIO3
+#define port_infoSpeedB			GPIOC
+#define adc_channelB		13
+
+
+//PIN and Port to control MotorC
+// TODO check the pin and port
+#define pin_ModeC 			GPIO12
+#define port_ModeC 				GPIOB
+#define pin_SpeedControlC	GPIO13
+#define port_SpeedControlC		GPIOB
+#define pin_brakeC 			GPIO15
+#define port_brakeC 			GPIOB
+#define pin_directionC 		GPIO14
+#define port_directionC 		GPIOB
+#define pin_resetC 			GPIO9
+#define port_resetC				GPIOC
+#define pin_CoastC 			GPIO8
+#define port_CoastC				GPIOA
+#define pin_esfC 			GPIO10
+#define port_esfC   			GPIOA
+#define pin_info1C			GPIO8
+#define port_info1C				GPIOC
+#define pin_info2C			GPIO7
+#define port_info2C				GPIOC
+#define pin_infoSpeedC		GPIO3
+#define port_infoSpeedC			GPIOC
+#define adc_channelC		11
 
 
 //PIN and Port to control the to led
+// TODO
 #define pin_led1			GPIO12
 #define port_led1				GPIOA
 #define pin_led2			GPIO15
 #define port_led2				GPIOA
 
-
-//PIN and PORT for the odometrie. Each pin are on different vector interrupt.
-#define pin_odometrie1R     GPIO2
-#define port_odometrie1R         GPIOD
-#define pin_odometrie2R     GPIO3
-#define port_odometrie2R         GPIOB
-#define pin_odometrie1L     GPIO4
-#define port_odometrie1L         GPIOB
-#define pin_odometrie2L     GPIO5
-#define port_odometrie2L         GPIOB
-
-//PIN and PORT free
-#define pin_free0           GPIO9
-#define port_free0              GPIOB
-#define pin_free1           GPIO13
-#define port_free1              GPIOC
-#define pin_free2           GPIO14
-#define port_free2              GPIOC
-#define pin_free3           GPIO15
-#define port_free3              GPIOC
-#define pin_free4           GPIO0
-#define port_free4              GPIOC
-#define pin_free5           GPIO1
-#define port_free5              GPIOC
-#define pin_free6           GPIO2
-#define port_free6              GPIOC
-#define pin_free7           GPIO3
-#define port_free7              GPIOC
+// PIN and Port for the buttons
+#define pin_TestButton		GPIO14
+#define port_TestButton		    GPIOC
+#define pin_PushButton		GPIO15
+#define port_PushButton		    GPIOC
 
 
 //PIN and PORT for the TX and RX pin. Use for debug
@@ -108,39 +114,22 @@
 #define pin_SWCLK           GPIO14
 #define port_SWCLK              GPIOA
 
-//PIN and PORT for the endstop. Use the end stop to calibrate the odometrie.
-#define pin_endStopL         GPIO11
-#define port_endstopL            GPIOC
-#define pin_endStopR         GPIO12
-#define port_endStopR            GPIOC
+//PIN and PORT for the odometry sensor in I2C (I2C3)
+#define pin_OdoClk			GPIO8
+#define port_OdoClk				GPIOA
+#define pin_OdoSda			GPIO9
+#define port_OdoSda				GPIOC  // TODO Check these
 
-//PIN and PORT for I2C
+//PIN and PORT for I2C   (I2C1)
 #define pin_I2CClk			GPIO6
 #define port_I2CClk				GPIOB
 #define pin_I2CSda			GPIO7
 #define port_I2CSda				GPIOB
 
 
-#define CALIBRATION_IT 10
-#define CALIBRATION_DIV 4
 
-//Odometrie
-#ifdef OLDROBOT
-    #define NUMBERSTEPBYROTATION 360
-    #define DISTANCEWHEEL 300 // + = teat -
-    #define DIAMETERWHEELD 41.12                // +1 roue = +25 distance
-    #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
-#else
-    #define NUMBERSTEPBYROTATION 360
-    #define DISTANCEWHEEL 253.9794921875 // + = teat -
-    #define DIAMETERWHEELD 41.3525390625                // +1 roue = +25 distance
-    #define DIAMETERWHEELG 41.3330078125// + = y -     // +1 roue = +25 distance
-
-    #define CALIBRATION_START_DISTANCEWHEEL 250.0
-    #define CALIBRATION_START_DIAMETERWHEEL 40.0
-    #define CALIBRATION_PLAGE_DISTANCEWHEEL 100.0
-    #define CALIBRATION_PLAGE_DIAMETERWHEEL 20.0
-#endif
+#define DISTANCE_WHEEL 30.0 // TOOD check
+#define DIAMETER_WHEEL 60.0
 
 #define PI 3.14159265359
 #define DEG_TO_RAD PI/180

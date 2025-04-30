@@ -2,7 +2,7 @@
 #include "config.h"
 #include "clock.h"
 #include "AsservissementMath.h"
-#include "odometrie.h"
+#include "odometry.h"
 
 class position
 {
@@ -12,7 +12,7 @@ private:
     bool needChangePos = false;
     bool positionChanged = false;
 public:
-    position(/* args */);
+    position();
 
     void loop(void);
 

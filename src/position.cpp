@@ -6,7 +6,7 @@ position::position(){
 }
 
 void position::loop(){
-    odometrieLoop(positionRobot);
+    odometryLoop(positionRobot);
     if(needChangePos){
         positionRobot.x = newPosition.x;
         positionRobot.y = newPosition.y;

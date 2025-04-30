@@ -1,7 +1,7 @@
 #include "movement.h"
 #include <atomic>
 
-movement::movement(position* pos):Asservissement(pos){
+movement::movement(position& pos):Asservissement(pos){
 }
 
 bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direction){
