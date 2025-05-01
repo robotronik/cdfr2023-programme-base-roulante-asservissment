@@ -13,10 +13,10 @@
 
 void ledSetup(void);
 
-void led1_clear(void);
-void led2_clear(void);
-void led1_set(void);
-void led2_set(void);
-void led1_toggle(void);
-void led2_toggle(void);
+void RedLED_Clear(void);
+void GreenLED_Clear(void);
+void RedLED_Set(void);
+void GreenLED_Set(void);
+void RedLED_Toggle(void);
+void GreenLED_Toggle(void);
 

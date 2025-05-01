@@ -24,7 +24,7 @@ movement robotAsserv(posRobot);
 i2c_interface* robotI2cInterface = new i2c_interface(posRobot, robotAsserv);
 
 void I2CRecieveData(uint8_t* data, int size){
-    robotI2cInterface->I2CDataSwitch(data,size);
+    robotI2cInterface->I2CDataSwitch(data, size);
 }
 
 void testloop(sequence* seq){
@@ -173,7 +173,7 @@ int main(void)
 
 		//BLINK LED
 		ledToggleSeq.interval([](){
-			led1_toggle();
+			RedLED_Toggle();
 		},1000);
 	}
 

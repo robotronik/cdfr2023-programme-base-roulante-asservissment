@@ -2,34 +2,34 @@
 
 void ledSetup(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
-	gpio_mode_setup(port_led1, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_led1);
-	gpio_mode_setup(port_led2, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_led2);
+	gpio_mode_setup(port_RedLED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_RedLED);
+	gpio_mode_setup(port_GreenLED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_GreenLED);
 }
 
 
-void led1_clear(void){
-    gpio_clear(port_led1,pin_led1);
+void RedLED_Clear(void){
+    gpio_clear(port_RedLED, pin_RedLED);
 }
 
-void led2_clear(void){
-    gpio_clear(port_led2,pin_led2);
+void GreenLED_Clear(void){
+    gpio_clear(port_GreenLED, pin_GreenLED);
 }
 
-void led1_set(void){
-    gpio_set(port_led1,pin_led1);
-}
-
-
-void led2_set(void){
-    gpio_set(port_led2,pin_led2);
+void RedLED_Set(void){
+    gpio_set(port_RedLED, pin_RedLED);
 }
 
 
-void led1_toggle(void){
-    gpio_toggle(port_led1,pin_led1);
+void GreenLED_Set(void){
+    gpio_set(port_GreenLED, pin_GreenLED);
 }
 
 
-void led2_toggle(void){
-    gpio_toggle(port_led2,pin_led2);
+void RedLED_Toggle(void){
+    gpio_toggle(port_RedLED, pin_RedLED);
+}
+
+
+void GreenLED_Toggle(void){
+    gpio_toggle(port_GreenLED, pin_GreenLED);
 }

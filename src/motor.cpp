@@ -13,17 +13,75 @@ static uint16_t * adc_values_registers[] = {NULL, NULL, NULL};
 void setuptimer(void);
 void adc_setup(void);
 
-Motor::Motor(int motorID)
+void setupDriveGPIO();
+
+void DriveDisable(){
+	gpio_clear(port_CoastDrive, pin_CoastDrive);
+	driveEnabled = false;
+}
+void DriveEnable(){
+	gpio_set(port_CoastDrive, pin_CoastDrive);
+	driveEnabled = true;
+}
+
+/*
+Sets the current-decay method. Referring to table 3, when
+in slow-decay mode, MODE = 1, only the high-side MOSFET
+is switched off during a PWM-off cycle. In the fast-decay mode,
+MODE = 0, the device switches both the high-side and low-side
+MOSFETs. 
+*/
+void SetDriveMode(int mode){
+	if (mode == 1)
+		gpio_set(port_ModeDrive, pin_ModeDrive);
+	else
+		gpio_clear(port_ModeDrive, pin_ModeDrive);
+}
+
+// Reset the motor drivers by lowering the reset pin for 10ms
+void ResetDrive(){
+	gpio_clear(port_ResetDrive, pin_ResetDrive);
+	delay_ms(10);
+	gpio_set(port_ResetDrive, pin_ResetDrive);
+	delay_ms(1);
+}
+
+void DriveSetup(){
+	setupDriveGPIO();
+	motorA.Setup();
+	motorB.Setup();
+	motorC.Setup();
+	setuptimer();
+	adc_setup();
+}
+
+Motor::Motor(int motorID, double wheelDiameter, double wheelDistance, double wheelAngle, 
+	int port_SpeedControl, int pin_SpeedControl,
+	int port_Direction, int pin_Direction,
+	int port_Brake, int pin_Brake,
+	int port_ESF, int pin_ESF,
+	int port_Tacho, int pin_Tacho,
+	int port_Err1, int pin_Err1,
+	int port_Err2, int pin_Err2,
+	int port_InfoDir, int pin_InfoDir,
+	tim_oc_id oc_id) :
+	id(motorID), wheelDiameter(wheelDiameter), wheelDistance(wheelDistance), wheelAngle(wheelAngle),
+	port_SpeedControl(port_SpeedControl), pin_SpeedControl(pin_SpeedControl),
+	port_Direction(port_Direction), pin_Direction(pin_Direction),
+	port_Brake(port_Brake), pin_Brake(pin_Brake),
+	port_ESF(port_ESF), pin_ESF(pin_ESF),
+	port_Tacho(port_Tacho), pin_Tacho(pin_Tacho),
+	port_Err1(port_Err1), pin_Err1(pin_Err1),
+	port_Err2(port_Err2), pin_Err2(pin_Err2),
+	port_InfoDir(port_InfoDir), pin_InfoDir(pin_InfoDir),
+	oc_id(oc_id)
 {
-	id = motorID;
 	name = 'A' + motorID;
 	adc_values_registers[id] = &adc_value;
 }
 
 void Motor::Setup(){
 	setupGPIO();
-	setuptimer();
-	adc_setup();
 }
 
 void Motor::SetSpeedSigned(int speed){
@@ -49,61 +107,14 @@ void Motor::Brake(bool brake){
 		gpio_set(port_Brake,pin_Brake);
 }
 
-/*
-Sets the current-decay method. Referring to table 3, when
-in slow-decay mode, MODE = 1, only the high-side MOSFET
-is switched off during a PWM-off cycle. In the fast-decay mode,
-MODE = 0, the device switches both the high-side and low-side
-MOSFETs. 
-*/
-void Motor::SetMode(int motorMode){
-	if (motorMode == 1) {
-		gpio_set(port_Mode,pin_Mode);
-		mode = 1;
-	}
-	else {
-		gpio_clear(port_Mode,pin_Mode);
-		mode = 0;
-	}
-}
 
 void Motor::SetSpeed(int speed){
 	speed = CLAMP(speed,0,maxSpeed);
+	int pwmVal = (speed/2 + 50) * COEFMULT;
 
-	int pwm;
-	if (mode == 0)
-		pwm = speed/2 + 50;
-	else
-		pwm = speed;
-		
-	int pwmVal = pwm * COEFMULT;
+	timer_set_oc_value(TIM1, oc_id, pwmVal);
+}
 
-	timer_set_oc_value(TIM1, TIM_OC2, pwmVal);
-}
-/*
-void motorSetSpeed(int speed){
-	if(speed<0){
-		speed = 0;
-	}
-	else if(speed>100){
-		speed = 100;
-	}
-	speed = CLAMP(speed,(maxSpeedR/2)-50,(maxSpeedR/2)+50);
-	if(modeR==0){
-		speed = speed/2 + 50;
-	}
-	timer_set_oc_value(TIM1, TIM_OC1, speed*COEFMULT);
-}
-*/
-
-void Motor::Disable(){
-	gpio_clear(port_Coast,pin_Coast);
-	motorEn = false;
-}
-void Motor::Enable(){
-	gpio_set(port_Coast,pin_Coast);
-	motorEn = true;
-}
 void Motor::SetMaxSpeed(int max){
 	maxSpeed = CLAMP(max,0,100);
 }
@@ -140,16 +151,27 @@ void Motor::PrintValues() {
     usartprintf(">Current of %c: %lf A\n", GetCurrent());
 }
 
+void setupDriveGPIO(void){
+	rcc_periph_clock_enable(RCC_GPIOA);
+	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_GPIOC);
+
+	gpio_mode_setup(port_ResetDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ResetDrive);
+	gpio_mode_setup(port_CoastDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_CoastDrive);
+	gpio_mode_setup(port_ModeDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeDrive);
+	
+	SetDriveMode(0);
+	gpio_set(port_CoastDrive,pin_CoastDrive);
+	gpio_set(port_ModeDrive,pin_ModeDrive);
+	DriveEnable();
+}
+
 void Motor::setupGPIO(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOC);
     rcc_periph_clock_enable(RCC_ADC1);
 
-
-	gpio_mode_setup(port_Reset, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Reset);
-	gpio_mode_setup(port_Coast, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Coast);
-	gpio_mode_setup(port_Mode, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Mode);
 	gpio_mode_setup(port_Direction, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Direction);
 	gpio_mode_setup(port_Brake, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Brake);
 	gpio_mode_setup(port_ESF, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ESF);
@@ -160,16 +182,8 @@ void Motor::setupGPIO(void){
     /* Configure PA5 en entrée analogique */
     gpio_mode_setup(port_Tacho, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_Tacho);
 
-	SetMode(0);
 	Brake(true);
 	SetDirection(false);
-
-	// disble reset = 1 (When RESET is low, all internal circuitry is disabled)
-	gpio_set(port_Reset, pin_Reset);
-
-	// coast disable = 1 (coast : reset only the gate)
-	gpio_set(port_Coast, pin_Coast);
-	Enable();
 
 	// Disable ESF
 	gpio_clear(port_ESF, pin_ESF);
@@ -182,10 +196,6 @@ void Motor::setupGPIO(void){
 }
 
 void setuptimer(void){
-	// Make sure this function is only called once.
-	static bool first = false;
-	if (first) return;
-	first = true;
 
 	// Enable TIM1 clock.
 	rcc_periph_clock_enable(RCC_TIM1);
@@ -265,10 +275,6 @@ void setuptimer(void){
 }
 
 void adc_setup(void) {
-	// Make sure this function is only called once.
-	static bool first = false;
-	if (first) return;
-	first = true;
 
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOC);

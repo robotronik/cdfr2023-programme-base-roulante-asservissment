@@ -18,20 +18,20 @@ void i2c_interface::setReponseBuffer(uint8_t* data, int size){
 }
 
 
-void i2c_interface::set_led_1(bool status){
-    if(status)
-        gpio_set(port_led1,pin_led1);
+void i2c_interface::set_red_led(bool status){
+    if (status)
+        gpio_set(port_RedLED, pin_RedLED);
     else
-        gpio_clear(port_led1,pin_led1);
+        gpio_clear(port_RedLED, pin_RedLED);
 }
 
 
 
-void i2c_interface::set_led_2(bool status){
-    if(status)
-        gpio_set(port_led2,pin_led2);
+void i2c_interface::set_green_led(bool status){
+    if (status)
+        gpio_set(port_GreenLED, pin_GreenLED);
     else
-        gpio_clear(port_led2,pin_led2);
+        gpio_clear(port_GreenLED, pin_GreenLED);
 }
 
 
@@ -139,14 +139,10 @@ void i2c_interface::set_motor_state(bool motorEnable){
         motorA.SetSpeedSigned(0);
         motorB.SetSpeedSigned(0);
         motorC.SetSpeedSigned(0);
-        motorA.Enable();
-        motorB.Enable();
-        motorC.Enable();
+        DriveEnable();
     }
     else{
-        motorA.Disable();
-        motorB.Disable();
-        motorC.Disable();
+        DriveDisable();
     }
 }
 

@@ -53,8 +53,3 @@ bool position::getPositionChanged(){
     positionChanged = false;
     return bret;
 }
-
-
-position::~position(){
-}
-

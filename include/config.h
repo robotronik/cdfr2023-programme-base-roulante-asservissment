@@ -12,88 +12,80 @@
 
 //#define ENABLE_STATISTIC
 
+
+#define pin_ResetDrive 			GPIO15
+#define port_ResetDrive				GPIOA
+#define pin_CoastDrive 			GPIO12
+#define port_CoastDrive				GPIOB
+#define pin_ModeDrive 			GPIO11
+#define port_ModeDrive 				GPIOA
+
 // ESF : Enable Stop on Fault
 //PIN and Port to control MotorA
-// TODO check the pin and port
-#define pin_ModeA 			GPIO0
-#define port_ModeA 				GPIOA
 #define pin_SpeedControlA	GPIO0
 #define port_SpeedControlA		GPIOB
-#define pin_brakeA 			GPIO6
-#define port_brakeA 			GPIOA
-#define pin_directionA 		GPIO4
-#define port_directionA 		GPIOA
-#define pin_resetA 			GPIO5
-#define port_resetA				GPIOC
-#define pin_CoastA 			GPIO1
-#define port_CoastA				GPIOB
-#define pin_esfA 			GPIO10
-#define port_esfA   			GPIOB
-#define pin_info1A			GPIO4
-#define port_info1A				GPIOC
-#define pin_info2A			GPIO7
-#define port_info2A				GPIOA
-#define pin_infoSpeedA		GPIO1
-#define port_infoSpeedA			GPIOA
+#define pin_BrakeA 			GPIO6
+#define port_BrakeA 			GPIOA
+#define pin_DirectionA 		GPIO4
+#define port_DirectionA 		GPIOA
+#define pin_ESFA 			GPIO10
+#define port_ESFA   			GPIOB
+#define pin_Err1A			GPIO4
+#define port_Err1A				GPIOC
+#define pin_Err2A			GPIO7
+#define port_Err2A				GPIOA
+#define pin_TachoA			GPIO5
+#define port_TachoA				GPIOA
+#define pin_InfoDirA		GPIO2
+#define port_InfoDirA			GPIOB
 #define adc_channelA		1
 
 
 //PIN and Port to control MotorB
-// TODO check the pin and port
-#define pin_ModeB 			GPIO12
-#define port_ModeB 				GPIOB
 #define pin_SpeedControlB	GPIO13
 #define port_SpeedControlB		GPIOB
-#define pin_brakeB 			GPIO15
-#define port_brakeB 			GPIOB
-#define pin_directionB 		GPIO14
-#define port_directionB 		GPIOB
-#define pin_resetB 			GPIO9
-#define port_resetB				GPIOC
-#define pin_CoastB 			GPIO8
-#define port_CoastB				GPIOA
-#define pin_esfB 			GPIO10
-#define port_esfB   			GPIOA
-#define pin_info1B			GPIO8
-#define port_info1B				GPIOC
-#define pin_info2B			GPIO7
-#define port_info2B				GPIOC
-#define pin_infoSpeedB		GPIO3
-#define port_infoSpeedB			GPIOC
-#define adc_channelB		13
+#define pin_BrakeB 			GPIO15
+#define port_BrakeB 			GPIOB
+#define pin_DirectionB 		GPIO14
+#define port_DirectionB 		GPIOB
+#define pin_ESFB 			GPIO10
+#define port_ESFB   			GPIOA
+#define pin_Err1B			GPIO8
+#define port_Err1B				GPIOC
+#define pin_Err2B			GPIO7
+#define port_Err2B				GPIOC
+#define pin_TachoB			GPIO6
+#define port_TachoB				GPIOC
+#define pin_InfoDirB		GPIO9
+#define port_InfoDirB			GPIOA
+#define adc_channelB		11
 
 
 //PIN and Port to control MotorC
-// TODO check the pin and port
-#define pin_ModeC 			GPIO12
-#define port_ModeC 				GPIOB
-#define pin_SpeedControlC	GPIO13
+#define pin_SpeedControlC	GPIO1
 #define port_SpeedControlC		GPIOB
-#define pin_brakeC 			GPIO15
-#define port_brakeC 			GPIOB
-#define pin_directionC 		GPIO14
-#define port_directionC 		GPIOB
-#define pin_resetC 			GPIO9
-#define port_resetC				GPIOC
-#define pin_CoastC 			GPIO8
-#define port_CoastC				GPIOA
-#define pin_esfC 			GPIO10
-#define port_esfC   			GPIOA
-#define pin_info1C			GPIO8
-#define port_info1C				GPIOC
-#define pin_info2C			GPIO7
-#define port_info2C				GPIOC
-#define pin_infoSpeedC		GPIO3
-#define port_infoSpeedC			GPIOC
-#define adc_channelC		11
+#define pin_BrakeC 			GPIO12
+#define port_BrakeC 			GPIOB
+#define pin_DirectionC 		GPIO11
+#define port_DirectionC 		GPIOC
+#define pin_ESFC 			GPIO4
+#define port_ESFC   			GPIOB
+#define pin_Err1C			GPIO3
+#define port_Err1C				GPIOB
+#define pin_Err2C			GPIO2
+#define port_Err2C				GPIOD
+#define pin_TachoC			GPIO0
+#define port_TachoC				GPIOA
+#define pin_InfoDirC		GPIO5
+#define port_InfoDirC			GPIOB
+#define adc_channelC		10
 
 
 //PIN and Port to control the to led
-// TODO
-#define pin_led1			GPIO12
-#define port_led1				GPIOA
-#define pin_led2			GPIO15
-#define port_led2				GPIOA
+#define pin_RedLED			GPIO8
+#define port_RedLED				GPIOB
+#define pin_GreenLED		GPIO9
+#define port_GreenLED			GPIOB
 
 // PIN and Port for the buttons
 #define pin_TestButton		GPIO14
@@ -118,7 +110,7 @@
 #define pin_OdoClk			GPIO8
 #define port_OdoClk				GPIOA
 #define pin_OdoSda			GPIO9
-#define port_OdoSda				GPIOC  // TODO Check these
+#define port_OdoSda				GPIOC
 
 //PIN and PORT for I2C   (I2C1)
 #define pin_I2CClk			GPIO6
@@ -128,7 +120,7 @@
 
 
 
-#define DISTANCE_WHEEL 30.0 // TOOD check
+#define DISTANCE_WHEEL 100.0
 #define DIAMETER_WHEEL 60.0
 
 #define PI 3.14159265359

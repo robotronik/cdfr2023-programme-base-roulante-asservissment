@@ -21,14 +21,34 @@
 #define COEFMULT TIMERPERIOD/100
 #define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
+// Coast
+bool driveEnabled = false;
+
+void DriveDisable();
+void DriveEnable();
+// Set the current-decay method.
+void SetDriveMode(int mode);
+// Reset the motor drivers by lowering the reset pin for 10ms
+void ResetDrive();
+void DriveSetup();
+
+
 class Motor
 {
 public:
-    Motor(int motorID);
+    Motor(int motorID, double wheelDiameter, double wheelDistance, double wheelAngle, 
+        int port_SpeedControl, int pin_SpeedControl,
+        int port_Direction, int pin_Direction,
+        int port_Brake, int pin_Brake,
+        int port_ESF, int pin_ESF,
+        int port_Tacho, int pin_Tacho,
+        int port_Err1, int pin_Err1,
+        int port_Err2, int pin_Err2,
+        int port_InfoDir, int pin_InfoDir,
+        tim_oc_id oc_id
+    );
 
     void Setup();
-    void setupGPIO();
-
 
     // Set the speed of the motor with a value between -100 and 100
     // 0 Stops the motor
@@ -43,8 +63,6 @@ public:
 
     void Brake(bool brake);
 
-    void Disable();
-    void Enable();
 
     // value must be bettween 0 and 100
     void SetMaxTorque(int torque);
@@ -60,6 +78,8 @@ public:
 
 private:
 
+    void setupGPIO();
+
     // Set motor driver direction
     void SetDirection(bool reverse);
 
@@ -68,12 +88,14 @@ private:
     // Don't forget to disable reset, coast and brake
     void SetSpeed(int speed);
 
-    // Set the current-decay method.
-    void SetMode(int motorMode);
 
     int id;
     char name;
-    int mode;
+
+    double wheelDiameter;
+    double wheelDistance;
+    double wheelAngle;
+
     uint16_t adc_value = 0;
     int maxTorque = 4096;
     bool motorEn = true;
@@ -81,20 +103,12 @@ private:
     bool doesLimitTorque = false;
 
     // Periferals
-
-    // ADC
-
-    int adc_channel;
+    // PWM timer
+    tim_oc_id oc_id = TIM_OC2; // OC2 for motor A, OC1 for motor B, OC3 for motor C
 
     // Pin definitions
 
     // Output
-    int port_Reset;
-    int pin_Reset;
-    int port_Coast;
-    int pin_Coast;
-    int port_Mode;
-    int pin_Mode;
     int port_SpeedControl;
     int pin_SpeedControl;
     int port_Direction;
@@ -119,6 +133,33 @@ private:
 
 // Create the motor objects
 
-Motor motorA(0);
-Motor motorB(1);
-Motor motorC(2);
+Motor motorA(0, DIAMETER_WHEEL, DISTANCE_WHEEL, 0.0, 
+    port_SpeedControlA, pin_SpeedControlA,
+    port_DirectionA, pin_DirectionA,
+    port_BrakeA, pin_BrakeA,
+    port_ESFA, pin_ESFA,
+    port_TachoA, pin_TachoA,
+    port_Err1A, pin_Err1A,
+    port_Err2A, pin_Err2A,
+    port_InfoDirA, pin_InfoDirA,
+    TIM_OC2);
+Motor motorB(1, DIAMETER_WHEEL, DISTANCE_WHEEL, 120.0, 
+    port_SpeedControlB, pin_SpeedControlB,
+    port_DirectionB, pin_DirectionB,
+    port_BrakeB, pin_BrakeB,
+    port_ESFB, pin_ESFB,
+    port_TachoB, pin_TachoB,
+    port_Err1B, pin_Err1B,
+    port_Err2B, pin_Err2B,
+    port_InfoDirB, pin_InfoDirB,
+    TIM_OC1);
+Motor motorC(2, DIAMETER_WHEEL, DISTANCE_WHEEL, 240.0, 
+    port_SpeedControlC, pin_SpeedControlC,
+    port_DirectionC, pin_DirectionC,
+    port_BrakeC, pin_BrakeC,
+    port_ESFC, pin_ESFC,
+    port_TachoC, pin_TachoC,
+    port_Err1C, pin_Err1C,
+    port_Err2C, pin_Err2C,
+    port_InfoDirC, pin_InfoDirC,
+    TIM_OC3);
