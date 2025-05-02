@@ -94,7 +94,7 @@ void Asservissement::asservissementLoop(){
 
     realErrorAngular = getAngularErrorReel();
     reduceErrorAngular = realErrorAngular-positionControlAngulaire.getPostion();
-    
+
     //Calculate Linear commande
     if(positionControlLineaire.getPostion()==0){
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
@@ -248,8 +248,6 @@ void Asservissement::reset(void){
     pidLineaireBlock.reset();
     pidLineaire.reset();
     nextTime =  get_uptime_ms();
-    statisticLinear.reset();
-    statisticAngular.reset();
     motorA.SetSpeedSigned(0);
     motorB.SetSpeedSigned(0);
     motorC.SetSpeedSigned(0);
