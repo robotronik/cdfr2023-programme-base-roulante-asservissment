@@ -21,6 +21,16 @@
 #define COEFMULT TIMERPERIOD/100
 #define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
+// typedef Enum containing the different fault actions
+typedef enum {
+    FAULT_NONE = 0,
+    FAULT_UNDERVOLTAGE = 1,
+    FAULT_OVERTEMPERATURE = 2,
+    FAULT_LOGIC = 3,
+    FAULT_SHORT = 4,
+    FAULT_LOW_LOAD_CURRENT = 5
+} fault_action_t;
+
 // Coast
 bool driveEnabled = false;
 
@@ -72,6 +82,8 @@ public:
 
     // Returns the current in A
     double GetCurrent();
+
+    fault_action_t GetFault();
 
     // Print useful values
     void PrintValues();

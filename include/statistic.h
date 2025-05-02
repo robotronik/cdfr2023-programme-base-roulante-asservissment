@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stdint.h"
-#include "clock.h"
 #include "AsservissementMath.h"
 
 class Statistic

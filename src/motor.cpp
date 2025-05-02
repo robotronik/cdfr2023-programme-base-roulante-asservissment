@@ -6,6 +6,9 @@
 // BLDC motor driver
 // https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-DGA5/483784.pdf
 
+// TODO
+// Count rising edges on a pin using a timer in external clock mode for tacho
+
 //local fonctions
 static uint8_t current_channel_indx = 0;
 static uint8_t adc_channels[] = {adc_channelA, adc_channelB, adc_channelC};
@@ -146,6 +149,23 @@ double Motor::GetCurrent() {
     return current;
 }
 
+fault_action_t Motor::GetFault(){
+	int err1 = gpio_get(port_Err1, pin_Err1);
+	int err2 = gpio_get(port_Err2, pin_Err2);
+
+	switch (err1 + err2 << 1) {
+		case 0b00: 
+			return FAULT_UNDERVOLTAGE;
+		case 0b01:
+			return FAULT_SHORT;
+		case 0b10:
+			return FAULT_LOW_LOAD_CURRENT;
+		case 0b11:
+			return FAULT_NONE;
+	}
+	return FAULT_NONE;
+}
+
 void Motor::PrintValues() {
     usartprintf(">ADC of %c: %4d /4095\n", adc_value);
     usartprintf(">Current of %c: %lf A\n", GetCurrent());
@@ -178,11 +198,10 @@ void Motor::setupGPIO(void){
 
 	gpio_mode_setup(port_Err1, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err1);
 	gpio_mode_setup(port_Err2, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err2);
+    gpio_mode_setup(port_Tacho, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Tacho);
+	gpio_mode_setup(port_InfoDir, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_InfoDir);
 
-    /* Configure PA5 en entrée analogique */
-    gpio_mode_setup(port_Tacho, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, pin_Tacho);
-
-	Brake(true);
+	Brake(false);
 	SetDirection(false);
 
 	// Disable ESF

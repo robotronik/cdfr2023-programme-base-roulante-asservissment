@@ -94,11 +94,7 @@ int main(void)
 	ledSetup();
     buttonSetup();
 	usartSetup();
-
-	motorA.Setup();
-	motorB.Setup();
-	motorC.Setup();
-
+	DriveSetup();
 	odometrySetup();
 	i2c_setup();
 	setCallbackReceive(I2CRecieveData);

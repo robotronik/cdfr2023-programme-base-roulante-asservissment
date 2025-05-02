@@ -1,7 +1,16 @@
-
 #include "uart.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include "config.h"
+
+#ifdef SIMULATION
+    #include <hardware_interface.h>
+#else
+    #include <libopencm3/stm32/rcc.h>
+    #include <libopencm3/stm32/gpio.h>
+    #include <libopencm3/stm32/usart.h>
+#endif
+
 
 void _uartClock_setup(void);
 void gpio_setup(void);

@@ -25,25 +25,16 @@ To install this project, follow these steps:
 
 Liste des points à améliorer
 
-1. Auto calibration de l’odométrie (déterminer automatiquement la taille et l’écartement des roues codeuses) : 
-    1. (fait) Refaire le buffer circulaire pour optimiser le stockage
-    2. Essayer de trouver un moyen de faire le calcule de la façon la plus optimal
-2. Système de versionnage de l’interface
-3. (fait) Auto génération de l’interface coté STM32
-4. (fait) Sécurisation des commandes et des déplacements (plus de moveForward qui peut casser mais des goto combinant le lookForward et le moveForward)
-5. (commencé) Torque contrôle (pour cogner les mures sans patinage) + (auto set de coordonner)
-6. Faire des courbes
+1. (fait) Auto génération de l’interface coté STM32
+2. (fait) Sécurisation des commandes et des déplacements (plus de moveForward qui peut casser mais des goto combinant le lookForward et le moveForward)
+3. (commencé) Torque contrôle (pour cogner les mures sans patinage) + (auto set de coordonner)
+4. Faire des courbes
     1. Séparation plus claire dans le code entre le générateur position et asservissement
     2. Déterminer une interface (gcode, arc de cercle : se synchroniser avec le path finding)
-7. Continuer à développer le simulateur
-    1. gestion des thread
-    2. simulation de la physique du robot
-8. Simuler le programme principal
-    1.  makefile
-    2. Simulation du lidar
-9. In Application Programming (programmer le stm32 via la liaison I2C)
+5. In Application Programming (programmer le stm32 via la liaison I2C)
 
 
 ## Author
 
-This program was created by Guillaume DALLE. (guillaume.dalle@grenoble-inp.org)
+This program was created by Guillaume DALLE (2023-2025) (guillaume.dalle@grenoble-inp.org)
+and Ludovic BOUCHARD (2025-) (ludovicb1239@gmail.com)

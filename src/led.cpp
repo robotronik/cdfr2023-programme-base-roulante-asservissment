@@ -1,5 +1,15 @@
 #include "led.h"
 
+#ifdef SIMULATION
+    #include <hardware_interface.h>
+#else
+    #include <libopencm3/stm32/rcc.h>
+    #include <libopencm3/stm32/gpio.h>
+    #include <libopencm3/cm3/nvic.h>
+#endif
+
+#include "config.h"
+
 void ledSetup(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
 	gpio_mode_setup(port_RedLED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_RedLED);

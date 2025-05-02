@@ -1,8 +1,7 @@
 #include "AsservissementMath.h"
 #include "uart.h"
 
-
-
+#include <math.h>
 
 double calculAngle(double x, double y, position_t actualPostion){
     double angleTournerPoint;
@@ -23,8 +22,6 @@ double calculAngle(double x, double y, position_t actualPostion){
     angleTournerPoint = mod_angle(angleTournerPoint);
     return angleTournerPoint;
 }
-
-
 
 double mod_angle(double a){
 	a = fmod(a,360);

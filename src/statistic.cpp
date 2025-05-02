@@ -1,5 +1,6 @@
 #include "statistic.h"
-
+#include "clock.h"
+#include "math.h"
 
 Statistic::Statistic(/* args */):lowPassFilter(0.1){
 

@@ -1,12 +1,9 @@
 #pragma once
 
-#include <math.h>
 #include "config.h"
-
 
 double mod_angle(double a);
 double calculAngle(double x, double y, position_t actualPostion);
-
 
 
 class LowPassFilter {
