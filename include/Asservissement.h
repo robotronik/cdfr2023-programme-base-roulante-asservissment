@@ -6,7 +6,6 @@
 #include "positionControl.h"
 #include "position.h"
 #include "Motor.h"
-#include "statistic.h"
 
 
 class Asservissement
@@ -31,8 +30,6 @@ public :
     PID pidAngulaire;
     PID pidLineaireBlock;
     PID pidAngulaireBlock;
-    Statistic statisticLinear;
-    Statistic statisticAngular;
 
 public:
     Asservissement(position& pos);

@@ -225,22 +225,13 @@ void movement::launchCommande(void){
 }
 
 bool movement::currentCommandRun(void){
-//slower chaining of actions with statistics to have a more consistent time
-#ifdef ENABLE_STATISTIC
-    if(currentCommand.baseCommand == BaseCommand::LINEAR){
-        return robotRunning();
-    }
-    else{
-        return robotTurning();
-    }
-#else
+// slower chaining of actions with statistics to have a more consistent time
     if(currentCommand.baseCommand == BaseCommand::LINEAR){
         return getLinearError()!=0;
     }
     else{
         return getAngularError()!=0;
     }
-#endif
 }
 
 void movement::loop(void){
@@ -263,9 +254,6 @@ void movement::loop(void){
             run = true;
         }
         else if(run && !currentCommandRun()){
-#ifdef ENABLE_STATISTIC
-            printStatistic();
-#endif
             if(!commandBuffer.isEmpty()){
                 currentCommand = commandBuffer.pop();
                 launchCommande();

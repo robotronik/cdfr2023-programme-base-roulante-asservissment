@@ -94,12 +94,7 @@ void Asservissement::asservissementLoop(){
 
     realErrorAngular = getAngularErrorReel();
     reduceErrorAngular = realErrorAngular-positionControlAngulaire.getPostion();
-
-#ifdef ENABLE_STATISTIC
-    statisticLinear.update(reduceErrorLinear,timeLastPos);
-    statisticAngular.update(reduceErrorAngular,timeLastPos);
-#endif
-
+    
     //Calculate Linear commande
     if(positionControlLineaire.getPostion()==0){
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);

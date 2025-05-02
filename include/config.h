@@ -10,8 +10,6 @@
 #endif
 #include "type.h"
 
-//#define ENABLE_STATISTIC
-
 
 #define pin_ResetDrive 			GPIO15
 #define port_ResetDrive				GPIOA
