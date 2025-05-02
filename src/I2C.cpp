@@ -1,5 +1,21 @@
 #include "I2C.h"
 
+#ifdef SIMULATION
+    #include <hardware_interface.h>
+#else
+    #include <libopencm3/stm32/i2c.h>
+    #include <libopencm3/stm32/gpio.h>
+    #include <libopencm3/stm32/rcc.h>
+    #include <libopencm3/cm3/nvic.h>
+    #include <libopencm3/stm32/usart.h>
+    #include <libopencm3/stm32/gpio.h>
+    #include <libopencm3/stm32/exti.h>
+#endif
+
+#include <string.h>
+
+#include "config.h"
+#include "uart.h"
 #include "clock.h"
 
 void (*callbacki2cRec)(uint8_t* data, int size);

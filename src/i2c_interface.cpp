@@ -17,7 +17,6 @@ void i2c_interface::setReponseBuffer(uint8_t* data, int size){
     I2CSetBuffer(data,size);
 }
 
-
 void i2c_interface::set_red_led(bool status){
     if (status)
         gpio_set(port_RedLED, pin_RedLED);
@@ -25,15 +24,12 @@ void i2c_interface::set_red_led(bool status){
         gpio_clear(port_RedLED, pin_RedLED);
 }
 
-
-
 void i2c_interface::set_green_led(bool status){
     if (status)
         gpio_set(port_GreenLED, pin_GreenLED);
     else
         gpio_clear(port_GreenLED, pin_GreenLED);
 }
-
 
 void i2c_interface::get_coordinates(int16_t &x, int16_t &y, int16_t &theta){
     position_t posi = posRobot.getPosition();
