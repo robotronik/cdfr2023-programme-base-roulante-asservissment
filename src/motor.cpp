@@ -113,7 +113,7 @@ void Motor::Brake(bool brake){
 
 void Motor::SetSpeed(int speed){
 	speed = CLAMP(speed,0,maxSpeed);
-	int pwmVal = (speed/2 + 50) * COEFMULT;
+	int pwmVal = speed * COEFMULT; // (speed/2 + 50)
 
 	timer_set_oc_value(TIM1, oc_id, pwmVal);
 }
@@ -180,10 +180,9 @@ void setupDriveGPIO(void){
 	gpio_mode_setup(port_CoastDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_CoastDrive);
 	gpio_mode_setup(port_ModeDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeDrive);
 	
+	gpio_set(port_ResetDrive, port_ResetDrive);
 	SetDriveMode(0);
-	gpio_set(port_CoastDrive,pin_CoastDrive);
-	gpio_set(port_ModeDrive,pin_ModeDrive);
-	DriveEnable();
+	DriveDisable();
 }
 
 void Motor::setupGPIO(void){
