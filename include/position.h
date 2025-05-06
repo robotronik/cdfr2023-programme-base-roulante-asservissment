@@ -2,7 +2,7 @@
 #include "config.h"
 #include "clock.h"
 #include "AsservissementMath.h"
-#include "odometry.h"
+#include "Odometry.h"
 
 class position
 {
