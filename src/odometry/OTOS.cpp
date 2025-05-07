@@ -17,7 +17,6 @@ return_t OTOS::begin(I2CDevice& commBus)
     if (commBus.address() != kDefaultAddress)
         return ret_FAIL;
 
-    commBus.begin();
     // Set bus pointer
     _commBus = &commBus;
     // Just check if the device is connected, no other setup is needed
@@ -45,7 +44,7 @@ return_t OTOS::getVersionInfo(otos_version_t &hwVersion, otos_version_t &fwVersi
     // Read hardware and firmware version registers
     uint8_t rawData[2];
     int readBytes;
-    int err = _commBus->readRegister(kRegHwVersion, rawData, sizeof(rawData), readBytes);
+    int err = _commBus->readRegisters(kRegHwVersion, rawData, sizeof(rawData), readBytes);
     if (err != 0)
         return ret_FAIL;
 
@@ -284,7 +283,7 @@ return_t OTOS::getPosVelAcc(position_t &pos, position_t &vel, position_t &acc)
     // Read all pose registers
     uint8_t rawData[18];
     int bytesRead;
-    int err = _commBus->readRegister(kRegPosXL, rawData, 18, bytesRead);
+    int err = _commBus->readRegisters(kRegPosXL, rawData, 18, bytesRead);
     if (err != 0)
         return ret_FAIL;
 
@@ -306,7 +305,7 @@ return_t OTOS::getPosVelAccStdDev(position_t &pos, position_t &vel, position_t &
     // Read all pose registers
     uint8_t rawData[18];
     int bytesRead;
-    int err = _commBus->readRegister(kRegPosStdXL, rawData, 18, bytesRead);
+    int err = _commBus->readRegisters(kRegPosStdXL, rawData, 18, bytesRead);
     if (err != 0)
         return ret_FAIL;
 
@@ -330,7 +329,7 @@ return_t OTOS::getPosVelAccAndStdDev(position_t &pos, position_t &vel, position_
     // Read all pose registers
     uint8_t rawData[36];
     int bytesRead;
-    int err = _commBus->readRegister(kRegPosXL, rawData, 36, bytesRead);
+    int err = _commBus->readRegisters(kRegPosXL, rawData, 36, bytesRead);
     if (err != 0)
         return ret_FAIL;
 
@@ -356,7 +355,7 @@ return_t OTOS::readPoseRegs(uint8_t reg, position_t &pose, float rawToXY, float 
     uint8_t rawData[6];
 
     // Attempt to read the raw pose data
-    int err = _commBus->readRegister(reg, rawData, 6, bytesRead);
+    int err = _commBus->readRegisters(reg, rawData, 6, bytesRead);
     if (err != 0)
         return ret_FAIL;
 
@@ -377,7 +376,7 @@ return_t OTOS::writePoseRegs(uint8_t reg, position_t &pose, float xyToRaw, float
     poseToRegs(rawData, pose, xyToRaw, hToRaw);
 
     // Write the raw data to the device
-    return _commBus->writeRegister(reg, rawData, 6) == 0 ? ret_OK : ret_FAIL;
+    return _commBus->writeRegisters(reg, rawData, 6) == 0 ? ret_OK : ret_FAIL;
 }
 
 void OTOS::regsToPose(uint8_t *rawData, position_t &pose, float rawToXY, float rawToH)

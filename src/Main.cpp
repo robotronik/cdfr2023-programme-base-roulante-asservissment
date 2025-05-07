@@ -11,6 +11,8 @@
 #include "movement.h"
 #include "i2c_interface.h"
 #include "button.h"
+#include "odometry/I2Cdevice.h"
+#include "odometry/OTOS.h"
 
 // #define TESTMOTOR
 
@@ -25,6 +27,8 @@ void *__dso_handle = 0;
 position posRobot;
 movement robotAsserv(posRobot);
 i2c_interface robotI2cInterface(posRobot, robotAsserv);
+I2CDevice i2cDevice(0x17);
+OTOS otos;
 
 void I2CRecieveData(uint8_t* data, int size){
     robotI2cInterface.I2CDataSwitch(data, size);
@@ -100,12 +104,19 @@ int main(void)
 	DriveSetup();
 	odometrySetup();
 	i2c_setup();
+	setupDeviceI2C();
 	setCallbackReceive(I2CRecieveData);
 
 
 	//WAIT
 	delay_ms(3000);
 	usartprintf("Start\n");
+
+	// Check the connection with the OTOS
+	if (otos.begin(i2cDevice) != ret_OK) {
+		usartprintf("OTOS not connected\n");
+		while (1);
+	}
 
 //
 // Test motor
