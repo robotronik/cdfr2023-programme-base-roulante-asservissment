@@ -3,7 +3,7 @@
 #ifdef SIMULATION_POSITION_CONTROL
     uint32_t TIME_;
 
-    void SET_TIME_(uint32_t time){
+    void SET_TIME_(uint32_t time) {
         TIME_ = time;
     }
 
@@ -38,7 +38,7 @@ positionControl::~positionControl(){
 
 }
 
-void positionControl::reset(double initialValue){
+void positionControl::reset(double initialValue) {
     consigne = initialValue;
     position = initialValue;
     vitesse = 0.0;
@@ -63,17 +63,17 @@ void positionControl::stop(void){
     computeStroke(true);
 }
 
-void positionControl::setPosition(double initialValue){
+void positionControl::setPosition(double initialValue) {
     position = initialValue;
     computeStroke();
 }
 
-void positionControl::setConsigne(double setConsigne){
+void positionControl::setConsigne(double setConsigne) {
     consigne = setConsigne;
     computeStroke();
 }
 
-void positionControl::setMaxSpeedOut(double max){
+void positionControl::setMaxSpeedOut(double max) {
     maxSpeedOut = max;
     computeStroke();
 }
@@ -83,12 +83,12 @@ void positionControl::computeStroke(bool forceStop) {
     decelerationAv = forceStop ? decelerationStopAv : decelerationMaxAv;
     decelerationAr = forceStop ? decelerationStopAr : decelerationMaxAr;
     //genstion du mouvement Avant
-    if(consigne != position){
-        if(consigne-position>0){
+    if (consigne != position) {
+        if (consigne-position>0) {
             computeDT(abs(consigne - position),vitesseMaxAv,accelerationMaxAv,decelerationAv);
         }
         //genstion du mouvement Arrière
-        else if(consigne-position<0){
+        else if (consigne-position<0) {
             computeDT(abs(consigne - position),vitesseMaxAr,accelerationMaxAr,decelerationAr);
         }
         startSpeed = vitesse;
@@ -97,13 +97,13 @@ void positionControl::computeStroke(bool forceStop) {
     }
 }
 
-void positionControl::computeDT(double distance,double vitesseMax, double acceleration, double deceleration){
+void positionControl::computeDT(double distance,double vitesseMax, double acceleration, double deceleration) {
     double vitesseInitial = vitesse;
     double vitesseFinal = getMaxSpeedOut();
     double maxSpeed;
 
 #ifndef SIMULATION_POSITION_CONTROL
-    if(vitesseInitial>vitesseMax){
+    if (vitesseInitial>vitesseMax) {
         usartprintf("Error : initial speed greater than maximum speed \n");
         vitesseMax = vitesseInitial; //to avoid bigger problems
     }
@@ -124,7 +124,7 @@ void positionControl::computeDT(double distance,double vitesseMax, double accele
         t_accel = (maxSpeed - vitesseInitial) / acceleration;
         t_decel = (maxSpeed - vitesseFinal) / deceleration;
 
-        if(t_decel < 0){
+        if (t_decel < 0) {
             t_decel = 0;
             maxSpeed = sqrt(vitesseInitial * vitesseInitial + 2 * acceleration * distance);
             t_accel = (maxSpeed - vitesseInitial) / acceleration;
@@ -146,7 +146,7 @@ double positionControl::getPostion(){
 void positionControl::updatePosition(){
     double time = (double)(get_uptime_ms()-startTimeMs)/1000;
     //genstion du mouvement Avant
-    if(consigne-position>0){
+    if (consigne-position>0) {
         if (time < t_accel) {
             double distance = startSpeed * time + 0.5 * accelerationMaxAv * time * time;
             position = startPosition + distance;
@@ -165,7 +165,7 @@ void positionControl::updatePosition(){
         }
     }
     //genstion du mouvement Arrière
-    else{
+    else {
         if (time < t_accel) {
             double distance = startSpeed * time + 0.5 * accelerationMaxAr * time * time;
             position = startPosition - distance;
@@ -188,7 +188,7 @@ void positionControl::updatePosition(){
 void positionControl::updateSpeed(){
     double time = (double)(get_uptime_ms()-startTimeMs)/1000;
     //genstion du mouvement Avant
-    if(consigne-position>0){
+    if (consigne-position>0) {
         if (time < t_accel) {
             vitesse = accelerationMaxAv * time + startSpeed;
         }
@@ -201,7 +201,7 @@ void positionControl::updateSpeed(){
         }
     }
     //genstion du mouvement Arrière
-    else{
+    else {
         if (time < t_accel) {
             vitesse = accelerationMaxAr * time + startSpeed;
         }
@@ -217,14 +217,14 @@ void positionControl::updateSpeed(){
 
 double positionControl::getMaxSpeedOut(){
     double localmaxSpeedOut = maxSpeedOut;
-    if(consigne-position>0){
-        if(maxSpeedOut > vitesseMaxAv){
+    if (consigne-position>0) {
+        if (maxSpeedOut > vitesseMaxAv) {
             localmaxSpeedOut = vitesseMaxAv;
         }
     }
     //genstion du mouvement Arrière
-    else if(consigne-position<0){
-        if(maxSpeedOut > vitesseMaxAr){
+    else if (consigne-position<0) {
+        if (maxSpeedOut > vitesseMaxAr) {
             localmaxSpeedOut = vitesseMaxAr;
         }
     }
@@ -237,10 +237,10 @@ bool positionControl::getMove(){
 }
 
 int positionControl::getBrakingDistance(){
-    if(consigne-position>0){
+    if (consigne-position>0) {
         return (vitesse*vitesse)/(decelerationStopAv);
     }
-    else{
+    else {
         return -(vitesse*vitesse)/(decelerationStopAr);
     }
 }

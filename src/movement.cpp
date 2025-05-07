@@ -1,11 +1,11 @@
 #include "movement.h"
 #include <atomic>
 
-movement::movement(position& pos):Asservissement(pos){
+movement::movement():Asservissement(){
 }
 
-bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direction){
-    if(commandBuffer.getAvailableSpace()>=2){
+bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direction) {
+    if (commandBuffer.getAvailableSpace()>=2) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
             x,
@@ -23,14 +23,14 @@ bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direct
             Rotation::SHORTEST    //useless
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
 }
 
-bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst, Direction direction, Rotation rotationSecond){
-    if(commandBuffer.getAvailableSpace()>=3){
+bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst, Direction direction, Rotation rotationSecond) {
+    if (commandBuffer.getAvailableSpace()>=3) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
             x,
@@ -56,14 +56,14 @@ bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFir
             rotationSecond
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
 }
 
-bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
-    if(!commandBuffer.isFull()){
+bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation) {
+    if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_THETA,
             0,                  //useless
@@ -73,14 +73,14 @@ bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
             rotation
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
 }
 
-bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Direction direction){
-    if(!commandBuffer.isFull()){
+bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Direction direction) {
+    if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
             x,
@@ -90,14 +90,14 @@ bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Directio
             rotation
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
 }
 
-bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration){
-    if(!commandBuffer.isFull()){
+bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
+    if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::MAX_SPEED_LINEAR,
             max_speed,
@@ -107,14 +107,14 @@ bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceler
             Rotation::NONE          //usless
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
 }
 
-bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration){
-    if(!commandBuffer.isFull()){
+bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
+    if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::MAX_SPEED_ANGULAR,
             max_speed,
@@ -124,7 +124,7 @@ bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_accele
             Rotation::NONE          //usless
         });
     }
-    else{
+    else {
         return -1;
     }
     return 0;
@@ -161,13 +161,13 @@ void movement::launchCommande(void){
         break;
 
     case BaseCommand::ANGULAR_LOOKAT:
-        if(currentCommand.direction == Direction::SHORTEST){
+        if (currentCommand.direction == Direction::SHORTEST) {
             Asservissement::setConsigneLookAt(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
-        else if(currentCommand.direction == Direction::FORWARD){
+        else if (currentCommand.direction == Direction::FORWARD) {
             Asservissement::setConsigneLookAtForward(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
-        else{
+        else {
             Asservissement::setConsigneLookAtBackward(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
         break;
@@ -201,10 +201,10 @@ void movement::launchCommande(void){
 
 bool movement::currentCommandRun(void){
 // slower chaining of actions with statistics to have a more consistent time
-    if(currentCommand.baseCommand == BaseCommand::LINEAR){
+    if (currentCommand.baseCommand == BaseCommand::LINEAR) {
         return getLinearError()!=0;
     }
-    else{
+    else {
         return getAngularError()!=0;
     }
 }
@@ -212,34 +212,34 @@ bool movement::currentCommandRun(void){
 void movement::loop(void){
     Asservissement::loop();
 
-    if(enablePause && !pause){
+    if (enablePause && !pause) {
         Asservissement::setConsigneStop();
         pause = true;
     }
 
-    if(!enablePause && pause){
+    if (!enablePause && pause) {
         launchCommande();
         pause = false;
     }
 
-    if(!pause){
-        if(!run && !commandBuffer.isEmpty()){
+    if (!pause) {
+        if (!run && !commandBuffer.isEmpty()) {
             currentCommand = commandBuffer.pop();
             launchCommande();
             run = true;
         }
-        else if(run && !currentCommandRun()){
-            if(!commandBuffer.isEmpty()){
+        else if (run && !currentCommandRun()) {
+            if (!commandBuffer.isEmpty()) {
                 currentCommand = commandBuffer.pop();
                 launchCommande();
             }
-            else{
+            else {
                 run = false;
             }
         }
     }
 
-    if(enableStop == true){
+    if (enableStop == true) {
         enableStop = false;
         commandBuffer.resetHead();
         Asservissement::setConsigneStop();
@@ -248,7 +248,4 @@ void movement::loop(void){
 
 uint16_t movement::getCommandBufferSize(){
     return commandBuffer.getUsedSpace() + run;
-}
-
-movement::~movement(){
 }

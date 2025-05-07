@@ -38,7 +38,7 @@ is switched off during a PWM-off cycle. In the fast-decay mode,
 MODE = 0, the device switches both the high-side and low-side
 MOSFETs. 
 */
-void SetDriveMode(int mode){
+void SetDriveMode(int mode) {
 	if (mode == 1)
 		gpio_set(port_ModeDrive, pin_ModeDrive);
 	else
@@ -89,23 +89,23 @@ void Motor::Setup(){
 	setupGPIO();
 }
 
-void Motor::SetSpeedSigned(int speed){
+void Motor::SetSpeedSigned(int speed) {
 	SetSpeedUnsigned(abs(speed), speed<0);
 }
 
-void Motor::SetSpeedUnsigned(int speed, bool reverse){
+void Motor::SetSpeedUnsigned(int speed, bool reverse) {
 	SetDirection(reverse);
 	SetSpeed(speed);
 }
 
-void Motor::SetDirection(bool reverse){
+void Motor::SetDirection(bool reverse) {
 	if (reverse)
 		gpio_set(_port_Direction,_pin_Direction);
 	else
 		gpio_clear(_port_Direction,_pin_Direction);
 }
 
-void Motor::Brake(bool brake){
+void Motor::Brake(bool brake) {
 	if (brake)
 		gpio_clear(_port_Brake,_pin_Brake);	
 	else
@@ -113,18 +113,18 @@ void Motor::Brake(bool brake){
 }
 
 
-void Motor::SetSpeed(int speed){
+void Motor::SetSpeed(int speed) {
 	speed = CLAMP(speed,0,maxSpeed);
 	int pwmVal = speed * COEFMULT; // (speed/2 + 50)
 
 	timer_set_oc_value(TIM1, _oc_id, pwmVal);
 }
 
-void Motor::SetMaxSpeed(int max){
+void Motor::SetMaxSpeed(int max) {
 	maxSpeed = CLAMP(max,0,100);
 }
 
-void Motor::SetMaxTorque(int torque){
+void Motor::SetMaxTorque(int torque) {
 	maxTorque = (torque*4096)/100;
 	if (maxTorque > 4095) {
 		doesLimitTorque = false;
@@ -136,7 +136,7 @@ void Motor::SetMaxTorque(int torque){
 }
 
 // Returns the current in A
-double Motor::GetCurrent() {
+double Motor::GetCurrent(){
 	// ADC value between 0 and 4095
 	// Resistor value = 0.018 Ohm
 	// Vref = 3.3V
@@ -168,7 +168,7 @@ fault_action_t Motor::GetFault(){
 	return FAULT_NONE;
 }
 
-void Motor::PrintValues() {
+void Motor::PrintValues(){
     usartprintf(">ADC of %c: %4d /4095\n", adc_value);
     usartprintf(">Current of %c: %lf A\n", GetCurrent());
 }
@@ -294,7 +294,7 @@ void setuptimer(void){
 	timer_enable_counter(TIM1);
 }
 
-void adc_setup(void) {
+void adc_setup(void){
 
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOC);
@@ -323,7 +323,7 @@ void adc_setup(void) {
 }
 
 // Fonction d'interruption pour l'ADC
-void adc_isr(void) {
+void adc_isr(void){
     if (adc_eoc(ADC1)) { // Vérifier si la conversion est terminée
 		if (adc_values_registers[current_channel_indx] != NULL) {
 			*adc_values_registers[current_channel_indx] = adc_read_regular(ADC1);

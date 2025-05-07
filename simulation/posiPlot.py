@@ -52,7 +52,7 @@ def calculate_speed(data, time):
             speed = distance_diff / time_diff  # Vitesse en mm/ms
             speed = max(-1000, min(1000, speed))
 
-        if(i>=2):
+        if (i>=2):
             if time_diff == 0:
                 acceleration = 0
             else:

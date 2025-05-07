@@ -66,27 +66,27 @@ void i2c1_er_isr(void){
 	sr1 = I2C1_SR1;
 	sr2 = I2C1_SR2;
 	(void)sr2;
-	if(sr1 & I2C_SR1_SMBALERT){
+	if (sr1 & I2C_SR1_SMBALERT) {
 		usartprintf("I2C ERROR SMBALERT\n");
 		sr1 |= I2C_SR1_SMBALERT;
 	}
-	if(sr1 & I2C_SR1_TIMEOUT){
+	if (sr1 & I2C_SR1_TIMEOUT) {
 		usartprintf("I2C ERROR TIMEOUT\n");
 		sr1 |= I2C_SR1_TIMEOUT;
 	}
-	if(sr1 & I2C_SR1_PECERR){
+	if (sr1 & I2C_SR1_PECERR) {
 		usartprintf("I2C ERROR PECERR\n");
 		sr1 |= I2C_SR1_PECERR;
 	}
-	if(sr1 & I2C_SR1_OVR){
+	if (sr1 & I2C_SR1_OVR) {
 		usartprintf("I2C ERROR OVR\n");
 		sr1 |= I2C_SR1_OVR;
 	}
-	if(sr1 & I2C_SR1_AF){
+	if (sr1 & I2C_SR1_AF) {
 		usartprintf("I2C ERROR SMBAFALERT\n");
 		sr1 |= I2C_SR1_AF;
 	}
-	if(sr1 & I2C_SR1_BERR){
+	if (sr1 & I2C_SR1_BERR) {
 		usartprintf("I2C ERROR BERR\n");
 		sr1 |= I2C_SR1_BERR;
 	}
@@ -98,74 +98,74 @@ void i2c1_ev_isr(void){
 	sr2 = I2C1_SR2;
 	(void)sr2;
 
-	if(sr1 & I2C_SR1_ADDR){
+	if (sr1 & I2C_SR1_ADDR) {
 		reading = 0;
 		sending = 0;
 
 		//TOFIX here a small delay to fix hadware problem on the raspberry pi
 		// https://www.advamation.com/knowhow/raspberrypi/rpi-i2c-bug.html
-		for(int i = 0; i <500; i++){
+		for(int i = 0; i <500; i++) {
 			asm("nop");
 		}
 		// end TOFIX
 
-		if(sr2 & I2C_SR2_TRA){
+		if (sr2 & I2C_SR2_TRA) {
 			communicationType = DIRSEND;
-			if(callbackinitialiseTrans){
+			if (callbackinitialiseTrans) {
 				callbacki2cTrans();
 			}
 		}
-		else{
+		else {
 			communicationType = DIRRECEIVE;
 		}
 	}
-	else if(sr1 & I2C_SR1_TxE){
-		if(sending<BUFFERSIZE){
+	else if (sr1 & I2C_SR1_TxE) {
+		if (sending<BUFFERSIZE) {
 			i2c_send_data(I2C1,bufsend[sending]);
 			sending++;
 		}
-		else{
+		else {
 			i2c_send_data(I2C1,0);
 		}
 	}
-	else if(sr1 & I2C_SR1_RxNE){
-		if(reading<BUFFERSIZE){
+	else if (sr1 & I2C_SR1_RxNE) {
+		if (reading<BUFFERSIZE) {
 			bufrec[reading] = i2c_get_data(I2C1);
 			reading++;
 		}
-		else{
+		else {
 			i2c_get_data(I2C1);
             usartprintf("error i2c\n");
 		}
 	}
-	else if(sr1 & I2C_SR1_STOPF){
+	else if (sr1 & I2C_SR1_STOPF) {
 		i2c_peripheral_enable(I2C1);
 		i2c_enable_ack(I2C1);
-		if(callbackinitialiseRec && communicationType == DIRRECEIVE){
+		if (callbackinitialiseRec && communicationType == DIRRECEIVE) {
 			callbacki2cRec(bufrec,reading);
 			sending = 0;
 		}
 	}
-	else{
+	else {
 		usartprintf("error i2c\n");
 	}
 }
 
-void I2CGetBufffer(uint8_t* data, int size){
-	if(size>BUFFERSIZE){
+void I2CGetBufffer(uint8_t* data, int size) {
+	if (size>BUFFERSIZE) {
 		size = BUFFERSIZE;
 	}
 	memcpy(data,bufrec,BUFFERSIZE);
 }
 
-void I2CSetBuffer(uint8_t* data, int size){
-	if(size>BUFFERSIZE){
+void I2CSetBuffer(uint8_t* data, int size) {
+	if (size>BUFFERSIZE) {
 		size = BUFFERSIZE;
 	}
 	memcpy(bufsend,data,BUFFERSIZE);
 }
 
-void setCallbackReceive(void (*f)(uint8_t* data, int size)){
+void setCallbackReceive(void (*f)(uint8_t* data, int size)) {
 	callbacki2cRec = f;
 	callbackinitialiseRec =  true;
 }
@@ -174,7 +174,7 @@ void disableCallbackReceive(void){
 	callbackinitialiseRec =  false;
 }
 
-void setCallbackTransmit(void (*f)(void)){
+void setCallbackTransmit(void (*f)(void)) {
 	callbacki2cTrans = f;
 	callbackinitialiseTrans =  true;
 }

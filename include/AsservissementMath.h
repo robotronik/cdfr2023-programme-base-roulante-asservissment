@@ -14,7 +14,7 @@ private:
     uint32_t prev_time;
 
 public:
-    LowPassFilter(double tau): tau_filter(tau){
+    LowPassFilter(double tau): tau_filter(tau) {
         reset();
     }
 

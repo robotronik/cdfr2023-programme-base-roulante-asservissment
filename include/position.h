@@ -1,26 +1,12 @@
 #pragma once
 #include "structs.h"
 
-class position
-{
-public:
-    position();
+extern position_t pos;
+extern position_t vel;
+extern position_t acc;
 
-    void loop(void);
+void updatePositionData();
 
-    void setPosition(position_t inCommingposition);
-    void setPosition(double x, double y, double a);
-
-
-    position_t getPosition();
-    double getPosition_X();
-    double getPosition_Y();
-    double getPosition_Teta();
-    double getPosition_Time();
-    bool getPositionChanged();
-private:
-    position_t positionRobot = {0.0, 0.0, 0.0};
-    position_t newPosition = {0.0, 0.0, 0.0};
-    bool needChangePos = false;
-    bool positionChanged = false;
-};
+void setPosition(position_t inCommingposition);
+void setPosition(double x, double y, double a);
+bool getPositionChanged();

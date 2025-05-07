@@ -34,7 +34,7 @@ extern "C" {
             current = positionControlLineaire.getPostion();
             vecData.push_back(current);
             vecTime.push_back(i*20);
-            if(i==50){
+            if (i==50) {
                 positionControlLineaire.stop();
                 // positionControlLineaire.setMaxSpeedOut(0);
                 // positionControlLineaire.setConsigne(-500);

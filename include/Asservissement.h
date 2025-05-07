@@ -20,8 +20,6 @@ private:
     uint32_t nextTime;
     int loopPeriod = 50;
 
-    position posRobot;
-
 public :
     positionControl positionControlLineaire;
     positionControl positionControlAngulaire;
@@ -31,8 +29,7 @@ public :
     PID pidAngulaireBlock;
 
 public:
-    Asservissement(position& pos);
-    ~Asservissement();
+    Asservissement();
 
     void loop();
     void asservissementLoop();

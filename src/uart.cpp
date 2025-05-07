@@ -32,7 +32,7 @@ void usartSetup(void){
 	usart_enable(USART2);
 }
 
-void usartSendMessage(uint32_t usart, char* Message){
+void usartSendMessage(uint32_t usart, char* Message) {
 	int i = 0;
 	while (Message[i] != 0)	{
 		usart_send_blocking(usart,Message[i]);

@@ -13,9 +13,9 @@ class I2CDevice
         int writeRegisters(uint8_t reg, uint8_t *data, uint8_t size);
         int writeRegister(uint8_t reg, uint8_t data);
         void setAddress(uint8_t address);
-        uint8_t address() { return _address; }
+        uint8_t address(){ return _address; }
         void setRetries(uint8_t retries) { _retries = retries; }
-        uint8_t getRetries() { return _retries; }
+        uint8_t getRetries(){ return _retries; }
     private:
         int _i2c;
         uint8_t _address;

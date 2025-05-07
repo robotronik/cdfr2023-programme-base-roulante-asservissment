@@ -125,12 +125,12 @@ class OTOS
 {
   public:
     /// @brief Default constructor, only initializes member variables
-    OTOS();
+    OTOS(I2CDevice* i2c_bus);
 
     /// @brief Begins the Qwiic OTOS and verifies it is connected
     /// @param commBus I2C bus to use for communication
     /// @return 0 for succuss, negative for errors, positive for warnings
-    return_t begin(I2CDevice& commBus);
+    return_t begin();
 
     /// @brief Checks if the device is connected
     /// @return 0 for succuss, negative for errors, positive for warnings
@@ -430,3 +430,6 @@ class OTOS
     static constexpr float kRpssToInt16 = 32768.0f / (M_PI * 1000.0f);
     static constexpr float kInt16ToRpss = 1.0f / kRpssToInt16;
 };
+
+extern OTOS otos;
+extern I2CDevice i2cDevice;

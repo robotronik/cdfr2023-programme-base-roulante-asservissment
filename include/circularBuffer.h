@@ -27,7 +27,7 @@ public:
     }
 
     int getAvailableSpace() const {
-        if(headIsReset){
+        if (headIsReset) {
             return N - head;
         }
         else if (tail >= head) {
@@ -49,7 +49,7 @@ public:
 // loop side
 //******************************************************
 
-    T pop() {
+    T pop(){
         T item = buffer[head];
         head = (head + 1) % (N+1);
         return item;
@@ -66,10 +66,10 @@ public:
 
     //not protected
     bool isEmpty() const {
-        if(headIsReset){
+        if (headIsReset) {
             return true;
         }
-        else{
+        else {
             return (head == tail);
         }
     }

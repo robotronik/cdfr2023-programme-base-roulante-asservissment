@@ -1,7 +1,6 @@
 #include "config.h"
 #include "Motor.h"
 #include "uart.h"
-#include "Odometry.h"
 #include "clock.h"
 #include "I2C.h"
 #include "led.h"
@@ -24,17 +23,14 @@
 // This is needed for the linker to find the __dso_handle symbol
 void *__dso_handle = 0;
 
-position posRobot;
-movement robotAsserv(posRobot);
-i2c_interface robotI2cInterface(posRobot, robotAsserv);
-I2CDevice i2cDevice(0x17);
-OTOS otos;
+movement robotAsserv;
+i2c_interface robotI2cInterface(robotAsserv);
 
-void I2CRecieveData(uint8_t* data, int size){
+void I2CRecieveData(uint8_t* data, int size) {
     robotI2cInterface.I2CDataSwitch(data, size);
 }
 
-void testloop(sequence* seq){
+void testloop(sequence* seq) {
 
 	seq->start();
 
@@ -100,23 +96,27 @@ int main(void)
 	clock_setup();
 	ledSetup();
     buttonSetup();
+		RedLED_Set();
 	usartSetup();
 	DriveSetup();
-	odometrySetup();
 	i2c_setup();
 	setupDeviceI2C();
 	setCallbackReceive(I2CRecieveData);
 
 
 	//WAIT
-	delay_ms(3000);
+	delay_ms(1000);
 	usartprintf("Start\n");
 
 	// Check the connection with the OTOS
-	if (otos.begin(i2cDevice) != ret_OK) {
+	while (otos.begin() != ret_OK) {
 		usartprintf("OTOS not connected\n");
-		while (1);
+		RedLED_Toggle();
+		delay_ms(200);
 	}
+	usartprintf("OTOS connected\n");
+	RedLED_Clear();
+	
 
 //
 // Test motor
@@ -124,7 +124,7 @@ int main(void)
 //
 #ifdef TESTMOTOR
     enableMotor();
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < 100; i++) {
         usartprintf("%d\n",i);
         motorSpeedSignedL(i);
         motorSpeedSignedR(i);
@@ -132,7 +132,7 @@ int main(void)
         usartprintf("Right : %d %d\n",gpio_get(port_info1R,pin_info1R),gpio_get(port_info2R,pin_info2R));
         usartprintf("Left : %d %d\n\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L));
     }
-    for (int i = 100; i > -100; i--){
+    for (int i = 100; i > -100; i--) {
         usartprintf("%d\n",i);
         motorSpeedSignedL(i);
         motorSpeedSignedR(i);
@@ -141,7 +141,7 @@ int main(void)
         usartprintf("Left : %d %d\n\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L));
     }
 
-    for (int i = -100; i < 0; i++){
+    for (int i = -100; i < 0; i++) {
         usartprintf("%d\n",i);
         motorSpeedSignedL(i);
         motorSpeedSignedR(i);
@@ -165,26 +165,26 @@ int main(void)
     // Reset because the stm has been booted for 3 seconds
 	robotAsserv.reset();
 
-	while (1){
-		posRobot.loop();
+	while (1) {
+		updatePositionData();
         robotAsserv.loop();
 
-        if(readTestButton() && !enableDebug){
+        if (readTestButton() && !enableDebug) {
             enableDebug = true;
             mySeq.reset();
         }
-        else if(enableDebug){
+        else if (enableDebug) {
             testloop(&mySeq);
         }
 
         dbg.interval([](){
-			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n",posRobot.getPosition_X(),posRobot.getPosition_Y(),posRobot.getPosition_Teta());;
-		},1000);
+			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n", pos.x, pos.y, pos.a);;
+		},100);
 
 		//BLINK LED
 		ledToggleSeq.interval([](){
-			RedLED_Toggle();
-		},1000);
+			GreenLED_Toggle();
+		},800);
 	}
 
 	return 0;

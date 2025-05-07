@@ -3,7 +3,7 @@
 // Fonction qui prend en entrée un pointeur de fonction
 
 
-sequence::sequence(/* args */){
+sequence::sequence(/* args */) {
     startTime = get_uptime_ms();
 }
 
@@ -18,8 +18,8 @@ void sequence::reset(void){
 
 void sequence::delay(FunctionPointer func, uint32_t delay) {
     Time += delay;
-    if(Time < get_uptime_ms()){
-        if(avancement <= count){
+    if (Time < get_uptime_ms()) {
+        if (avancement <= count) {
             avancement++;
             func();
         }
@@ -28,7 +28,7 @@ void sequence::delay(FunctionPointer func, uint32_t delay) {
 }
 
 void sequence::interval(FunctionPointer func, uint32_t delay) {
-    if(startTime < get_uptime_ms()){
+    if (startTime < get_uptime_ms()) {
         startTime = get_uptime_ms() + delay;
         func();
     }

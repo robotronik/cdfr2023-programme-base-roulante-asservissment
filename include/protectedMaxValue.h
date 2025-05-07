@@ -21,7 +21,7 @@ public:
     void setRange(T minValue, T maxValue) {
         MinValue = minValue;
         MaxValue = maxValue;
-        if(Value < MinValue){
+        if (Value < MinValue) {
             Value = MinValue;
             if (onChange1)onChange1(Value);
         }
@@ -54,13 +54,13 @@ public:
     }
 
     protectedMaxValue& operator=(T newValue) {
-        if(newValue < MinValue){
+        if (newValue < MinValue) {
             Value = MinValue;
         }
         else if (newValue > MaxValue) {
             Value = MaxValue;
         }
-        else{
+        else {
             Value = newValue;
         }
         if (onChange1)onChange1(Value);

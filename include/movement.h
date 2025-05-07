@@ -37,8 +37,7 @@ private:
     StatesMovement currentState = RUN;
 
 public:
-    movement(position& pos);
-    ~movement();
+    movement();
     bool goToPoint(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::SHORTEST);
     bool goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::SHORTEST, Rotation rotationSecond = Rotation::SHORTEST);
     bool setConsigneAngulaire(int16_t angle,Rotation rotation);
