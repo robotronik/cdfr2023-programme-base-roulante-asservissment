@@ -17,25 +17,25 @@ void i2c_interface::setReponseBuffer(uint8_t* data, int size){
     I2CSetBuffer(data,size);
 }
 
-void i2c_interface::set_red_led(bool status){
+void i2c_interface::set_led_1(bool status){
     if (status)
-        gpio_set(port_RedLED, pin_RedLED);
+        RedLED_Set();
     else
-        gpio_clear(port_RedLED, pin_RedLED);
+        RedLED_Clear();
 }
 
-void i2c_interface::set_green_led(bool status){
+void i2c_interface::set_led_2(bool status){
     if (status)
-        gpio_set(port_GreenLED, pin_GreenLED);
+        GreenLED_Set();
     else
-        gpio_clear(port_GreenLED, pin_GreenLED);
+        GreenLED_Clear();
 }
 
 void i2c_interface::get_coordinates(int16_t &x, int16_t &y, int16_t &theta){
     position_t posi = posRobot.getPosition();
     x = posi.x;
     y = posi.y;
-    theta = posi.teta;
+    theta = posi.a;
 }
 
 void i2c_interface::set_coordinates(int16_t x, int16_t y, int16_t theta){
@@ -98,7 +98,7 @@ void i2c_interface::get_current_target(int16_t &x, int16_t &y, int16_t &theta){
     position_t consigne = robotAsserv.getCurrentConsigne();
     x = consigne.x;
     y = consigne.y;
-    theta = consigne.teta;
+    theta = consigne.a;
 }
 
 bool i2c_interface::get_moving_is_done(){

@@ -2,12 +2,16 @@
 #include "uart.h"
 #include "clock.h"
 #include "math.h"
+#include "config.h"
 
 // BLDC motor driver
 // https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-DGA5/483784.pdf
 
 // TODO
 // Count rising edges on a pin using a timer in external clock mode for tacho
+
+// Coast
+static bool driveEnabled = false;
 
 //local fonctions
 static uint8_t current_channel_indx = 0;
@@ -58,8 +62,7 @@ void DriveSetup(){
 	adc_setup();
 }
 
-Motor::Motor(int motorID, double wheelDiameter, double wheelDistance, double wheelAngle, 
-	int port_SpeedControl, int pin_SpeedControl,
+Motor::Motor(int motorID, int port_SpeedControl, int pin_SpeedControl,
 	int port_Direction, int pin_Direction,
 	int port_Brake, int pin_Brake,
 	int port_ESF, int pin_ESF,
@@ -68,16 +71,15 @@ Motor::Motor(int motorID, double wheelDiameter, double wheelDistance, double whe
 	int port_Err2, int pin_Err2,
 	int port_InfoDir, int pin_InfoDir,
 	tim_oc_id oc_id) :
-	id(motorID), wheelDiameter(wheelDiameter), wheelDistance(wheelDistance), wheelAngle(wheelAngle),
-	port_SpeedControl(port_SpeedControl), pin_SpeedControl(pin_SpeedControl),
-	port_Direction(port_Direction), pin_Direction(pin_Direction),
-	port_Brake(port_Brake), pin_Brake(pin_Brake),
-	port_ESF(port_ESF), pin_ESF(pin_ESF),
-	port_Tacho(port_Tacho), pin_Tacho(pin_Tacho),
-	port_Err1(port_Err1), pin_Err1(pin_Err1),
-	port_Err2(port_Err2), pin_Err2(pin_Err2),
-	port_InfoDir(port_InfoDir), pin_InfoDir(pin_InfoDir),
-	oc_id(oc_id)
+	id(motorID), _port_SpeedControl(port_SpeedControl), _pin_SpeedControl(pin_SpeedControl),
+	_port_Direction(port_Direction), _pin_Direction(pin_Direction),
+	_port_Brake(port_Brake), _pin_Brake(pin_Brake),
+	_port_ESF(port_ESF), _pin_ESF(pin_ESF),
+	_port_Tacho(port_Tacho), _pin_Tacho(pin_Tacho),
+	_port_Err1(port_Err1), _pin_Err1(pin_Err1),
+	_port_Err2(port_Err2), _pin_Err2(pin_Err2),
+	_port_InfoDir(port_InfoDir), _pin_InfoDir(pin_InfoDir),
+	_oc_id(oc_id)
 {
 	name = 'A' + motorID;
 	adc_values_registers[id] = &adc_value;
@@ -98,16 +100,16 @@ void Motor::SetSpeedUnsigned(int speed, bool reverse){
 
 void Motor::SetDirection(bool reverse){
 	if (reverse)
-		gpio_set(port_Direction,pin_Direction);
+		gpio_set(_port_Direction,_pin_Direction);
 	else
-		gpio_clear(port_Direction,pin_Direction);
+		gpio_clear(_port_Direction,_pin_Direction);
 }
 
 void Motor::Brake(bool brake){
 	if (brake)
-		gpio_clear(port_Brake,pin_Brake);	
+		gpio_clear(_port_Brake,_pin_Brake);	
 	else
-		gpio_set(port_Brake,pin_Brake);
+		gpio_set(_port_Brake,_pin_Brake);
 }
 
 
@@ -115,7 +117,7 @@ void Motor::SetSpeed(int speed){
 	speed = CLAMP(speed,0,maxSpeed);
 	int pwmVal = speed * COEFMULT; // (speed/2 + 50)
 
-	timer_set_oc_value(TIM1, oc_id, pwmVal);
+	timer_set_oc_value(TIM1, _oc_id, pwmVal);
 }
 
 void Motor::SetMaxSpeed(int max){
@@ -150,10 +152,10 @@ double Motor::GetCurrent() {
 }
 
 fault_action_t Motor::GetFault(){
-	int err1 = gpio_get(port_Err1, pin_Err1);
-	int err2 = gpio_get(port_Err2, pin_Err2);
+	int err1 = gpio_get(_port_Err1, _pin_Err1);
+	int err2 = gpio_get(_port_Err2, _pin_Err2);
 
-	switch (err1 + err2 << 1) {
+	switch (err1 + (err2 << 1)) {
 		case 0b00: 
 			return FAULT_UNDERVOLTAGE;
 		case 0b01:
@@ -180,7 +182,7 @@ void setupDriveGPIO(void){
 	gpio_mode_setup(port_CoastDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_CoastDrive);
 	gpio_mode_setup(port_ModeDrive, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ModeDrive);
 	
-	gpio_set(port_ResetDrive, port_ResetDrive);
+	gpio_set(port_ResetDrive, pin_ResetDrive);
 	SetDriveMode(0);
 	DriveDisable();
 }
@@ -191,25 +193,25 @@ void Motor::setupGPIO(void){
 	rcc_periph_clock_enable(RCC_GPIOC);
     rcc_periph_clock_enable(RCC_ADC1);
 
-	gpio_mode_setup(port_Direction, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Direction);
-	gpio_mode_setup(port_Brake, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_Brake);
-	gpio_mode_setup(port_ESF, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, pin_ESF);
+	gpio_mode_setup(_port_Direction, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, _pin_Direction);
+	gpio_mode_setup(_port_Brake, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, _pin_Brake);
+	gpio_mode_setup(_port_ESF, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, _pin_ESF);
 
-	gpio_mode_setup(port_Err1, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err1);
-	gpio_mode_setup(port_Err2, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Err2);
-    gpio_mode_setup(port_Tacho, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_Tacho);
-	gpio_mode_setup(port_InfoDir, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pin_InfoDir);
+	gpio_mode_setup(_port_Err1, GPIO_MODE_INPUT, GPIO_PUPD_NONE, _pin_Err1);
+	gpio_mode_setup(_port_Err2, GPIO_MODE_INPUT, GPIO_PUPD_NONE, _pin_Err2);
+    gpio_mode_setup(_port_Tacho, GPIO_MODE_INPUT, GPIO_PUPD_NONE, _pin_Tacho);
+	gpio_mode_setup(_port_InfoDir, GPIO_MODE_INPUT, GPIO_PUPD_NONE, _pin_InfoDir);
 
 	Brake(false);
 	SetDirection(false);
 
 	// Disable ESF
-	gpio_clear(port_ESF, pin_ESF);
+	gpio_clear(_port_ESF, _pin_ESF);
 
 	// setup PWM AF for the speed control
-	gpio_mode_setup(port_SpeedControl, GPIO_MODE_AF, GPIO_PUPD_NONE, pin_SpeedControl);
-	gpio_set_af(port_SpeedControl, GPIO_AF1, pin_SpeedControl);
-	gpio_set_output_options(port_SpeedControl, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, pin_SpeedControl);
+	gpio_mode_setup(_port_SpeedControl, GPIO_MODE_AF, GPIO_PUPD_NONE, _pin_SpeedControl);
+	gpio_set_af(_port_SpeedControl, GPIO_AF1, _pin_SpeedControl);
+	gpio_set_output_options(_port_SpeedControl, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, _pin_SpeedControl);
 	SetSpeed(0);
 }
 
@@ -335,3 +337,32 @@ void adc_isr(void) {
 		adc_start_conversion_regular(ADC1);
     }
 }
+
+
+Motor motorA(0, port_SpeedControlA, pin_SpeedControlA,
+    port_DirectionA, pin_DirectionA,
+    port_BrakeA, pin_BrakeA,
+    port_ESFA, pin_ESFA,
+    port_TachoA, pin_TachoA,
+    port_Err1A, pin_Err1A,
+    port_Err2A, pin_Err2A,
+    port_InfoDirA, pin_InfoDirA,
+    TIM_OC2);
+Motor motorB(1, port_SpeedControlB, pin_SpeedControlB,
+    port_DirectionB, pin_DirectionB,
+    port_BrakeB, pin_BrakeB,
+    port_ESFB, pin_ESFB,
+    port_TachoB, pin_TachoB,
+    port_Err1B, pin_Err1B,
+    port_Err2B, pin_Err2B,
+    port_InfoDirB, pin_InfoDirB,
+    TIM_OC1);
+Motor motorC(2, port_SpeedControlC, pin_SpeedControlC,
+    port_DirectionC, pin_DirectionC,
+    port_BrakeC, pin_BrakeC,
+    port_ESFC, pin_ESFC,
+    port_TachoC, pin_TachoC,
+    port_Err1C, pin_Err1C,
+    port_Err2C, pin_Err2C,
+    port_InfoDirC, pin_InfoDirC,
+    TIM_OC3);

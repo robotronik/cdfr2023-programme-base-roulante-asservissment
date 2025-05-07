@@ -1,23 +1,15 @@
 #pragma once
-#include "config.h"
-#include "clock.h"
-#include "AsservissementMath.h"
-#include "Odometry.h"
+#include "structs.h"
 
 class position
 {
-private:
-    position_t positionRobot = {0.0, 0.0, 0.0};
-    position_t newPosition = {0.0, 0.0, 0.0};
-    bool needChangePos = false;
-    bool positionChanged = false;
 public:
     position();
 
     void loop(void);
 
     void setPosition(position_t inCommingposition);
-    void setPosition(double x, double y, double teta);
+    void setPosition(double x, double y, double a);
 
 
     position_t getPosition();
@@ -26,10 +18,9 @@ public:
     double getPosition_Teta();
     double getPosition_Time();
     bool getPositionChanged();
+private:
+    position_t positionRobot = {0.0, 0.0, 0.0};
+    position_t newPosition = {0.0, 0.0, 0.0};
+    bool needChangePos = false;
+    bool positionChanged = false;
 };
-
-
-
-
-
-

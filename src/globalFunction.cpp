@@ -1,4 +1,4 @@
-#include "config.h"
+#include "structs.h"
 
 const char* directionToChar(Direction dir) {
     switch (dir) {

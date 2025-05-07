@@ -1,5 +1,7 @@
-
 #include "position.h"
+#include "config.h"
+#include "Odometry.h"
+#include "clock.h"
 
 position::position(){
     positionRobot = {0.0, 0.0, 0.0};
@@ -10,7 +12,7 @@ void position::loop(){
     if(needChangePos){
         positionRobot.x = newPosition.x;
         positionRobot.y = newPosition.y;
-        positionRobot.teta = newPosition.teta*DEG_TO_RAD;
+        positionRobot.a = newPosition.a*DEG_TO_RAD;
         needChangePos = false;
         positionChanged = true;
     }
@@ -19,20 +21,20 @@ void position::loop(){
 
 void position::setPosition(position_t inCommingposition){
     newPosition = inCommingposition;
-    newPosition.teta = mod_angle(inCommingposition.teta);
+    newPosition.a = mod_angle(inCommingposition.a);
     needChangePos = true;
 }
-void position::setPosition(double x, double y, double teta){
+void position::setPosition(double x, double y, double a){
     newPosition.x = x;
     newPosition.y = y;
-    newPosition.teta =  mod_angle(teta);
+    newPosition.a =  mod_angle(a);
     newPosition.time = get_uptime_ms();
     needChangePos = true;
 }
 
 position_t position::getPosition(){
     position_t retPos = positionRobot;
-    retPos.teta = positionRobot.teta*RAD_TO_DEG;
+    retPos.a = positionRobot.a*RAD_TO_DEG;
     return retPos;
 }
 double position::getPosition_X(){
@@ -42,7 +44,7 @@ double position::getPosition_Y(){
     return positionRobot.y;
 }
 double position::getPosition_Teta(){
-    return positionRobot.teta*RAD_TO_DEG;
+    return positionRobot.a*RAD_TO_DEG;
 }
 double position::getPosition_Time(){
     return positionRobot.time;

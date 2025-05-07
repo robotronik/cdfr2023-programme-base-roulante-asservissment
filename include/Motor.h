@@ -11,8 +11,6 @@
     #include <libopencm3/stm32/adc.h>
 #endif
 
-#include "config.h"
-
 
 // Freq = 84Mhz / TIMERPERIOD
 // The ideal frequency is arround 8kHz but it creates a noise unpleasant to the ear
@@ -31,9 +29,6 @@ typedef enum {
     FAULT_LOW_LOAD_CURRENT = 5
 } fault_action_t;
 
-// Coast
-bool driveEnabled = false;
-
 void DriveDisable();
 void DriveEnable();
 // Set the current-decay method.
@@ -46,8 +41,8 @@ void DriveSetup();
 class Motor
 {
 public:
-    Motor(int motorID, double wheelDiameter, double wheelDistance, double wheelAngle, 
-        int port_SpeedControl, int pin_SpeedControl,
+
+    Motor(int motorID, int port_SpeedControl, int pin_SpeedControl,
         int port_Direction, int pin_Direction,
         int port_Brake, int pin_Brake,
         int port_ESF, int pin_ESF,
@@ -104,10 +99,6 @@ private:
     int id;
     char name;
 
-    double wheelDiameter;
-    double wheelDistance;
-    double wheelAngle;
-
     uint16_t adc_value = 0;
     int maxTorque = 4096;
     bool motorEn = true;
@@ -115,63 +106,36 @@ private:
     bool doesLimitTorque = false;
 
     // Periferals
-    // PWM timer
-    tim_oc_id oc_id = TIM_OC2; // OC2 for motor A, OC1 for motor B, OC3 for motor C
 
     // Pin definitions
 
     // Output
-    int port_SpeedControl;
-    int pin_SpeedControl;
-    int port_Direction;
-    int pin_Direction;
-    int port_Brake;
-    int pin_Brake;
-    int port_ESF;
-    int pin_ESF;
+    int _port_SpeedControl;
+    int _pin_SpeedControl;
+    int _port_Direction;
+    int _pin_Direction;
+    int _port_Brake;
+    int _pin_Brake;
+    int _port_ESF;
+    int _pin_ESF;
 
     // Input
-    int port_Tacho;
-    int pin_Tacho;
-    int port_Err1;
-    int pin_Err1;
-    int port_Err2;
-    int pin_Err2;
-    int port_InfoDir;
-    int pin_InfoDir;
-    // int port_Current;
-    // int pin_Current;
+    int _port_Tacho;
+    int _pin_Tacho;
+    int _port_Err1;
+    int _pin_Err1;
+    int _port_Err2;
+    int _pin_Err2;
+    int _port_InfoDir;
+    int _pin_InfoDir;
+    // int _port_Current;
+    // int _pin_Current;
+
+    // PWM timer
+    tim_oc_id _oc_id; // OC2 for motor A, OC1 for motor B, OC3 for motor C
 };
 
 // Create the motor objects
-
-Motor motorA(0, DIAMETER_WHEEL, DISTANCE_WHEEL, 0.0, 
-    port_SpeedControlA, pin_SpeedControlA,
-    port_DirectionA, pin_DirectionA,
-    port_BrakeA, pin_BrakeA,
-    port_ESFA, pin_ESFA,
-    port_TachoA, pin_TachoA,
-    port_Err1A, pin_Err1A,
-    port_Err2A, pin_Err2A,
-    port_InfoDirA, pin_InfoDirA,
-    TIM_OC2);
-Motor motorB(1, DIAMETER_WHEEL, DISTANCE_WHEEL, 120.0, 
-    port_SpeedControlB, pin_SpeedControlB,
-    port_DirectionB, pin_DirectionB,
-    port_BrakeB, pin_BrakeB,
-    port_ESFB, pin_ESFB,
-    port_TachoB, pin_TachoB,
-    port_Err1B, pin_Err1B,
-    port_Err2B, pin_Err2B,
-    port_InfoDirB, pin_InfoDirB,
-    TIM_OC1);
-Motor motorC(2, DIAMETER_WHEEL, DISTANCE_WHEEL, 240.0, 
-    port_SpeedControlC, pin_SpeedControlC,
-    port_DirectionC, pin_DirectionC,
-    port_BrakeC, pin_BrakeC,
-    port_ESFC, pin_ESFC,
-    port_TachoC, pin_TachoC,
-    port_Err1C, pin_Err1C,
-    port_Err2C, pin_Err2C,
-    port_InfoDirC, pin_InfoDirC,
-    TIM_OC3);
+extern Motor motorA;
+extern Motor motorB;
+extern Motor motorC;

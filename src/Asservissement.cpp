@@ -1,4 +1,6 @@
 #include "Asservissement.h"
+#include "Motor.h"
+#include "AsservissementMath.h"
 
 
 Asservissement::Asservissement(position& pos):
@@ -139,14 +141,14 @@ void Asservissement::setProtectedConsigneAngulaire(double angle, Rotation rotati
 void Asservissement::setConsigneAngulaire(double angle, Rotation rotation){
     double errorBefor = getAngularErrorReel()-positionControlAngulaire.getPostion();
     currentState = rotation;
-    consigne.teta = mod_angle(angle);
+    consigne.a = mod_angle(angle);
     positionControlAngulaire.setPosition(getAngularErrorReel() - errorBefor);
     positionControlAngulaire.setConsigne(0);
 }
 
 void Asservissement::setProtectedConsigneLineaire(double x, double y){
     if(positionControlAngulaire.getPostion()!=0){
-        consigne.teta = mod_angle(posRobot.getPosition_Teta());
+        consigne.a = mod_angle(posRobot.getPosition_Teta());
         positionControlAngulaire.setPosition(0);
         positionControlAngulaire.setConsigne(0);
     }
@@ -238,7 +240,7 @@ Direction Asservissement::getDirectionSide(void){
 
 void Asservissement::reset(void){
     currentState = Rotation::SHORTEST;
-    consigne.teta = posRobot.getPosition_Teta();
+    consigne.a = posRobot.getPosition_Teta();
     consigne.x = posRobot.getPosition_X();
     consigne.y = posRobot.getPosition_Y();
     positionControlLineaire.reset(0);
@@ -258,7 +260,7 @@ void Asservissement::reset(void){
 //******************************************************
 
 double Asservissement::getAngularErrorReel(void){
-    double angleErreur = mod_angle(consigne.teta-posRobot.getPosition_Teta());
+    double angleErreur = mod_angle(consigne.a-posRobot.getPosition_Teta());
 
     if(angleErreur>0 && currentState == Rotation::CLOCKWISE){
         angleErreur -= 360;

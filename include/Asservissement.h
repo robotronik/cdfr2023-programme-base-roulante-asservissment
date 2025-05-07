@@ -5,7 +5,6 @@
 #include "uart.h"
 #include "positionControl.h"
 #include "position.h"
-#include "Motor.h"
 
 
 class Asservissement
