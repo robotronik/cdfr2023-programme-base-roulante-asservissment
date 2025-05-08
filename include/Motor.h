@@ -11,14 +11,6 @@
     #include <libopencm3/stm32/adc.h>
 #endif
 
-
-// Freq = 84Mhz / TIMERPERIOD
-// The ideal frequency is arround 8kHz but it creates a noise unpleasant to the ear
-// with a period of 4000, this creates a freq of 21kHz, that people cant hear
-#define TIMERPERIOD 4000
-#define COEFMULT TIMERPERIOD/100
-#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
-
 // typedef Enum containing the different fault actions
 typedef enum {
     FAULT_NONE = 0,
@@ -101,7 +93,6 @@ private:
 
     uint16_t adc_value = 0;
     int maxTorque = 4096;
-    bool motorEn = true;
     int maxSpeed = 100;
     bool doesLimitTorque = false;
 

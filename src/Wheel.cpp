@@ -13,7 +13,7 @@ Wheel::Wheel(double dist, double ang, double diameter, Motor* motorPtr) :
 }
 
 
-// Updates the speed of a single wheel given the commanded linear and angular velocities.
+// Updates the speed of a single wheel given the commandd linear and angular velocities.
 // linear: linear speed of robot in mm/s
 // theta: current error angle to target in degrees
 // angular: angular speed of robot in degrees/s
@@ -23,7 +23,7 @@ void Wheel::update(double linear, double theta, double angular) {
     double circumference = M_PI * diam; // in mm
     double robotCircumference = 2 * M_PI * distanceToCenter; // in mm
     
-    // Compute the wheel speed by projecting the commanded linear velocity and adding the contribution of rotational velocity.
+    // Compute the wheel speed by projecting the commandd linear velocity and adding the contribution of rotational velocity.
     // The wheel speed is in mm/s.
     double wheelSpeed = linear * -sin(rad) + robotCircumference * angular / 360;
 

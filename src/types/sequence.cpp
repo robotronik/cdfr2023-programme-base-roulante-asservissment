@@ -1,4 +1,4 @@
-#include "sequence.h"
+#include "types/sequence.h"
 
 // Fonction qui prend en entrée un pointeur de fonction
 

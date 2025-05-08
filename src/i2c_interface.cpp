@@ -42,15 +42,15 @@ void i2c_interface::set_coordinates(int16_t x, int16_t y, int16_t theta) {
 }
 
 void i2c_interface::stop(){
-    robotAsserv.setConsigneStop();
+    robotAsserv.Stop();
 }
 
 void i2c_interface::pause(){
-    robotAsserv.setConsignePause();
+    robotAsserv.Pause();
 }
 
 void i2c_interface::resume(){
-    robotAsserv.setConsigneResume();
+    robotAsserv.Resume();
 }
 
 void i2c_interface::go_to_point(int16_t x,int16_t y,Rotation rotation, Direction direction) {
@@ -62,19 +62,19 @@ void i2c_interface::go_to_point(int16_t x,int16_t y,int16_t theta, Rotation rota
 }
 
 void i2c_interface::consigne_angulaire(int16_t angle, Rotation rotation) {
-    robotAsserv.setConsigneAngulaire(angle,(Rotation)rotation);
+    robotAsserv.setTargetAngulaire(angle,(Rotation)rotation);
 }
 
 void i2c_interface::consigne_angulaire(int16_t x, int16_t y, Rotation rotation, Direction direction) {
-    robotAsserv.setConsigneLookAt(x ,y ,rotation,direction);
+    robotAsserv.setTargetLookAt(x ,y ,rotation,direction);
 }
 
 void i2c_interface::set_linear_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration) {
-    robotAsserv.setConsigneMaxSpeedLinear(max_speed,max_acceleration,max_deceleration);
+    robotAsserv.setTargetMaxSpeedLinear(max_speed,max_acceleration,max_deceleration);
 }
 
 void i2c_interface::set_angular_max_speed(int16_t max_speed, int16_t max_acceleration, int16_t max_deceleration) {
-    robotAsserv.setConsigneMaxSpeedAngular(max_speed,max_acceleration,max_deceleration);
+    robotAsserv.setTargetMaxSpeedAngular(max_speed,max_acceleration,max_deceleration);
 }
 
 int16_t i2c_interface::get_braking_distance(){
@@ -94,10 +94,10 @@ Rotation i2c_interface::get_rotation_side(){
 }
 
 void i2c_interface::get_current_target(int16_t &x, int16_t &y, int16_t &theta) {
-    position_t consigne = robotAsserv.getCurrentConsigne();
-    x = consigne.x;
-    y = consigne.y;
-    theta = consigne.a;
+    position_t target = robotAsserv.getCurrentTarget();
+    x = target.x;
+    y = target.y;
+    theta = target.a;
 }
 
 bool i2c_interface::get_moving_is_done(){
@@ -131,9 +131,6 @@ void i2c_interface::get_speed(int16_t &speedRight, int16_t &speedLeft) {
 void i2c_interface::set_motor_state(bool motorEnable) {
     if (motorEnable) {
         robotAsserv.reset();
-        motorA.SetSpeedSigned(0);
-        motorB.SetSpeedSigned(0);
-        motorC.SetSpeedSigned(0);
         DriveEnable();
     }
     else {

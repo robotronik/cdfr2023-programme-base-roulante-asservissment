@@ -7,6 +7,13 @@
 // BLDC motor driver
 // https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-DGA5/483784.pdf
 
+// Freq = 84Mhz / TIMERPERIOD
+// The ideal frequency is arround 8kHz but it creates a noise unpleasant to the ear
+// with a period of 4000, this creates a freq of 21kHz, that people cant hear
+#define TIMERPERIOD 4000
+#define COEFMULT TIMERPERIOD/100
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+
 // TODO
 // Count rising edges on a pin using a timer in external clock mode for tacho
 
@@ -25,6 +32,9 @@ void setupDriveGPIO();
 void DriveDisable(){
 	gpio_clear(port_CoastDrive, pin_CoastDrive);
 	driveEnabled = false;
+	motorA.SetSpeedSigned(0);
+	motorB.SetSpeedSigned(0);
+	motorC.SetSpeedSigned(0);
 }
 void DriveEnable(){
 	gpio_set(port_CoastDrive, pin_CoastDrive);

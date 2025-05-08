@@ -4,7 +4,7 @@
 #include "clock.h"
 #include "I2C.h"
 #include "led.h"
-#include "sequence.h"
+#include "types/sequence.h"
 #include "position.h"
 #include "Asservissement.h"
 #include "movement.h"
@@ -41,11 +41,11 @@ void testloop(sequence* seq) {
 	},0);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneAngulaire(-90,ROTATION_TRIGO);
+	// 	robotAsserv.setTargetAngulaire(-90,ROTATION_TRIGO);
 	// },3000);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneAngulaire(90,ROTATION_HORRAIRE);
+	// 	robotAsserv.setTargetAngulaire(90,ROTATION_HORRAIRE);
 	// },3000);
 
 	seq->delay([](){
@@ -73,19 +73,19 @@ void testloop(sequence* seq) {
 	},7000);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneStop();
+	// 	robotAsserv.setTargetStop();
 	// },1500);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneLineaire(0,0);
+	// 	robotAsserv.setTargetLineaire(0,0);
 	// },10000);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneAngulaire(90,ROTATION_TRIGO);
+	// 	robotAsserv.setTargetAngulaire(90,ROTATION_TRIGO);
 	// },7000);
 
 	// seq->delay([](){
-	// 	robotAsserv.setConsigneAngulaire(0,ROTATION_HORRAIRE);
+	// 	robotAsserv.setTargetAngulaire(0,ROTATION_HORRAIRE);
 	// },7000);
 }
 

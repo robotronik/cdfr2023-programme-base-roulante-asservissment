@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include <stdint.h>
-#include "structs.h"
+#include "types/structs.h"
 #include "odometry/I2Cdevice.h"
 
 

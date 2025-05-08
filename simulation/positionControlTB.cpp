@@ -23,11 +23,11 @@ extern "C" {
         positionControlLineaire.decelerationStopAr = 500;
         positionControlLineaire.decelerationStopAv = 500;
         positionControlLineaire.setPosition(1000);
-        positionControlLineaire.setConsigne(0);
+        positionControlLineaire.setTarget(0);
         positionControlLineaire.setMaxSpeedOut(150);
 
         double current;
-        int numCommande = 0;
+        int numCommand = 0;
         // Initialisation de vos données (exemple aléatoire)
         for (int i = 0; i < DATA_SIZE; i+=1) {
             SET_TIME_(i*20);
@@ -37,9 +37,9 @@ extern "C" {
             if (i==50) {
                 positionControlLineaire.stop();
                 // positionControlLineaire.setMaxSpeedOut(0);
-                // positionControlLineaire.setConsigne(-500);
+                // positionControlLineaire.setTarget(-500);
                 // positionControlLineaire.vitesseMaxAr = 300;
-                numCommande ++;
+                numCommand ++;
             }
         }
 

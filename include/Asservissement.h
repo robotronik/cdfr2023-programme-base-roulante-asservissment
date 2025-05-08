@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "PID.h"
+#include "types/PID.h"
 #include "uart.h"
 #include "positionControl.h"
 #include "position.h"
@@ -12,7 +12,7 @@ class Asservissement
 private:
     /* data */
     Rotation currentState;
-    position_t consigne;
+    position_t target;
 
     double getAngularErrorReel(void);
     double getLinearErrorReel(void);
@@ -37,8 +37,8 @@ public:
 
     void reset(void);
 
-    void setConsigneStop(void);
-    void setConsigne(position_t position);
+    void setTargetStop(void);
+    void setTarget(position_t position);
 
     double getAngularError(void);
     double getLinearError(void);
@@ -49,16 +49,16 @@ public:
     int getBrakingDistance(void);
     Rotation getRotationSide(void);
     Direction getDirectionSide(void);
-    position_t getCurrentConsigne(void);
+    position_t getCurrentTarget(void);
 
 private:
-    void setConsigneAngulaire(double angle,Rotation rotation);
-    void setConsigneLineaire(double x, double y);
+    void setTargetAngulaire(double angle,Rotation rotation);
+    void setTargetLineaire(double x, double y);
 
 protected:
-    void setProtectedConsigneLineaire(double x, double y);
-    void setConsigneLookAt(double x, double y, Rotation rotation);
-    void setConsigneLookAtForward(double x, double y, Rotation rotation);
-    void setConsigneLookAtBackward(double x, double y, Rotation rotation);
-    void setProtectedConsigneAngulaire(double angle, Rotation rotation);
+    void setProtectedTargetLineaire(double x, double y);
+    void setTargetLookAt(double x, double y, Rotation rotation);
+    void setTargetLookAtForward(double x, double y, Rotation rotation);
+    void setTargetLookAtBackward(double x, double y, Rotation rotation);
+    void setProtectedTargetAngulaire(double angle, Rotation rotation);
 };

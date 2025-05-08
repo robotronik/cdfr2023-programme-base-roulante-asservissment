@@ -1,5 +1,5 @@
 #pragma once
-#include "structs.h"
+#include "types/structs.h"
 
 extern position_t pos;
 extern position_t vel;

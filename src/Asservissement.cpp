@@ -57,20 +57,20 @@ void Asservissement::setAsservissementLoopPeriod(int period) {
 void Asservissement::loop(){
     // if (nextTime < get_uptime_ms()) {
     //     if (getPositionChanged()) {
-    //         setConsigne(pos);
+    //         setTarget(pos);
     //     }
     //     nextTime = get_uptime_ms() + loopPeriod;
     //     asservissementLoop();
     // }
     if (getPositionChanged()) {
-        setConsigne(pos);
+        setTarget(pos);
     }
     asservissementLoop();
 }
 
 
 void Asservissement::asservissementLoop(){
-    double targetAngle = calculAngle(consigne.x,consigne.y,pos);
+    double targetAngle = calculAngle(target.x,target.y,pos);
     bool reTargetAngle = false;
     double valPidLineaire;
     double valPidAngulaire;
@@ -82,17 +82,17 @@ void Asservissement::asservissementLoop(){
 
     if (realErrorLinear >= 100) {
         reTargetAngle = true;
-        setConsigneAngulaire(targetAngle,Rotation::SHORTEST);
+        setTargetAngulaire(targetAngle,Rotation::SHORTEST);
     }
     else if (realErrorLinear <= -100) {
         reTargetAngle = true;
-        setConsigneAngulaire(targetAngle+180,Rotation::SHORTEST);
+        setTargetAngulaire(targetAngle+180,Rotation::SHORTEST);
     }
 
     realErrorAngular = getAngularErrorReel();
     reduceErrorAngular = realErrorAngular-positionControlAngulaire.getPostion();
 
-    //Calculate Linear commande
+    //Calculate Linear command
     if (positionControlLineaire.getPostion()==0) {
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
         pidLineaire.reset();
@@ -102,7 +102,7 @@ void Asservissement::asservissementLoop(){
         pidLineaireBlock.reset();
     }
 
-    //Calculate Angular commande
+    //Calculate Angular command
     if (positionControlAngulaire.getPostion()==0 || reTargetAngle) {
         valPidAngulaire = pidAngulaireBlock.update(reduceErrorAngular,timeLastPos);
         pidAngulaire.reset();
@@ -120,45 +120,45 @@ void Asservissement::asservissementLoop(){
 
 
 //******************************************************
-//Set consigne
+//Set target
 //******************************************************
 
-void Asservissement::setProtectedConsigneAngulaire(double angle, Rotation rotation) {
+void Asservissement::setProtectedTargetAngulaire(double angle, Rotation rotation) {
     if (positionControlLineaire.getPostion()!=0) {
-        consigne.x = pos.x;
-        consigne.y = pos.y;
+        target.x = pos.x;
+        target.y = pos.y;
         positionControlLineaire.setPosition(0);
-        positionControlLineaire.setConsigne(0);
+        positionControlLineaire.setTarget(0);
     }
-    setConsigneAngulaire(angle,rotation);
+    setTargetAngulaire(angle,rotation);
 }
 
-void Asservissement::setConsigneAngulaire(double angle, Rotation rotation) {
+void Asservissement::setTargetAngulaire(double angle, Rotation rotation) {
     double errorBefor = getAngularErrorReel()-positionControlAngulaire.getPostion();
     currentState = rotation;
-    consigne.a = mod_angle(angle);
+    target.a = mod_angle(angle);
     positionControlAngulaire.setPosition(getAngularErrorReel() - errorBefor);
-    positionControlAngulaire.setConsigne(0);
+    positionControlAngulaire.setTarget(0);
 }
 
-void Asservissement::setProtectedConsigneLineaire(double x, double y) {
+void Asservissement::setProtectedTargetLineaire(double x, double y) {
     if (positionControlAngulaire.getPostion()!=0) {
-        consigne.a = mod_angle(pos.a);
+        target.a = mod_angle(pos.a);
         positionControlAngulaire.setPosition(0);
-        positionControlAngulaire.setConsigne(0);
+        positionControlAngulaire.setTarget(0);
     }
-    setConsigneLineaire(x,y);
+    setTargetLineaire(x,y);
 }
 
-void Asservissement::setConsigneLineaire(double x, double y) {
+void Asservissement::setTargetLineaire(double x, double y) {
     double errorBefor = getLinearErrorReel()-positionControlLineaire.getPostion();
-    consigne.x = x;
-    consigne.y = y;
+    target.x = x;
+    target.y = y;
     positionControlLineaire.setPosition(getLinearErrorReel() - errorBefor);
-    positionControlLineaire.setConsigne(0);
+    positionControlLineaire.setTarget(0);
 }
 
-void Asservissement::setConsigneLookAt(double x, double y, Rotation rotation) {
+void Asservissement::setTargetLookAt(double x, double y, Rotation rotation) {
     double angleErreur = mod_angle(calculAngle(x,y,pos)-pos.a);
     if (angleErreur>0 && rotation == Rotation::CLOCKWISE) {
         angleErreur -= 360;
@@ -169,36 +169,36 @@ void Asservissement::setConsigneLookAt(double x, double y, Rotation rotation) {
 
     if (rotation == Rotation::SHORTEST)
         if (angleErreur<90 && angleErreur>-90) {
-            setProtectedConsigneAngulaire(calculAngle(x,y,pos),rotation);
+            setProtectedTargetAngulaire(calculAngle(x,y,pos),rotation);
         }
         else {
-            setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
+            setProtectedTargetAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
         }
     else {
         if (angleErreur<180 && angleErreur>-180) {
-            setProtectedConsigneAngulaire(calculAngle(x,y,pos),rotation);
+            setProtectedTargetAngulaire(calculAngle(x,y,pos),rotation);
         }
         else {
-            setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
+            setProtectedTargetAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
         }
     }
 }
 
-void Asservissement::setConsigneLookAtForward(double x, double y, Rotation rotation) {
-    setProtectedConsigneAngulaire(calculAngle(x,y,pos),rotation);
+void Asservissement::setTargetLookAtForward(double x, double y, Rotation rotation) {
+    setProtectedTargetAngulaire(calculAngle(x,y,pos),rotation);
 }
 
-void Asservissement::setConsigneLookAtBackward(double x, double y, Rotation rotation) {
-    setProtectedConsigneAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
+void Asservissement::setTargetLookAtBackward(double x, double y, Rotation rotation) {
+    setProtectedTargetAngulaire(mod_angle(calculAngle(x,y,pos)+180),rotation);
 }
 
-void Asservissement::setConsigneStop(void){
+void Asservissement::setTargetStop(void){
     positionControlLineaire.stop();
     positionControlAngulaire.stop();
 }
 
-void Asservissement::setConsigne(position_t position) {
-    consigne = position;
+void Asservissement::setTarget(position_t position) {
+    target = position;
 }
 
 double Asservissement::getAngularError(void){
@@ -235,7 +235,7 @@ Direction Asservissement::getDirectionSide(void){
 
 void Asservissement::reset(void){
     currentState = Rotation::SHORTEST;
-    consigne = pos;
+    target = pos;
     positionControlLineaire.reset(0);
     positionControlAngulaire.reset(0);
     pidAngulaire.reset();
@@ -253,7 +253,7 @@ void Asservissement::reset(void){
 //******************************************************
 
 double Asservissement::getAngularErrorReel(void){
-    double angleErreur = mod_angle(consigne.a-pos.a);
+    double angleErreur = mod_angle(target.a-pos.a);
 
     if (angleErreur>0 && currentState == Rotation::CLOCKWISE) {
         angleErreur -= 360;
@@ -268,11 +268,11 @@ double Asservissement::getAngularErrorReel(void){
 }
 
 double Asservissement::getLinearErrorReel(void){
-    //Première partie, connaitre l'angle formé entre le robot et le point de la consigne
-    double erreurAngulaireSurPoint = calculAngle(consigne.x,consigne.y,pos);
+    //Première partie, connaitre l'angle formé entre le robot et le point de la target
+    double erreurAngulaireSurPoint = calculAngle(target.x,target.y,pos);
 
-    // Calculer la distance entre le robot et la droite orthogonal qui passe par le point de la consigne
-    double distanceRobotPoint = sqrt(pow((consigne.x - pos.x),2)+pow((consigne.y -pos.y),2));
+    // Calculer la distance entre le robot et la droite orthogonal qui passe par le point de la target
+    double distanceRobotPoint = sqrt(pow((target.x - pos.x),2)+pow((target.y -pos.y),2));
     return (distanceRobotPoint*cos((erreurAngulaireSurPoint-pos.a)*DEG_TO_RAD));
 }
 
@@ -295,6 +295,6 @@ int Asservissement::getBrakingDistance(void){
     return -positionControlLineaire.getBrakingDistance();
 }
 
-position_t Asservissement::getCurrentConsigne(void){
-    return consigne;
+position_t Asservissement::getCurrentTarget(void){
+    return target;
 };

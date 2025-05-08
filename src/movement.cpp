@@ -62,7 +62,7 @@ bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFir
     return 0;
 }
 
-bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation) {
+bool movement::setTargetAngulaire(int16_t angle,Rotation rotation) {
     if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_THETA,
@@ -79,7 +79,7 @@ bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation) {
     return 0;
 }
 
-bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Direction direction) {
+bool movement::setTargetLookAt(int16_t x,int16_t y,Rotation rotation, Direction direction) {
     if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_LOOKAT,
@@ -96,7 +96,7 @@ bool movement::setConsigneLookAt(int16_t x,int16_t y,Rotation rotation, Directio
     return 0;
 }
 
-bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
+bool movement::setTargetMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
     if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::MAX_SPEED_LINEAR,
@@ -113,7 +113,7 @@ bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceler
     return 0;
 }
 
-bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
+bool movement::setTargetMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration) {
     if (!commandBuffer.isFull()) {
         commandBuffer.push(Command{
             BaseCommand::MAX_SPEED_ANGULAR,
@@ -130,23 +130,23 @@ bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_accele
     return 0;
 }
 
-bool movement::setConsigneStop(void){
+bool movement::Stop(void){
     commandBuffer.resetTail();
     enableStop = true;
     return true;
 }
 
-bool movement::setConsignePause(void){
+bool movement::Pause(void){
     enablePause = true;
     return true;
 }
 
-bool movement::setConsigneResume(void){
+bool movement::Resume(void){
     enablePause = false;
     return true;
 }
 
-void movement::launchCommande(void){
+void movement::launchCommand(void){
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
     usartprintf("x %d\n",currentCommand.x);
     usartprintf("y %d\n",currentCommand.y);
@@ -157,23 +157,23 @@ void movement::launchCommande(void){
     switch (currentCommand.baseCommand)
     {
     case BaseCommand::LINEAR:
-        setProtectedConsigneLineaire(currentCommand.x,currentCommand.y);
+        setProtectedTargetLineaire(currentCommand.x,currentCommand.y);
         break;
 
     case BaseCommand::ANGULAR_LOOKAT:
         if (currentCommand.direction == Direction::SHORTEST) {
-            Asservissement::setConsigneLookAt(currentCommand.x,currentCommand.y,currentCommand.rotation);
+            Asservissement::setTargetLookAt(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
         else if (currentCommand.direction == Direction::FORWARD) {
-            Asservissement::setConsigneLookAtForward(currentCommand.x,currentCommand.y,currentCommand.rotation);
+            Asservissement::setTargetLookAtForward(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
         else {
-            Asservissement::setConsigneLookAtBackward(currentCommand.x,currentCommand.y,currentCommand.rotation);
+            Asservissement::setTargetLookAtBackward(currentCommand.x,currentCommand.y,currentCommand.rotation);
         }
         break;
 
     case BaseCommand::ANGULAR_THETA:
-        setProtectedConsigneAngulaire(currentCommand.theta,currentCommand.rotation);
+        setProtectedTargetAngulaire(currentCommand.theta,currentCommand.rotation);
         break;
 
     case BaseCommand::MAX_SPEED_LINEAR:
@@ -213,25 +213,25 @@ void movement::loop(void){
     Asservissement::loop();
 
     if (enablePause && !pause) {
-        Asservissement::setConsigneStop();
+        Asservissement::setTargetStop();
         pause = true;
     }
 
     if (!enablePause && pause) {
-        launchCommande();
+        launchCommand();
         pause = false;
     }
 
     if (!pause) {
         if (!run && !commandBuffer.isEmpty()) {
             currentCommand = commandBuffer.pop();
-            launchCommande();
+            launchCommand();
             run = true;
         }
         else if (run && !currentCommandRun()) {
             if (!commandBuffer.isEmpty()) {
                 currentCommand = commandBuffer.pop();
-                launchCommande();
+                launchCommand();
             }
             else {
                 run = false;
@@ -242,7 +242,7 @@ void movement::loop(void){
     if (enableStop == true) {
         enableStop = false;
         commandBuffer.resetHead();
-        Asservissement::setConsigneStop();
+        Asservissement::setTargetStop();
     }
 }
 

@@ -16,7 +16,7 @@ class positionControl{
 private:
     /* data */
     double position;
-    double consigne;
+    double target;
     double vitesse;
 
     double t_accel;
@@ -53,7 +53,7 @@ public:
     void reset(double initialValue);
     void stop(void);
     void setPosition(double initialValue);
-    void setConsigne(double setConsigne);
+    void setTarget(double setTarget);
     void setMaxSpeedOut(double max);
 
     double getPostion();

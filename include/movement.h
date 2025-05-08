@@ -2,8 +2,7 @@
 
 #include "Asservissement.h"
 #include "stdint.h"
-#include "circularBuffer.h"
-#include "config.h"
+#include "types/circularBuffer.h"
 
 
 struct Command {
@@ -40,14 +39,14 @@ public:
     movement();
     bool goToPoint(int16_t x,int16_t y,Rotation rotation = Rotation::SHORTEST, Direction direction = Direction::SHORTEST);
     bool goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFirst = Rotation::SHORTEST, Direction direction = Direction::SHORTEST, Rotation rotationSecond = Rotation::SHORTEST);
-    bool setConsigneAngulaire(int16_t angle,Rotation rotation);
-    bool setConsigneLookAt(int16_t x,int16_t y,Rotation rotation,Direction direction);
-    bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
-    bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
+    bool setTargetAngulaire(int16_t angle,Rotation rotation);
+    bool setTargetLookAt(int16_t x,int16_t y,Rotation rotation,Direction direction);
+    bool setTargetMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
+    bool setTargetMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
 
-    bool setConsigneStop(void);
-    bool setConsignePause(void);
-    bool setConsigneResume(void);
+    bool Stop(void);
+    bool Pause(void);
+    bool Resume(void);
 
     void printStatistic(void);
 
@@ -55,7 +54,7 @@ public:
     uint16_t getCommandBufferSize();
 
 private:
-    void launchCommande(void);
+    void launchCommand(void);
     bool currentCommandRun(void);
 };
 

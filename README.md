@@ -26,7 +26,7 @@ To install this project, follow these steps:
 Liste des points à améliorer
 
 1. (fait) Auto génération de l’interface coté STM32
-2. (fait) Sécurisation des commandes et des déplacements (plus de moveForward qui peut casser mais des goto combinant le lookForward et le moveForward)
+2. (fait) Sécurisation des commands et des déplacements (plus de moveForward qui peut casser mais des goto combinant le lookForward et le moveForward)
 3. (commencé) Torque contrôle (pour cogner les mures sans patinage) + (auto set de coordonner)
 4. Faire des courbes
     1. Séparation plus claire dans le code entre le générateur position et asservissement

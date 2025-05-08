@@ -1,6 +1,6 @@
 #pragma once
 
-#include "structs.h"
+#include "types/structs.h"
 
 double mod_angle(double a);
 double calculAngle(double x, double y, position_t actualPostion);
