@@ -1,8 +1,6 @@
 #pragma once
 
-#include "config.h"
 #include "types/PID.h"
-#include "uart.h"
 #include "positionControl.h"
 #include "position.h"
 

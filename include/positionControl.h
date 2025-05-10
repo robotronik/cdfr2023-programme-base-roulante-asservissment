@@ -1,16 +1,12 @@
 #pragma once
 
-#include <math.h>
 #include <stdint.h>
+#include "protectedMaxValue.h"
 
-#ifndef SIMULATION_POSITION_CONTROL
-    #include "clock.h"
-    #include "uart.h"
-#else
+#ifdef SIMULATION_POSITION_CONTROL
     void SET_TIME_(uint32_t time);
     extern uint32_t TIME_;
 #endif
-#include "protectedMaxValue.h"
 
 class positionControl{
 private:

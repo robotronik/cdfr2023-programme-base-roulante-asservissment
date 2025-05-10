@@ -16,7 +16,7 @@
 // #define TESTMOTOR
 
 // If debug is define, the code will be compiled with debug information
-#define DEBUG
+// #define DEBUG
 
 #ifdef SIMULATION
 	#include "hardware_interface.h"

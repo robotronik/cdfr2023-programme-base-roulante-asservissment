@@ -1,4 +1,8 @@
-#include "../include/positionControl.h"
+#include "positionControl.h"
+
+#include <math.h>
+#include "uart.h"
+#include "clock.h"
 
 #ifdef SIMULATION_POSITION_CONTROL
     uint32_t TIME_;

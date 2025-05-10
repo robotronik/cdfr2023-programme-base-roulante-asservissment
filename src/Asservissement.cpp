@@ -1,6 +1,10 @@
 #include "Asservissement.h"
 #include "Motor.h"
 #include "AsservissementMath.h"
+#include "config.h"
+#include "uart.h"
+#include "clock.h"
+#include <math.h>
 
 
 Asservissement::Asservissement():

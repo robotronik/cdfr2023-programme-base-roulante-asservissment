@@ -2,8 +2,6 @@
 
 #include "robot_interface.h"
 #include "movement.h"
-#include "Motor.h"
-#include "led.h"
 #include "I2C.h"
 
 class i2c_interface : public Robot_interface

@@ -1,5 +1,6 @@
 #include "movement.h"
 #include <atomic>
+#include "uart.h"
 
 movement::movement():Asservissement(){
 }
