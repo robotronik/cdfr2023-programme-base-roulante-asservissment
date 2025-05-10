@@ -3,6 +3,7 @@
 #include "clock.h"
 #include "odometry/OTOS.h"
 #include "AsservissementMath.h" // for mod_angle
+#include "led.h"
 
 position_t pos = {0.0, 0.0, 0.0};
 position_t vel = {0.0, 0.0, 0.0};
@@ -14,26 +15,29 @@ static bool positionChanged = false;
 void updatePositionData(){
     
     if (needChangePos) {
-        pos.x = newPosition.x;
-        pos.y = newPosition.y;
-        pos.a = newPosition.a;
+        pos = newPosition;
         needChangePos = false;
         positionChanged = true;
         otos.setPosition(pos);
     }
+    
+    RedLED_Clear();
     // Get the current position from the OTOS
     position_t r_pos, r_vel, r_acc;
-    if (otos.getPosVelAcc(r_pos, r_vel, r_acc) != ret_OK) {
-        // Handle error if needed
+    if (otos.getPosVelAcc(r_pos, r_vel, r_acc) == ret_OK) {
+        // Update the position, velocity, and acceleration data
+        pos = r_pos;
+        vel = r_vel;
+        acc = r_acc;
+        // Update the time of the position data
+        pos.time = get_uptime_ms();
+        vel.time = pos.time;
+        acc.time = pos.time;
     }
-    // Update the position, velocity, and acceleration data
-    pos = r_pos;
-    vel = r_vel;
-    acc = r_acc;
-    // Update the time of the position data
-    pos.time = get_uptime_ms();
-    vel.time = pos.time;
-    acc.time = pos.time;
+    else{
+        // If the OTOS is not connected
+        RedLED_Set();
+    }
 }
 
 void setPosition(position_t inCommingposition) {

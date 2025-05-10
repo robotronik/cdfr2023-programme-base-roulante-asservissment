@@ -15,6 +15,9 @@
 
 // #define TESTMOTOR
 
+// If debug is define, the code will be compiled with debug information
+#define DEBUG
+
 #ifdef SIMULATION
 	#include "hardware_interface.h"
 	#define main stm_main
@@ -96,12 +99,11 @@ int main(void)
 	clock_setup();
 	ledSetup();
     buttonSetup();
-		RedLED_Set();
 	usartSetup();
 	DriveSetup();
 	i2c_setup();
-	setupDeviceI2C();
 	setCallbackReceive(I2CRecieveData);
+	setupDeviceI2C();
 
 
 	//WAIT
@@ -160,7 +162,7 @@ int main(void)
 	sequence ledToggleSeq;
     sequence mySeq;
     sequence dbg;
-    bool enableDebug = false;
+    bool isDebug = false;
 
     // Reset because the stm has been booted for 3 seconds
 	robotAsserv.reset();
@@ -169,16 +171,17 @@ int main(void)
 		updatePositionData();
         robotAsserv.loop();
 
-        if (readTestButton() && !enableDebug) {
-            enableDebug = true;
-            mySeq.reset();
-        }
-        else if (enableDebug) {
+        if (isDebug) {
             testloop(&mySeq);
         }
+        else if (readTestButton()) {
+            isDebug = true;
+            mySeq.reset();
+        }
 
+		// Write the position to debug console
         dbg.interval([](){
-			usartprintf("x : %5lf, y : %5lf, theta : %5lf\n", pos.x, pos.y, pos.a);;
+			usartprintf("x : %5lf mm, y : %5lf mm, a : %5lf degs\n", pos.x, pos.y, pos.a);;
 		},100);
 
 		//BLINK LED

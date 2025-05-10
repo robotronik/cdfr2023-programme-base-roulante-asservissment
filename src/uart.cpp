@@ -41,12 +41,14 @@ void usartSendMessage(uint32_t usart, char* Message) {
 }
 
 void usartprintf(const char* format, ...) {
+#ifdef DEBUG
     char buffer[1000];
     va_list args;
     va_start(args, format);
     vsnprintf(buffer, 1000, format, args);
     usartSendMessage(USART2,buffer);
     va_end(args);
+#endif
 }
 
 
