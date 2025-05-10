@@ -13,8 +13,6 @@
 #include "odometry/I2Cdevice.h"
 #include "odometry/OTOS.h"
 
-// #define TESTMOTOR
-
 // If debug is define, the code will be compiled with debug information
 // #define DEBUG
 
@@ -31,6 +29,117 @@ i2c_interface robotI2cInterface(robotAsserv);
 
 void I2CRecieveData(uint8_t* data, int size) {
     robotI2cInterface.I2CDataSwitch(data, size);
+}
+
+void testMotors();
+void testloop(sequence* seq);
+
+int main(void)
+{
+	//SETUP
+	clock_setup();
+	ledSetup();
+    buttonSetup();
+	usartSetup();
+	DriveSetup();
+	i2c_setup();
+	setCallbackReceive(I2CRecieveData);
+	setupDeviceI2C();
+
+
+	//WAIT
+	delay_ms(1000);
+	usartprintf("Start\n");
+
+	// Check the connection with the OTOS
+	while (otos.begin() != ret_OK) {
+		usartprintf("OTOS not connected\n");
+		RedLED_Toggle();
+		delay_ms(200);
+	}
+	usartprintf("OTOS connected\n");
+	RedLED_Clear();
+	
+
+
+
+//
+//	Main Loop of the robot
+//
+	sequence ledToggleSeq;
+    sequence mySeq;
+    sequence dbg;
+    bool isDebug = false;
+
+    // Reset because the stm has been booted for 3 seconds
+	robotAsserv.reset();
+
+	while (1) {
+		updatePositionData();
+        robotAsserv.loop();
+
+        if (isDebug) {
+            testloop(&mySeq);
+        }
+        else if (readTestButton()) {
+            isDebug = true;
+            mySeq.reset();
+        }
+
+		if (readPushButton())
+			testMotors();
+
+		// Write the position to debug console
+        dbg.interval([](){
+			usartprintf("x : %5lf mm, y : %5lf mm, a : %5lf degs\n", pos.x, pos.y, pos.a);;
+		},100);
+
+		//BLINK LED
+		ledToggleSeq.interval([](){
+			GreenLED_Toggle();
+		},800);
+	}
+
+	return 0;
+}
+
+//
+// Test motor
+// Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward
+//
+void testMotors(){
+    DriveEnable();
+    for (double i = 0.0; i < 100.0; i++) {
+        usartprintf("%d\n",i);
+		motorA.SetSpeedSigned(i);
+		motorB.SetSpeedSigned(i);
+		motorC.SetSpeedSigned(i);
+		motorA.PrintValues();
+		motorB.PrintValues();
+		motorC.PrintValues();
+        delay_ms(100);
+    }
+    for (double i = 100.0; i > -100.0; i--) {
+        usartprintf("%d\n",i);
+		motorA.SetSpeedSigned(i);
+		motorB.SetSpeedSigned(i);
+		motorC.SetSpeedSigned(i);
+		motorA.PrintValues();
+		motorB.PrintValues();
+		motorC.PrintValues();
+        delay_ms(100);
+    }
+    for (double i = -100.0; i <= 0.0; i++) {
+        usartprintf("%d\n",i);
+		motorA.SetSpeedSigned(i);
+		motorB.SetSpeedSigned(i);
+		motorC.SetSpeedSigned(i);
+		motorA.PrintValues();
+		motorB.PrintValues();
+		motorC.PrintValues();
+        delay_ms(100);
+    }
+    while (1);
 }
 
 void testloop(sequence* seq) {
@@ -90,105 +199,4 @@ void testloop(sequence* seq) {
 	// seq->delay([](){
 	// 	robotAsserv.setTargetAngulaire(0,ROTATION_HORRAIRE);
 	// },7000);
-}
-
-
-int main(void)
-{
-	//SETUP
-	clock_setup();
-	ledSetup();
-    buttonSetup();
-	usartSetup();
-	DriveSetup();
-	i2c_setup();
-	setCallbackReceive(I2CRecieveData);
-	setupDeviceI2C();
-
-
-	//WAIT
-	delay_ms(1000);
-	usartprintf("Start\n");
-
-	// Check the connection with the OTOS
-	while (otos.begin() != ret_OK) {
-		usartprintf("OTOS not connected\n");
-		RedLED_Toggle();
-		delay_ms(200);
-	}
-	usartprintf("OTOS connected\n");
-	RedLED_Clear();
-	
-
-//
-// Test motor
-// Accelerate Forward -> Decelerate Forward -> Accelerate backward -> Decelerate backward
-//
-#ifdef TESTMOTOR
-    enableMotor();
-    for (int i = 0; i < 100; i++) {
-        usartprintf("%d\n",i);
-        motorSpeedSignedL(i);
-        motorSpeedSignedR(i);
-        delay_ms(100);
-        usartprintf("Right : %d %d\n",gpio_get(port_info1R,pin_info1R),gpio_get(port_info2R,pin_info2R));
-        usartprintf("Left : %d %d\n\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L));
-    }
-    for (int i = 100; i > -100; i--) {
-        usartprintf("%d\n",i);
-        motorSpeedSignedL(i);
-        motorSpeedSignedR(i);
-        delay_ms(100);
-        usartprintf("Right : %d %d\n",gpio_get(port_info1R,pin_info1R),gpio_get(port_info2R,pin_info2R));
-        usartprintf("Left : %d %d\n\n",gpio_get(port_info1L,pin_info1L),gpio_get(port_info2L,pin_info2L));
-    }
-
-    for (int i = -100; i < 0; i++) {
-        usartprintf("%d\n",i);
-        motorSpeedSignedL(i);
-        motorSpeedSignedR(i);
-        delay_ms(100);
-        usartprintf("Right : %d %d\n",gpio_get(port_info1R,port_info1R),gpio_get(port_info2R,port_info2R));
-        usartprintf("Left : %d %d\n\n",gpio_get(port_info1R,port_info1L),gpio_get(port_info2R,port_info2L));
-    }
-    while (1);
-#endif
-
-
-
-//
-//	Main Loop of the robot
-//
-	sequence ledToggleSeq;
-    sequence mySeq;
-    sequence dbg;
-    bool isDebug = false;
-
-    // Reset because the stm has been booted for 3 seconds
-	robotAsserv.reset();
-
-	while (1) {
-		updatePositionData();
-        robotAsserv.loop();
-
-        if (isDebug) {
-            testloop(&mySeq);
-        }
-        else if (readTestButton()) {
-            isDebug = true;
-            mySeq.reset();
-        }
-
-		// Write the position to debug console
-        dbg.interval([](){
-			usartprintf("x : %5lf mm, y : %5lf mm, a : %5lf degs\n", pos.x, pos.y, pos.a);;
-		},100);
-
-		//BLINK LED
-		ledToggleSeq.interval([](){
-			GreenLED_Toggle();
-		},800);
-	}
-
-	return 0;
 }

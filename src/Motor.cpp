@@ -99,11 +99,18 @@ void Motor::Setup(){
 	setupGPIO();
 }
 
-void Motor::SetSpeedSigned(int speed) {
+void Motor::SetSpeedSigned(double speed) {
 	SetSpeedUnsigned(abs(speed), speed<0);
 }
 
-void Motor::SetSpeedUnsigned(int speed, bool reverse) {
+void Motor::SetSpeedUnsigned(double speed, bool reverse) {
+	if (!driveEnabled) {
+		usartprintf("Drive not enabled\n");
+		return;
+	}
+	if (braking) {
+		Brake(false);
+	}
 	SetDirection(reverse);
 	SetSpeed(speed);
 }
@@ -120,12 +127,13 @@ void Motor::Brake(bool brake) {
 		gpio_clear(_port_Brake,_pin_Brake);	
 	else
 		gpio_set(_port_Brake,_pin_Brake);
+	braking = brake;
 }
 
 
-void Motor::SetSpeed(int speed) {
+void Motor::SetSpeed(double speed) {
 	speed = CLAMP(speed,0,maxSpeed);
-	int pwmVal = speed * COEFMULT; // (speed/2 + 50)
+	int pwmVal = (int)(speed * COEFMULT); // (speed/2 + 50)
 
 	timer_set_oc_value(TIM1, _oc_id, pwmVal);
 }

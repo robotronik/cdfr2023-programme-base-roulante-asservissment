@@ -50,12 +50,12 @@ public:
     // 0 Stops the motor
     // Negative value are use to backward
     // Don't forget to disable reset, coast and brake
-    void SetSpeedSigned(int speed);
+    void SetSpeedSigned(double speed);
 
     // Set the speed of the motor with a value between 0 and 100
     // 0 Stops the motor
     // Don't forget to disable reset, coast and brake
-    void SetSpeedUnsigned(int speed, bool reverse);
+    void SetSpeedUnsigned(double speed, bool reverse);
 
     void Brake(bool brake);
 
@@ -84,11 +84,13 @@ private:
     // Set the speed of the motor with a value between 0 and 100
     // 0 Stops the motor
     // Don't forget to disable reset, coast and brake
-    void SetSpeed(int speed);
+    void SetSpeed(double speed);
 
 
     int id;
     char name;
+
+    bool braking = false;
 
     uint16_t adc_value = 0;
     int maxTorque = 4096;
