@@ -28,6 +28,7 @@ public :
 
 public:
     Asservissement();
+    ~Asservissement(){};
 
     void loop();
     void asservissementLoop();

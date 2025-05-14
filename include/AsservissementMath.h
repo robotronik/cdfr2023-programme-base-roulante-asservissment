@@ -17,6 +17,7 @@ public:
     LowPassFilter(double tau): tau_filter(tau) {
         reset();
     }
+    ~LowPassFilter() {};
 
     void reset(void){
         prev_filtered = 0.0;

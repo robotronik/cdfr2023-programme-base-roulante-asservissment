@@ -43,7 +43,8 @@ public:
         int port_InfoDir, int pin_InfoDir,
         tim_oc_id oc_id
     );
-
+    ~Motor(){};
+    
     void Setup();
 
     // Set the speed of the motor with a value between -100 and 100

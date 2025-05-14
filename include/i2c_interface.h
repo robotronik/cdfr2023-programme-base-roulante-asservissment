@@ -10,6 +10,7 @@ private:
     movement* robotAsserv;
 public:
     i2c_interface(movement* inRobotAsservisement);
+    ~i2c_interface(){};
 
     void get_version(uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4);
     void set_led_1(bool status);

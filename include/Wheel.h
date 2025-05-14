@@ -6,6 +6,7 @@ class Wheel {
 public:
     // Constructor to initialize wheel geometry.
     Wheel(double dist, double ang, double diameter, Motor* motorPtr);
+    ~Wheel(){};
 
     void update(double linear, double theta, double angular);
     void setSpeed(double speed);
