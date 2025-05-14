@@ -1,4 +1,6 @@
 #include "i2c_interface.h"
+#include "led.h"
+#include "Motor.h"
 
 i2c_interface::i2c_interface(movement& inRobotAsservisement):
 robotAsserv(inRobotAsservisement) {

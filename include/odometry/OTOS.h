@@ -391,8 +391,8 @@ class OTOS
     static constexpr uint8_t kProductId = 0x5F;
 
     // Conversion factors
-    static constexpr float kRadianToDegree = 180.0f / M_PI;
-    static constexpr float kDegreeToRadian = M_PI / 180.0f;
+    static constexpr float kRadianToDegree = 180.0f / PI;
+    static constexpr float kDegreeToRadian = PI / 180.0f;
 
     // Conversion factor for the linear position registers. 16-bit signed
     // registers with a max value of 10 meters (394 inches) gives a resolution
@@ -415,7 +415,7 @@ class OTOS
     // Conversion factor for the angular position registers. 16-bit signed
     // registers with a max value of pi radians (180 degrees) gives a resolution
     // of about 0.00096 radians (0.0055 degrees)
-    static constexpr float kRadToInt16 = 32768.0f / M_PI;
+    static constexpr float kRadToInt16 = 32768.0f / PI;
     static constexpr float kInt16ToRad = 1.0f / kRadToInt16;
 
     // Conversion factor for the angular velocity registers. 16-bit signed
@@ -427,7 +427,7 @@ class OTOS
     // Conversion factor for the angular acceleration registers. 16-bit signed
     // registers with a max value of 3141 rps^2 (180000 dps^2) gives a
     // resolution of about 0.096 rps^2 (5.5 dps^2)
-    static constexpr float kRpssToInt16 = 32768.0f / (M_PI * 1000.0f);
+    static constexpr float kRpssToInt16 = 32768.0f / (PI * 1000.0f);
     static constexpr float kInt16ToRpss = 1.0f / kRpssToInt16;
 };
 

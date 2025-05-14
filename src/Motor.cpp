@@ -188,7 +188,7 @@ fault_action_t Motor::GetFault(){
 
 void Motor::PrintValues(){
     usartprintf(">ADC of %c: %4d /4095\n", adc_value);
-    usartprintf(">Current of %c: %lf A\n", GetCurrent());
+    usartprintf(">Current of %c: %g A\n", GetCurrent());
 }
 
 void setupDriveGPIO(void){
@@ -355,7 +355,6 @@ void adc_isr(void){
 		adc_start_conversion_regular(ADC1);
     }
 }
-
 
 Motor motorA(0, port_SpeedControlA, pin_SpeedControlA,
     port_DirectionA, pin_DirectionA,

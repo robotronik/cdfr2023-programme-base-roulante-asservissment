@@ -1,6 +1,7 @@
 #include <math.h>
 #include "Wheel.h"
 #include "config.h"
+#include "types/structs.h"
 
 Wheel wheelA(DISTANCE_WHEEL, 180, DIAMETER_WHEEL, &motorA);  // WheelA at 0°
 Wheel wheelB(DISTANCE_WHEEL,  60, DIAMETER_WHEEL, &motorB);  // WheelB at 120°
@@ -18,10 +19,10 @@ Wheel::Wheel(double dist, double ang, double diameter, Motor* motorPtr) :
 // theta: current error angle to target in degrees
 // angular: angular speed of robot in degrees/s
 void Wheel::update(double linear, double theta, double angular) {
-    double rad = (angle + theta) * M_PI / 180.0;
+    double rad = (angle + theta) * DEG_TO_RAD;
 
-    double circumference = M_PI * diam; // in mm
-    double robotCircumference = 2 * M_PI * distanceToCenter; // in mm
+    double circumference = PI * diam; // in mm
+    double robotCircumference = 2 * PI * distanceToCenter; // in mm
     
     // Compute the wheel speed by projecting the commandd linear velocity and adding the contribution of rotational velocity.
     // The wheel speed is in mm/s.
