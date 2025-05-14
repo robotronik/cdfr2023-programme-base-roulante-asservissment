@@ -21,6 +21,6 @@ private:
     Motor* motor;
 };
 
-extern Wheel wheelA;
-extern Wheel wheelB;
-extern Wheel wheelC;
+extern Wheel* wheelA;
+extern Wheel* wheelB;
+extern Wheel* wheelC;

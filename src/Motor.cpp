@@ -4,6 +4,10 @@
 #include "math.h"
 #include "config.h"
 
+Motor* motorA = nullptr;
+Motor* motorB = nullptr;
+Motor* motorC = nullptr;
+
 // BLDC motor driver
 // https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-DGA5/483784.pdf
 
@@ -32,9 +36,9 @@ void setupDriveGPIO();
 void DriveDisable(){
 	gpio_clear(port_CoastDrive, pin_CoastDrive);
 	driveEnabled = false;
-	motorA.SetSpeedSigned(0);
-	motorB.SetSpeedSigned(0);
-	motorC.SetSpeedSigned(0);
+	motorA->SetSpeedSigned(0);
+	motorB->SetSpeedSigned(0);
+	motorC->SetSpeedSigned(0);
 }
 void DriveEnable(){
 	gpio_set(port_CoastDrive, pin_CoastDrive);
@@ -65,9 +69,36 @@ void ResetDrive(){
 
 void DriveSetup(){
 	setupDriveGPIO();
-	motorA.Setup();
-	motorB.Setup();
-	motorC.Setup();
+	motorA = new Motor(0, port_SpeedControlA, pin_SpeedControlA,
+    port_DirectionA, pin_DirectionA,
+    port_BrakeA, pin_BrakeA,
+    port_ESFA, pin_ESFA,
+    port_TachoA, pin_TachoA,
+    port_Err1A, pin_Err1A,
+    port_Err2A, pin_Err2A,
+    port_InfoDirA, pin_InfoDirA,
+    TIM_OC2);
+	motorB = new Motor(1, port_SpeedControlB, pin_SpeedControlB,
+    port_DirectionB, pin_DirectionB,
+    port_BrakeB, pin_BrakeB,
+    port_ESFB, pin_ESFB,
+    port_TachoB, pin_TachoB,
+    port_Err1B, pin_Err1B,
+    port_Err2B, pin_Err2B,
+    port_InfoDirB, pin_InfoDirB,
+    TIM_OC1);
+	motorC = new Motor(2, port_SpeedControlC, pin_SpeedControlC,
+    port_DirectionC, pin_DirectionC,
+    port_BrakeC, pin_BrakeC,
+    port_ESFC, pin_ESFC,
+    port_TachoC, pin_TachoC,
+    port_Err1C, pin_Err1C,
+    port_Err2C, pin_Err2C,
+    port_InfoDirC, pin_InfoDirC,
+    TIM_OC3);
+	motorA->Setup();
+	motorB->Setup();
+	motorC->Setup();
 	setuptimer();
 	adc_setup();
 }
@@ -355,31 +386,3 @@ void adc_isr(void){
 		adc_start_conversion_regular(ADC1);
     }
 }
-
-Motor motorA(0, port_SpeedControlA, pin_SpeedControlA,
-    port_DirectionA, pin_DirectionA,
-    port_BrakeA, pin_BrakeA,
-    port_ESFA, pin_ESFA,
-    port_TachoA, pin_TachoA,
-    port_Err1A, pin_Err1A,
-    port_Err2A, pin_Err2A,
-    port_InfoDirA, pin_InfoDirA,
-    TIM_OC2);
-Motor motorB(1, port_SpeedControlB, pin_SpeedControlB,
-    port_DirectionB, pin_DirectionB,
-    port_BrakeB, pin_BrakeB,
-    port_ESFB, pin_ESFB,
-    port_TachoB, pin_TachoB,
-    port_Err1B, pin_Err1B,
-    port_Err2B, pin_Err2B,
-    port_InfoDirB, pin_InfoDirB,
-    TIM_OC1);
-Motor motorC(2, port_SpeedControlC, pin_SpeedControlC,
-    port_DirectionC, pin_DirectionC,
-    port_BrakeC, pin_BrakeC,
-    port_ESFC, pin_ESFC,
-    port_TachoC, pin_TachoC,
-    port_Err1C, pin_Err1C,
-    port_Err2C, pin_Err2C,
-    port_InfoDirC, pin_InfoDirC,
-    TIM_OC3);

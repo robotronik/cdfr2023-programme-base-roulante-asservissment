@@ -117,9 +117,9 @@ void Asservissement::asservissementLoop(){
     }
 
     //usartprintf(">speedL:%d\n>speedR:%d\n",(int)(valPidLineaire-valPidAngulaire),(int)(valPidLineaire+valPidAngulaire));
-    motorA.SetSpeedSigned((int)(valPidLineaire-valPidAngulaire)); // TODO
-    motorB.SetSpeedSigned((int)(valPidLineaire+valPidAngulaire));
-    motorC.SetSpeedSigned((int)(valPidLineaire-valPidAngulaire));
+    motorA->SetSpeedSigned((int)(valPidLineaire-valPidAngulaire)); // TODO
+    motorB->SetSpeedSigned((int)(valPidLineaire+valPidAngulaire));
+    motorC->SetSpeedSigned((int)(valPidLineaire-valPidAngulaire));
 }
 
 
@@ -247,9 +247,9 @@ void Asservissement::reset(void){
     pidLineaireBlock.reset();
     pidLineaire.reset();
     nextTime =  get_uptime_ms();
-    motorA.SetSpeedSigned(0);
-    motorB.SetSpeedSigned(0);
-    motorC.SetSpeedSigned(0);
+    motorA->SetSpeedSigned(0);
+    motorB->SetSpeedSigned(0);
+    motorC->SetSpeedSigned(0);
 }
 
 //******************************************************

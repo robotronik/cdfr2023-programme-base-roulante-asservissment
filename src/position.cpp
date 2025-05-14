@@ -18,13 +18,13 @@ void updatePositionData(){
         pos = newPosition;
         needChangePos = false;
         positionChanged = true;
-        otos.setPosition(pos);
+        otos->setPosition(pos);
     }
     
     RedLED_Clear();
     // Get the current position from the OTOS
     position_t r_pos, r_vel, r_acc;
-    if (otos.getPosVelAcc(r_pos, r_vel, r_acc) == ret_OK) {
+    if (otos->getPosVelAcc(r_pos, r_vel, r_acc) == ret_OK) {
         // Update the position, velocity, and acceleration data
         pos = r_pos;
         vel = r_vel;

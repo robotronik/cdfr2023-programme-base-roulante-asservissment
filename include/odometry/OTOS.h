@@ -174,7 +174,7 @@ class OTOS
     /// @return 0 for succuss, negative for errors, positive for warnings
     return_t getLinearScalar(float &scalar);
 
-    /// @brief Sets the linear scalar used by the OTOS. Can be used to
+    /// @brief Sets the linear scalar used by the otos-> Can be used to
     /// compensate for scaling issues with the sensor measurements
     /// @param scalar Linear scalar, must be between 0.872 and 1.127
     /// @return 0 for succuss, negative for errors, positive for warnings
@@ -185,7 +185,7 @@ class OTOS
     /// @return 0 for succuss, negative for errors, positive for warnings
     return_t getAngularScalar(float &scalar);
 
-    /// @brief Sets the angular scalar used by the OTOS. Can be used to
+    /// @brief Sets the angular scalar used by the otos-> Can be used to
     /// compensate for scaling issues with the sensor measurements
     /// @param scalar Angular scalar, must be between 0.872 and 1.127
     /// @return 0 for succuss, negative for errors, positive for warnings
@@ -201,7 +201,7 @@ class OTOS
     /// @return 0 for succuss, negative for errors, positive for warnings
     return_t getSignalProcessConfig(otos_signal_process_config_t &config);
 
-    /// @brief Sets the signal processing configuration on the OTOS. This is
+    /// @brief Sets the signal processing configuration on the otos-> This is
     /// primarily useful for creating and testing a new lookup table calibration
     /// @param config Signal processing configuration
     /// @return 0 for succuss, negative for errors, positive for warnings
@@ -218,7 +218,7 @@ class OTOS
     /// @return 0 for succuss, negative for errors, positive for warnings
     return_t getOffset(position_t &pose);
 
-    /// @brief Sets the offset of the OTOS. This is useful if your sensor is
+    /// @brief Sets the offset of the otos-> This is useful if your sensor is
     /// mounted off-center from a robot. Rather than returning the position of
     /// the sensor, the OTOS will return the position of the robot
     /// @param pose Offset of the sensor relative to the center of the robot
@@ -230,7 +230,7 @@ class OTOS
     /// @return 0 for succuss, negative for errors, positive for warnings
     return_t getPosition(position_t &pose);
 
-    /// @brief Sets the position measured by the OTOS. This is useful if your
+    /// @brief Sets the position measured by the otos-> This is useful if your
     /// robot does not start at the origin, or you have another source of
     /// location information (eg. vision odometry); the OTOS will continue
     /// tracking from this position
@@ -431,5 +431,5 @@ class OTOS
     static constexpr float kInt16ToRpss = 1.0f / kRpssToInt16;
 };
 
-extern OTOS otos;
-extern I2CDevice i2cDevice;
+extern OTOS* otos;
+extern I2CDevice* i2cDevice;

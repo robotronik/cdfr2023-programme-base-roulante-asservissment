@@ -128,6 +128,6 @@ private:
 };
 
 // Create the motor objects
-extern Motor motorA;
-extern Motor motorB;
-extern Motor motorC;
+extern Motor* motorA;
+extern Motor* motorB;
+extern Motor* motorC;
