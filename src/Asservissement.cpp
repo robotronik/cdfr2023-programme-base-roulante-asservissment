@@ -84,11 +84,11 @@ void Asservissement::asservissementLoop(){
     // usartprintf(">consignLin:%lf\n",positionControlLineaire.getPostion());
     // usartprintf(">errorLin:%lf\n",realErrorLinear);
 
-    if(realErrorLinear >= 100){
+    if(realErrorLinear >= 200){
         reTargetAngle = true;
         setConsigneAngulaire(targetAngle,Rotation::SHORTEST);
     }
-    else if(realErrorLinear <= -100){
+    else if(realErrorLinear <= -200){
         reTargetAngle = true;
         setConsigneAngulaire(targetAngle+180,Rotation::SHORTEST);
     }

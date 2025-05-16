@@ -111,3 +111,18 @@ int rotation10(i2c_interface* robotI2cInterface){
     SEQUENCE_END();
     return EXIT_SUCCESS;
 }
+
+
+int longLine(i2c_interface* robotI2cInterface){
+    SEQUENCE_BEGIN();
+
+    robotI2cInterface->set_coordinates(0,0,0);
+    robotI2cInterface->set_motor_state(true);
+
+    robotI2cInterface->go_to_point(-2500,0,Rotation::SHORTEST,Direction::BACKWARD);
+
+    DELAY(1);
+
+    SEQUENCE_END();
+    return EXIT_SUCCESS;
+}

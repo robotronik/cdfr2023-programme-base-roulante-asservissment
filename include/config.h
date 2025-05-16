@@ -132,9 +132,9 @@
     #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
 #else
     #define NUMBERSTEPBYROTATION 360
-    #define DISTANCEWHEEL 253.9794921875 // + = teat -
-    #define DIAMETERWHEELD 41.3525390625                // +1 roue = +25 distance
-    #define DIAMETERWHEELG 41.3330078125// + = y -     // +1 roue = +25 distance
+    #define DISTANCEWHEEL 258.647754 // + = teat -
+    #define DIAMETERWHEELD 41.455078              // +1 roue = +25 distance
+    #define DIAMETERWHEELG 41.220703// + = y -     // +1 roue = +25 distance
 
     #define CALIBRATION_START_DISTANCEWHEEL 250.0
     #define CALIBRATION_START_DIAMETERWHEEL 40.0
