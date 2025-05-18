@@ -11,6 +11,7 @@
 #include "type.h"
 
 //#define ENABLE_STATISTIC
+//#define OLDROBOT
 
 //PIN and Port to control the first MotorL
 #define pin_ModeL 			GPIO0
