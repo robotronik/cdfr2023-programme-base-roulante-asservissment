@@ -130,6 +130,11 @@
     #define DISTANCEWHEEL 300 // + = teat -
     #define DIAMETERWHEELD 41.12                // +1 roue = +25 distance
     #define DIAMETERWHEELG 41.410 // + = y -     // +1 roue = +25 distance
+
+    #define CALIBRATION_START_DISTANCEWHEEL 300
+    #define CALIBRATION_START_DIAMETERWHEEL 40.0
+    #define CALIBRATION_PLAGE_DISTANCEWHEEL 100.0
+    #define CALIBRATION_PLAGE_DIAMETERWHEEL 20.0
 #else
     #define NUMBERSTEPBYROTATION 360
     #define DISTANCEWHEEL 258.647754 // + = teat -
@@ -151,7 +156,8 @@ enum class BaseCommand {
     ANGULAR_LOOKAT,
     LINEAR,
     MAX_SPEED_LINEAR,
-    MAX_SPEED_ANGULAR
+    MAX_SPEED_ANGULAR,
+    SET_POSITION
 };
 
 const char* directionToChar(Direction dir);

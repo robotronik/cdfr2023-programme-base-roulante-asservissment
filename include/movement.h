@@ -44,6 +44,7 @@ public:
     bool setConsigneLookAt(int16_t x,int16_t y,Rotation rotation,Direction direction);
     bool setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
     bool setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_acceleration,uint16_t max_deceleration);
+    bool setPosition(int x, int y, int theta);
 
     bool setConsigneStop(void);
     bool setConsignePause(void);

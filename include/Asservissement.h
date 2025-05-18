@@ -23,8 +23,10 @@ private:
     uint32_t nextTime;
     int loopPeriod = 20;
 
-    position* posRobot;
     bool print = false;
+
+protected:
+    position* posRobot;
 
 public :
     positionControl positionControlLineaire;

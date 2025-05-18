@@ -58,9 +58,6 @@ void Asservissement::setAsservissementLoopPeriod(int period){
 }
 
 void Asservissement::loop(){
-    if(posRobot->getPositionChanged()){
-        setConsigne(posRobot->getPosition());
-    }
     if(nextTime < get_uptime_ms()){
         nextTime = get_uptime_ms() + loopPeriod;
         asservissementLoop();

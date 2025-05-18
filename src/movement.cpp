@@ -130,6 +130,23 @@ bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_accele
     return 0;
 }
 
+bool movement::setPosition(int x, int y, int theta){
+    if(!commandBuffer.isFull()){
+        commandBuffer.push(Command{
+            BaseCommand::SET_POSITION,
+            x,
+            y,
+            theta,
+            Direction::BACKWARD,    //usless
+            Rotation::NONE          //usless
+        });
+    }
+    else{
+        return -1;
+    }
+    return 0;
+}
+
 bool movement::setConsigneStop(void){
     commandBuffer.resetTail();
     enableStop = true;
@@ -218,6 +235,13 @@ void movement::launchCommande(void){
         positionControlAngulaire.decelerationMaxAv = currentCommand.theta;
         positionControlAngulaire.decelerationMaxAr = currentCommand.theta;
         break;
+
+    case BaseCommand::SET_POSITION:{
+        posRobot->setPosition(currentCommand.x,currentCommand.y,currentCommand.theta);
+        position_t offsetCons = {(double)currentCommand.x,(double)currentCommand.y,(double)currentCommand.theta,0};
+        setConsigne(offsetCons);
+        break;
+    }
 
     default:
         break;

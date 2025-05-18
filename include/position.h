@@ -8,9 +8,6 @@ class position
 {
 private:
     position_t positionRobot = {0.0, 0.0, 0.0};
-    position_t newPosition = {0.0, 0.0, 0.0};
-    bool needChangePos = false;
-    bool positionChanged = false;
 public:
     position(/* args */);
 

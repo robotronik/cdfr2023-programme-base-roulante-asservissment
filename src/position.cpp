@@ -7,27 +7,18 @@ position::position(){
 
 void position::loop(){
     odometrieLoop(positionRobot);
-    if(needChangePos){
-        positionRobot.x = newPosition.x;
-        positionRobot.y = newPosition.y;
-        positionRobot.teta = newPosition.teta*DEG_TO_RAD;
-        needChangePos = false;
-        positionChanged = true;
-    }
     positionRobot.time = get_uptime_ms();
 }
 
 void position::setPosition(position_t inCommingposition){
-    newPosition = inCommingposition;
-    newPosition.teta = mod_angle(inCommingposition.teta);
-    needChangePos = true;
+    positionRobot = inCommingposition;
+    positionRobot.teta = mod_angle(inCommingposition.teta * DEG_TO_RAD);
 }
 void position::setPosition(double x, double y, double teta){
-    newPosition.x = x;
-    newPosition.y = y;
-    newPosition.teta =  mod_angle(teta);
-    newPosition.time = get_uptime_ms();
-    needChangePos = true;
+    positionRobot.x = x;
+    positionRobot.y = y;
+    positionRobot.teta =  mod_angle(teta * DEG_TO_RAD);
+    positionRobot.time = get_uptime_ms();
 }
 
 position_t position::getPosition(){
@@ -46,12 +37,6 @@ double position::getPosition_Teta(){
 }
 double position::getPosition_Time(){
     return positionRobot.time;
-}
-
-bool position::getPositionChanged(){
-    bool bret = positionChanged;
-    positionChanged = false;
-    return bret;
 }
 
 
