@@ -55,6 +55,11 @@ public:
         return item;
     }
 
+    T* read(int i) {
+        int localHead = (head + i) % (N+1);
+        return &(buffer[localHead]);
+    }
+
     void resetHead(){
         head = 0;
         headIsReset = false;
@@ -65,12 +70,13 @@ public:
 //******************************************************
 
     //not protected
-    bool isEmpty() const {
+    bool isEmpty(int i = 0) const {
+        int localHead = (head + i) % (N+1);
         if(headIsReset){
             return true;
         }
         else{
-            return (head == tail);
+            return (localHead == tail);
         }
     }
 

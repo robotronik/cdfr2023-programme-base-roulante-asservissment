@@ -20,6 +20,7 @@ class movement : public Asservissement
 private:
     CircularBuffer<Command, 1000> commandBuffer;
     Command currentCommand;
+    double maxSpeedOut;
     bool run = false;
 
     bool enableStop = false;
@@ -58,6 +59,7 @@ public:
 
 private:
     void launchCommande(void);
+    void preComputeBuffer(void);
     bool currentCommandRun(void);
 };
 

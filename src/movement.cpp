@@ -19,8 +19,8 @@ bool movement::goToPoint(int16_t x,int16_t y,Rotation rotation, Direction direct
             x,
             y,
             0,                  //useless
-            Direction::SHORTEST, //useless
-            Rotation::SHORTEST    //useless
+            Direction::NONE,    //useless
+            Rotation::NONE,     //useless
         });
     }
     else{
@@ -44,15 +44,15 @@ bool movement::goToPoint(int16_t x,int16_t y,int16_t theta, Rotation rotationFir
             x,
             y,
             0,                  //useless
-            Direction::SHORTEST, //useless
-            Rotation::SHORTEST    //useless
+            Direction::NONE,    //useless
+            Rotation::NONE,     //useless
         });
         commandBuffer.push(Command{
             BaseCommand::ANGULAR_THETA,
             0,                  //useless
             0,                  //useless
             theta,
-            Direction::SHORTEST, //useless
+            Direction::NONE,    //useless
             rotationSecond
         });
     }
@@ -69,7 +69,7 @@ bool movement::setConsigneAngulaire(int16_t angle,Rotation rotation){
             0,                  //useless
             0,                  //useless
             angle,
-            Direction::SHORTEST, //useless
+            Direction::NONE,    //useless
             rotation
         });
     }
@@ -103,7 +103,7 @@ bool movement::setConsigneMaxSpeedLinear(uint16_t max_speed,uint16_t max_acceler
             max_speed,
             max_acceleration,
             max_deceleration,
-            Direction::BACKWARD,    //usless
+            Direction::NONE,        //usless
             Rotation::NONE          //usless
         });
     }
@@ -120,7 +120,7 @@ bool movement::setConsigneMaxSpeedAngular(uint16_t max_speed,uint16_t max_accele
             max_speed,
             max_acceleration,
             max_deceleration,
-            Direction::BACKWARD,    //usless
+            Direction::NONE,        //usless
             Rotation::NONE          //usless
         });
     }
@@ -137,7 +137,7 @@ bool movement::setPosition(int x, int y, int theta){
             x,
             y,
             theta,
-            Direction::BACKWARD,    //usless
+            Direction::NONE,        //usless
             Rotation::NONE          //usless
         });
     }
@@ -184,8 +184,42 @@ void movement::printStatistic(void){
     }
 }
 
+void movement::preComputeBuffer(void){
+    int i = 0;
+    position_t preComputePos = posRobot->getPosition();
+    while (!commandBuffer.isEmpty(i)){
+        Command* command = commandBuffer.read(i);
+        switch (command->baseCommand)
+        {
+        case BaseCommand::LINEAR:
+            preComputePos.x = currentCommand.x;
+            preComputePos.y = currentCommand.y;
+            break;
+
+        case BaseCommand::ANGULAR_LOOKAT:
+            preComputePos.teta = getLookAtAngle(preComputePos,currentCommand.x,currentCommand.y,currentCommand.direction,currentCommand.rotation);
+            break;
+
+        case BaseCommand::ANGULAR_THETA:
+            preComputePos.teta = currentCommand.theta;
+            break;
+
+
+        case BaseCommand::SET_POSITION:
+            preComputePos.x = currentCommand.x;
+            preComputePos.y = currentCommand.y;
+            preComputePos.teta = currentCommand.theta;
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 
 void movement::launchCommande(void){
+    currentCommand = commandBuffer.pop();
+
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
     usartprintf("x %d\n",currentCommand.x);
     usartprintf("y %d\n",currentCommand.y);
@@ -199,23 +233,15 @@ void movement::launchCommande(void){
     switch (currentCommand.baseCommand)
     {
     case BaseCommand::LINEAR:
-        setProtectedConsigneLineaire(currentCommand.x,currentCommand.y);
+        Asservissement::setConsigneLineaire(currentCommand.x,currentCommand.y);
         break;
 
     case BaseCommand::ANGULAR_LOOKAT:
-        if(currentCommand.direction == Direction::SHORTEST){
-            Asservissement::setConsigneLookAt(currentCommand.x,currentCommand.y,currentCommand.rotation);
-        }
-        else if(currentCommand.direction == Direction::FORWARD){
-            Asservissement::setConsigneLookAtForward(currentCommand.x,currentCommand.y,currentCommand.rotation);
-        }
-        else{
-            Asservissement::setConsigneLookAtBackward(currentCommand.x,currentCommand.y,currentCommand.rotation);
-        }
+        Asservissement::setConsigneAngulaire(currentCommand.x,currentCommand.y,currentCommand.direction,currentCommand.rotation);
         break;
 
     case BaseCommand::ANGULAR_THETA:
-        setProtectedConsigneAngulaire(currentCommand.theta,currentCommand.rotation);
+        Asservissement::setConsigneAngulaire(currentCommand.theta,currentCommand.rotation);
         break;
 
     case BaseCommand::MAX_SPEED_LINEAR:
@@ -286,7 +312,6 @@ void movement::loop(void){
 
     if(!pause){
         if(!run && !commandBuffer.isEmpty()){
-            currentCommand = commandBuffer.pop();
             launchCommande();
             run = true;
         }
@@ -295,7 +320,6 @@ void movement::loop(void){
             printStatistic();
 #endif
             if(!commandBuffer.isEmpty()){
-                currentCommand = commandBuffer.pop();
                 launchCommande();
             }
             else{

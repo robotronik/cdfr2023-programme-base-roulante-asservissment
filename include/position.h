@@ -22,7 +22,6 @@ public:
     double getPosition_Y();
     double getPosition_Teta();
     double getPosition_Time();
-    bool getPositionChanged();
 
 
     ~position();
