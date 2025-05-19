@@ -18,7 +18,13 @@ struct Command {
 class movement : public Asservissement
 {
 private:
-    CircularBuffer<Command, 1000> commandBuffer;
+    enum stateMovement {
+        NONE = 0,
+        ANGULAR = 1,
+        LINEAR = 2,
+    };
+
+    CircularBuffer<Command, COMMANDE_BUFFER_SIZE> commandBuffer;
     Command currentCommand;
     double maxSpeedOut;
     bool run = false;
@@ -59,7 +65,7 @@ public:
 
 private:
     void launchCommande(void);
-    void preComputeBuffer(void);
+    double findLinearMaxSpeedOut(void);
     bool currentCommandRun(void);
 };
 

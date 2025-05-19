@@ -184,37 +184,89 @@ void movement::printStatistic(void){
     }
 }
 
-void movement::preComputeBuffer(void){
-    int i = 0;
+double getDeltaAngle(double angleErreur, Rotation rotation){
+    if(angleErreur>0 && rotation == Rotation::CLOCKWISE){
+        angleErreur -= 360;
+    }
+    else if(angleErreur<0 && rotation == Rotation::ANTICLOCKWISE){
+        angleErreur += 360;
+    }
+    return angleErreur;
+}
+
+double movement::findLinearMaxSpeedOut(void){
     position_t preComputePos = posRobot->getPosition();
-    while (!commandBuffer.isEmpty(i)){
+    position_t prevPos;
+    double deltaAngle[COMMANDE_BUFFER_SIZE];
+    double deltaSize[COMMANDE_BUFFER_SIZE];
+    double maxDeccel[COMMANDE_BUFFER_SIZE];
+    double maxSpeed[COMMANDE_BUFFER_SIZE];
+    double maxSpeedCurve[COMMANDE_BUFFER_SIZE];
+    int vectorCount = -1;
+    stateMovement currentStateVector = NONE;
+    bool stop = false;
+    double currentMaxSpeed = positionControlLineaire.vitesseMaxAv;
+    double currentMaxDeccel = positionControlLineaire.decelerationMaxAv;
+
+    for(int i = 0; !stop && !commandBuffer.isEmpty(i); i++){
+        prevPos = preComputePos;
         Command* command = commandBuffer.read(i);
+
+        if((command->baseCommand == BaseCommand::ANGULAR_LOOKAT || command->baseCommand == BaseCommand::ANGULAR_THETA) && currentStateVector == ANGULAR){
+            break;
+        }
+
         switch (command->baseCommand)
         {
         case BaseCommand::LINEAR:
-            preComputePos.x = currentCommand.x;
-            preComputePos.y = currentCommand.y;
+            preComputePos.x = command->x;
+            preComputePos.y = command->y;
+            vectorCount ++;
+            maxSpeed[vectorCount] = currentMaxSpeed;
+            maxDeccel[vectorCount] = currentMaxDeccel;
+            deltaSize[vectorCount] = hypot(prevPos.x - preComputePos.x, prevPos.y - preComputePos.y);
+            if(vectorCount != 0){
+                double dist = std::min(std::min(deltaSize[vectorCount-1],deltaSize[vectorCount]),50.0)/50.0;
+                double angle = map(std::min(abs(deltaAngle[vectorCount-1]),20.0), 0, 20,300,0);
+                maxSpeedCurve[vectorCount-1] = dist * angle;
+            }
+            currentStateVector = LINEAR;
             break;
 
         case BaseCommand::ANGULAR_LOOKAT:
-            preComputePos.teta = getLookAtAngle(preComputePos,currentCommand.x,currentCommand.y,currentCommand.direction,currentCommand.rotation);
+            preComputePos.teta = getLookAtAngle(preComputePos,command->x,command->y,command->direction,command->rotation);
+            deltaAngle[vectorCount] = getDeltaAngle(mod_angle(prevPos.teta - preComputePos.teta), command->rotation);
+            currentStateVector = ANGULAR;
             break;
 
         case BaseCommand::ANGULAR_THETA:
-            preComputePos.teta = currentCommand.theta;
+            preComputePos.teta = command->theta;
+            deltaAngle[vectorCount] = getDeltaAngle(mod_angle(prevPos.teta - preComputePos.teta), command->rotation);
+            currentStateVector = ANGULAR;
+            break;
+
+        case BaseCommand::MAX_SPEED_LINEAR:
+            currentMaxSpeed = command->x;
+            currentMaxDeccel = command->theta;
             break;
 
 
         case BaseCommand::SET_POSITION:
-            preComputePos.x = currentCommand.x;
-            preComputePos.y = currentCommand.y;
-            preComputePos.teta = currentCommand.theta;
+            stop = true;
             break;
 
         default:
             break;
         }
     }
+
+    double currentSpeed = 0;
+    for(int i = vectorCount - 1; i >= 1; i--){
+        currentSpeed = sqrt(currentSpeed*currentSpeed + 2*deltaSize[i]*maxDeccel[i]);
+        currentSpeed = std::min(currentSpeed,maxSpeed[i]);
+        currentSpeed = std::min(currentSpeed,maxSpeedCurve[i-1]);
+    }
+    return currentSpeed;
 }
 
 void movement::launchCommande(void){

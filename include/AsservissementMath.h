@@ -6,6 +6,7 @@
 
 double mod_angle(double a);
 double calculAngle(double x, double y, position_t actualPostion);
+double map(double x, double in_min, double in_max, double out_min, double out_max);
 
 
 
