@@ -125,6 +125,7 @@
 
 #define CALIBRATION_IT 10
 #define CALIBRATION_DIV 4
+#define COMMANDE_BUFFER_SIZE 1000
 
 //Odometrie
 #ifdef OLDROBOT
