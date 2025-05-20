@@ -82,6 +82,7 @@ void positionControl::setMaxSpeedOut(double max){
 void positionControl::computeStroke(bool forceStop) {
     decelerationAv = forceStop ? decelerationStopAv : decelerationMaxAv;
     decelerationAr = forceStop ? decelerationStopAr : decelerationMaxAr;
+    double time = (double)(get_uptime_ms()-startTimeMs)/1000;
     //genstion du mouvement Avant
     if(consigne != position){
         if(consigne-position>0){
@@ -94,6 +95,12 @@ void positionControl::computeStroke(bool forceStop) {
         startSpeed = vitesse;
         startTimeMs = get_uptime_ms();
         startPosition = position;
+    }
+    //Prevent stop when the robot not start to move
+    else if(time < t_accel + t_cruise + t_decel){
+        t_accel = 0;
+        t_cruise = 0;
+        t_decel = 0;
     }
 }
 
