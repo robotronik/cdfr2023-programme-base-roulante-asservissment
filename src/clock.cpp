@@ -6,6 +6,7 @@
 #else
     #include <libopencm3/cm3/systick.h>
     #include <libopencm3/stm32/rcc.h>
+    #include <libopencm3/cm3/nvic.h>
 #endif
 
 void clock_setup(){
@@ -19,6 +20,8 @@ void clock_setup(){
   systick_counter_enable();
   systick_interrupt_enable();
 
+  //enable global iterrupts
+  nvic_enable_irq(NVIC_SYSTICK_IRQ);
 }
 
 volatile uint32_t systicks = 0;

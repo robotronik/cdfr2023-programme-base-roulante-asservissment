@@ -15,7 +15,7 @@
 #include "odometry/OTOS.h"
 
 // If debug is define, the code will be compiled with debug information
-#define DEBUG
+// #define MUTE_UART
 
 #ifdef SIMULATION
 	#include "hardware_interface.h"
@@ -44,7 +44,6 @@ int main(void)
 	robotI2cInterface = new i2c_interface(robotAsserv);
 
 	ledSetup();
-					GreenLED_Set();
     buttonSetup();
 	usartSetup();
 	DriveSetup();
@@ -74,7 +73,8 @@ int main(void)
 	wheelA =  new Wheel(DISTANCE_WHEEL, 60, DIAMETER_WHEEL, motorA);
 	wheelA =  new Wheel(DISTANCE_WHEEL,-60, DIAMETER_WHEEL, motorA);
 	
-
+	// Reset the position of the robot
+	setPosition(0, 0, 0);
 
 
 //
@@ -105,13 +105,13 @@ int main(void)
 
 		// Write the position to debug console
         dbg.interval([](){
-			usartprintf("x : %5lf mm, y : %5lf mm, a : %5lf degs\n", pos.x, pos.y, pos.a);;
+			usartprintf("x : %1lf mm, y : %1lf mm, a : %1lf degs\n", pos.x, pos.y, pos.a);;
 		},100);
 
 		//BLINK LED
 		ledToggleSeq.interval([](){
 			GreenLED_Toggle();
-		},800);
+		},750);
 	}
 
 	return 0;

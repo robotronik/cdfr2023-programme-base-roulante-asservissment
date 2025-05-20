@@ -26,6 +26,13 @@ typedef struct{
 	uint64_t time = 0;
 }position_t;
 
+typedef struct{
+	double x = 0;
+    double y = 0;
+	double a = 0;
+	uint64_t time = 0;
+}position_time_t;
+
 typedef enum {
     /// @brief Success
     ret_OK = 0,

@@ -136,7 +136,7 @@ void Motor::SetSpeedSigned(double speed) {
 
 void Motor::SetSpeedUnsigned(double speed, bool reverse) {
 	if (!driveEnabled) {
-		usartprintf("Drive not enabled\n");
+		//usartprintf("Drive not enabled\n");
 		return;
 	}
 	if (braking) {
