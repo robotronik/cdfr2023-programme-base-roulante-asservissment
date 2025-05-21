@@ -261,9 +261,13 @@ bool movement::currentCommandRun(void){
     if(currentCommand.baseCommand == BaseCommand::LINEAR){
         return getLinearError()!=0;
     }
-    else{
+    else if(currentCommand.baseCommand == BaseCommand::ANGULAR_LOOKAT){
         return getAngularError()!=0;
     }
+    else if(currentCommand.baseCommand == BaseCommand::ANGULAR_THETA){
+        return getAngularError()!=0;
+    }
+    return false;
 #endif
 }
 

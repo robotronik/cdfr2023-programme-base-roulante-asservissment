@@ -43,7 +43,7 @@ void i2c_interface::get_coordinates(int16_t &x, int16_t &y, int16_t &theta){
 }
 
 void i2c_interface::set_coordinates(int16_t x, int16_t y, int16_t theta){
-    robotPosition->setPosition(x,y,theta);
+    robotAsservisement->setPosition(x,y,theta);
 }
 
 void i2c_interface::stop(){
