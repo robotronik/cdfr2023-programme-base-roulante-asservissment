@@ -11,13 +11,15 @@ void position::loop(){
 }
 
 void position::setPosition(position_t inCommingposition){
-    positionRobot = inCommingposition;
-    positionRobot.teta = mod_angle(inCommingposition.teta * DEG_TO_RAD);
+    positionRobot.x = inCommingposition.x;
+    positionRobot.y = inCommingposition.y;
+    positionRobot.teta = mod_angle(inCommingposition.teta)*DEG_TO_RAD;
+    positionRobot.time = inCommingposition.time;
 }
 void position::setPosition(double x, double y, double teta){
     positionRobot.x = x;
     positionRobot.y = y;
-    positionRobot.teta =  mod_angle(teta * DEG_TO_RAD);
+    positionRobot.teta =  mod_angle(teta)*DEG_TO_RAD;
     positionRobot.time = get_uptime_ms();
 }
 
