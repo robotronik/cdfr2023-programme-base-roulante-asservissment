@@ -69,6 +69,8 @@ void ResetDrive(){
 
 void DriveSetup(){
 	setupDriveGPIO();
+	setuptimer();
+	adc_setup();
 	motorA = new Motor(0, port_SpeedControlA, pin_SpeedControlA,
     port_DirectionA, pin_DirectionA,
     port_BrakeA, pin_BrakeA,
@@ -99,8 +101,6 @@ void DriveSetup(){
 	motorA->Setup();
 	motorB->Setup();
 	motorC->Setup();
-	setuptimer();
-	adc_setup();
 }
 
 Motor::Motor(int motorID, int port_SpeedControl, int pin_SpeedControl,

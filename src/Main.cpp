@@ -70,8 +70,8 @@ int main(void)
 	RedLED_Clear();
 
 	wheelA =  new Wheel(DISTANCE_WHEEL,180, DIAMETER_WHEEL, motorA);
-	wheelA =  new Wheel(DISTANCE_WHEEL, 60, DIAMETER_WHEEL, motorA);
-	wheelA =  new Wheel(DISTANCE_WHEEL,-60, DIAMETER_WHEEL, motorA);
+	wheelB =  new Wheel(DISTANCE_WHEEL, 60, DIAMETER_WHEEL, motorB);
+	wheelC =  new Wheel(DISTANCE_WHEEL,-60, DIAMETER_WHEEL, motorC);
 	
 	// Reset the position of the robot
 	setPosition(0, 0, 0);
@@ -123,7 +123,7 @@ int main(void)
 //
 void testMotors(){
     DriveEnable();
-    for (double i = 0.0; i < 100.0; i++) {
+    for (double i = 0.0; i <= 100.0; i++) {
         usartprintf("%d\n",i);
 		motorA->SetSpeedSigned(i);
 		motorB->SetSpeedSigned(i);
@@ -133,6 +133,7 @@ void testMotors(){
 		motorC->PrintValues();
         delay_ms(100);
     }
+	delay_ms(500);
     for (double i = 100.0; i > -100.0; i--) {
         usartprintf("%d\n",i);
 		motorA->SetSpeedSigned(i);
@@ -143,6 +144,7 @@ void testMotors(){
 		motorC->PrintValues();
         delay_ms(100);
     }
+	delay_ms(500);
     for (double i = -100.0; i <= 0.0; i++) {
         usartprintf("%d\n",i);
 		motorA->SetSpeedSigned(i);
@@ -153,7 +155,8 @@ void testMotors(){
 		motorC->PrintValues();
         delay_ms(100);
     }
-    while (1);
+	delay_ms(500);
+	DriveDisable();
 }
 
 void testloop(sequence* seq) {
