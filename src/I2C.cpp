@@ -7,8 +7,8 @@ bool callbackinitialiseRec = false;
 void (*callbacki2cTrans)(void);
 bool callbackinitialiseTrans =  false;
 
-uint8_t bufrec[BUFFERSIZE];
-uint8_t bufsend[BUFFERSIZE];
+uint8_t bufrec[I2CBUFFERSIZE];
+uint8_t bufsend[I2CBUFFERSIZE];
 int reading;
 int sending;
 commnucationDirection_t communicationType;
@@ -104,7 +104,7 @@ void i2c1_ev_isr(void){
 		}
 	}
 	else if(sr1 & I2C_SR1_TxE){
-		if(sending<BUFFERSIZE){
+		if(sending<I2CBUFFERSIZE){
 			i2c_send_data(I2C1,bufsend[sending]);
 			sending++;
 		}
@@ -113,7 +113,7 @@ void i2c1_ev_isr(void){
 		}
 	}
 	else if(sr1 & I2C_SR1_RxNE){
-		if(reading<BUFFERSIZE){
+		if(reading<I2CBUFFERSIZE){
 			bufrec[reading] = i2c_get_data(I2C1);
 			reading++;
 		}
@@ -136,17 +136,17 @@ void i2c1_ev_isr(void){
 }
 
 void I2CGetBufffer(uint8_t* data, int size){
-	if(size>BUFFERSIZE){
-		size = BUFFERSIZE;
+	if(size>I2CBUFFERSIZE){
+		size = I2CBUFFERSIZE;
 	}
-	memcpy(data,bufrec,BUFFERSIZE);
+	memcpy(data,bufrec,I2CBUFFERSIZE);
 }
 
 void I2CSetBuffer(uint8_t* data, int size){
-	if(size>BUFFERSIZE){
-		size = BUFFERSIZE;
+	if(size>I2CBUFFERSIZE){
+		size = I2CBUFFERSIZE;
 	}
-	memcpy(bufsend,data,BUFFERSIZE);
+	memcpy(bufsend,data,I2CBUFFERSIZE);
 }
 
 void setCallbackReceive(void (*f)(uint8_t* data, int size)){

@@ -13,6 +13,14 @@ void i2c_interface::get_version(uint16_t &part1, uint16_t &part2, uint16_t &part
     part4 = GIT_COMMIT_SHA_PART4;
 }
 
+uint16_t i2c_interface::get_log_size(){
+    return getLogBufferSize();
+}
+
+void i2c_interface::get_log(uint8_t** data, int &length){
+    return getLogBuffer((char**)data,length);
+}
+
 void i2c_interface::setReponseBuffer(uint8_t* data, int size){
     I2CSetBuffer(data,size);
 }

@@ -12,6 +12,7 @@
 
 //#define ENABLE_STATISTIC
 //#define OLDROBOT
+#define ENABLE_STM32_LOG_I2C
 
 //PIN and Port to control the first MotorL
 #define pin_ModeL 			GPIO0
@@ -200,3 +201,13 @@ union uintConv
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 #define EXIT_TASKNOTFINISH 128
+
+
+#define LOGBUFFERSIZE 64
+#define __I2CBUFFERSIZE__ 256
+
+#ifndef ENABLE_STM32_LOG_I2C
+    #define I2CBUFFERSIZE __I2CBUFFERSIZE__
+#else
+    #define I2CBUFFERSIZE (((__I2CBUFFERSIZE__) < (LOGBUFFERSIZE+1)) ? (LOGBUFFERSIZE+1) : (__I2CBUFFERSIZE__))
+#endif

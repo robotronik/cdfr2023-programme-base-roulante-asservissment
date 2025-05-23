@@ -9,6 +9,7 @@
 #endif
 
 #include "config.h"
+#include "logI2c.h"
 
 void usartSetup(void);
 
