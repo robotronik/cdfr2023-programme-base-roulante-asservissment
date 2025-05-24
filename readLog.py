@@ -168,14 +168,15 @@ trace_stop = go.Scatter(
 )
 
 
-image_path = "../../stategie/2025/CoupeRobotique.png"
+image_path = "../../stategie/2025/Vinyl.svg"
 
-# Charger et encoder l'image
-with open(image_path, "rb") as image_file:
-    encoded_image = base64.b64encode(image_file.read()).decode()
+# Charger et encoder le fichier SVG
+with open(image_path, "r", encoding="utf-8") as svg_file:
+    svg_content = svg_file.read()
+    encoded_svg = base64.b64encode(svg_content.encode("utf-8")).decode()
 
-# Créer l'URL base64
-image_base64 = "data:image/png;base64," + encoded_image
+# Créer l'URL base64 pour image SVG
+image_base64 = "data:image/svg+xml;base64," + encoded_svg
 
 # Layout avec l'image encodée
 layout = go.Layout(
