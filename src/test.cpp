@@ -62,7 +62,7 @@ int angularCalibration(i2c_interface* robotI2cInterface){
 int testloop(i2c_interface* robotI2cInterface){
     SEQUENCE_BEGIN();
 
-    robotI2cInterface->set_coordinates(-200,0,180);
+    robotI2cInterface->set_coordinates(0,0,0);
     robotI2cInterface->set_motor_state(true);
 	robotI2cInterface->consigne_angulaire(90,Rotation::SHORTEST);
 
@@ -72,10 +72,7 @@ int testloop(i2c_interface* robotI2cInterface){
 
     DELAY(3000);
 
-	robotI2cInterface->go_to_point(400,400);
-
-    //DELAY(2000);
-	//robotI2cInterface->stop();
+	robotI2cInterface->go_to_point(500,500);
 
     DELAY(7000);
 
@@ -83,7 +80,7 @@ int testloop(i2c_interface* robotI2cInterface){
 
     DELAY(7000);
 
-	robotI2cInterface->go_to_point(400,400,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
+	robotI2cInterface->go_to_point(500,500,Rotation::ANTICLOCKWISE,Direction::BACKWARD);
 
     DELAY(7000);
 

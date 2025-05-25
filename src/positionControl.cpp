@@ -64,7 +64,7 @@ void positionControl::stop(void){
 }
 
 void positionControl::setPosition(double initialValue){
-    usartprintf("setPostion : %lf",initialValue);
+    usartprintf("setPostion : %lf\n",initialValue);
     position = initialValue;
     computeStroke();
 }
