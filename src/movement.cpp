@@ -275,7 +275,8 @@ double movement::findLinearMaxSpeedOut(void){
     for(int j = vectorCount; j >= 1; j--){
         currentSpeed = sqrt(currentSpeed*currentSpeed + 2*deltaSize[j]*maxDeccel[j]);
         currentSpeed = std::min(currentSpeed,maxSpeed[j]);
-        //currentSpeed = std::min(currentSpeed,maxSpeedCurve[j-1]);
+        //acceptable angle : 10deg per meter
+        currentSpeed = abs(deltaSize[j] / deltaAngle[j-1])>100 ? currentSpeed : 0;
     }
     return currentSpeed;
 }
@@ -299,7 +300,6 @@ void movement::launchCommande(void){
     case BaseCommand::LINEAR:{
             double maxSpeedOutTmp = findLinearMaxSpeedOut();
             usartprintf("maxSpeedOut %lf\n",maxSpeedOutTmp);
-            maxSpeedOutTmp = maxSpeedOutTmp > 0 ? maxSpeedOutTmp - 1 : maxSpeedOutTmp;
             nextCommandIschained = maxSpeedOutTmp > 0 ? true : false;
             Asservissement::setConsigneLineaire(currentCommand.x,currentCommand.y,maxSpeedOutTmp);
         }
