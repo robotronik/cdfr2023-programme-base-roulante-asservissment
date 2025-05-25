@@ -64,7 +64,7 @@ public:
     ~Asservissement();
 
 protected:
-    void setConsigneLineaire(double x, double y);
+    void setConsigneLineaire(double x, double y, double maxSpeedOut = 0);
     void setConsigneAngulaire(double angle,Rotation rotation);
     void setConsigneAngulaire(double x, double y, Direction direction, Rotation rotation);
     static double getLookAtAngle(position_t pos, double x, double y, Direction direction, Rotation rotation);

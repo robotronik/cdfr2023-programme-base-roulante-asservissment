@@ -19,7 +19,6 @@
 //with a periode off 4000, this creat a frequence off 21kHz, that people don't hear
 #define TIMERPERIOD 4000
 #define COEFMULT TIMERPERIOD/100
-#define CLIP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
 
 

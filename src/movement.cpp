@@ -195,6 +195,10 @@ double getDeltaAngle(double angleErreur, Rotation rotation){
 }
 
 double movement::findLinearMaxSpeedOut(void){
+    if(currentCommand.baseCommand != BaseCommand::LINEAR){
+        return 0;
+    }
+
     position_t preComputePos = posRobot->getPosition();
     position_t prevPos;
     double deltaAngle[COMMANDE_BUFFER_SIZE];
@@ -207,15 +211,13 @@ double movement::findLinearMaxSpeedOut(void){
     bool stop = false;
     double currentMaxSpeed = positionControlLineaire.vitesseMaxAv;
     double currentMaxDeccel = positionControlLineaire.decelerationMaxAv;
+    Command* command = &currentCommand;
+    int i = 0;
 
-    for(int i = 0; !stop && !commandBuffer.isEmpty(i); i++){
+    do{
         prevPos = preComputePos;
-        Command* command = commandBuffer.read(i);
 
-        if((command->baseCommand == BaseCommand::ANGULAR_LOOKAT || command->baseCommand == BaseCommand::ANGULAR_THETA) && currentStateVector == ANGULAR){
-            break;
-        }
-
+        //compute MAX
         switch (command->baseCommand)
         {
         case BaseCommand::LINEAR:
@@ -258,41 +260,60 @@ double movement::findLinearMaxSpeedOut(void){
         default:
             break;
         }
-    }
+
+        //get next command and check validity
+        if(!commandBuffer.isEmpty(i))
+            command = commandBuffer.read(i);
+        else
+            stop = true;
+        if((command->baseCommand == BaseCommand::ANGULAR_LOOKAT || command->baseCommand == BaseCommand::ANGULAR_THETA) && currentStateVector == ANGULAR)
+            stop = true;
+        i++;
+    }while(!stop);
 
     double currentSpeed = 0;
-    for(int i = vectorCount - 1; i >= 1; i--){
-        currentSpeed = sqrt(currentSpeed*currentSpeed + 2*deltaSize[i]*maxDeccel[i]);
-        currentSpeed = std::min(currentSpeed,maxSpeed[i]);
-        currentSpeed = std::min(currentSpeed,maxSpeedCurve[i-1]);
+    for(int j = vectorCount; j >= 1; j--){
+        currentSpeed = sqrt(currentSpeed*currentSpeed + 2*deltaSize[j]*maxDeccel[j]);
+        currentSpeed = std::min(currentSpeed,maxSpeed[j]);
+        //currentSpeed = std::min(currentSpeed,maxSpeedCurve[j-1]);
     }
     return currentSpeed;
 }
 
 void movement::launchCommande(void){
     currentCommand = commandBuffer.pop();
+    bool chainedCommand = false;
 
     usartprintf("\nbaseCommand %s\n",baseCommandToString(currentCommand.baseCommand));
     usartprintf("x %d\n",currentCommand.x);
     usartprintf("y %d\n",currentCommand.y);
     usartprintf("theta %d\n",currentCommand.theta);
     usartprintf("direction %s\n",directionToChar(currentCommand.direction));
-    usartprintf("rotation %s\n\n\n",rotationToChar(currentCommand.rotation));
+    usartprintf("rotation %s\n",rotationToChar(currentCommand.rotation));
 
     statisticAngular.reset();
     statisticLinear.reset();
 
     switch (currentCommand.baseCommand)
     {
-    case BaseCommand::LINEAR:
-        Asservissement::setConsigneLineaire(currentCommand.x,currentCommand.y);
+    case BaseCommand::LINEAR:{
+            double maxSpeedOutTmp = findLinearMaxSpeedOut();
+            usartprintf("maxSpeedOut %lf\n",maxSpeedOutTmp);
+            maxSpeedOutTmp = maxSpeedOutTmp > 0 ? maxSpeedOutTmp - 1 : maxSpeedOutTmp;
+            nextCommandIschained = maxSpeedOutTmp > 0 ? true : false;
+            Asservissement::setConsigneLineaire(currentCommand.x,currentCommand.y,maxSpeedOutTmp);
+        }
         break;
 
     case BaseCommand::ANGULAR_LOOKAT:
+        chainedCommand = nextCommandIschained;
+        nextCommandIschained = false;
         Asservissement::setConsigneAngulaire(currentCommand.x,currentCommand.y,currentCommand.direction,currentCommand.rotation);
         break;
 
     case BaseCommand::ANGULAR_THETA:
+        chainedCommand = nextCommandIschained;
+        nextCommandIschained = false;
         Asservissement::setConsigneAngulaire(currentCommand.theta,currentCommand.rotation);
         break;
 
@@ -323,6 +344,10 @@ void movement::launchCommande(void){
 
     default:
         break;
+    }
+    usartprintf("\n\n");
+    if(!currentCommandRun() || chainedCommand){
+        launchCommande();
     }
 }
 

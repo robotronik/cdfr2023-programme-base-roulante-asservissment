@@ -28,6 +28,7 @@ private:
     Command currentCommand;
     double maxSpeedOut;
     bool run = false;
+    bool nextCommandIschained = false;
 
     bool enableStop = false;
     bool enablePause = false;

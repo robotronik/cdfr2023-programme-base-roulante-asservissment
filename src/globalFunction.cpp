@@ -39,6 +39,12 @@ const char* baseCommandToString(BaseCommand cmd) {
             return "ANGULAR_LOOKAT";
         case BaseCommand::LINEAR:
             return "LINEAR";
+        case BaseCommand::MAX_SPEED_LINEAR:
+            return "MAX_SPEED_LINEAR";
+        case BaseCommand::MAX_SPEED_ANGULAR:
+            return "MAX_SPEED_ANGULAR";
+        case BaseCommand::SET_POSITION:
+            return "SET_POSITION";
         default:
             return "UNKNOWN";
     }

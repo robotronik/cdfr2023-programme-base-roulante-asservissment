@@ -143,10 +143,11 @@ void Asservissement::setConsigneAngulaire(double x, double y, Direction directio
     setConsigneAngulaire(angle,rotation);
 }
 
-void Asservissement::setConsigneLineaire(double x, double y){
+void Asservissement::setConsigneLineaire(double x, double y, double maxSpeedOut){
     double errorBefor = getLinearErrorReel()-positionControlLineaire.getPostion();
     consigne.x = x;
     consigne.y = y;
+    positionControlLineaire.setMaxSpeedOut(maxSpeedOut);
     positionControlLineaire.setPosition(getLinearErrorReel() - errorBefor);
     positionControlLineaire.setConsigne(0);
 }

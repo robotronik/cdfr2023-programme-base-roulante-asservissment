@@ -154,6 +154,8 @@
 #define DEG_TO_RAD PI/180
 #define RAD_TO_DEG 180/PI
 
+#define CLIP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+
 enum class BaseCommand {
     ANGULAR_THETA,
     ANGULAR_LOOKAT,

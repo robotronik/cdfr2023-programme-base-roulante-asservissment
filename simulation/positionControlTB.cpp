@@ -14,17 +14,26 @@ extern "C" {
         SET_TIME_(0);
 
         positionControl positionControlLineaire;
-        positionControlLineaire.vitesseMaxAv = 300;
-        positionControlLineaire.accelerationMaxAv = 300;
-        positionControlLineaire.decelerationMaxAv = 300;
-        positionControlLineaire.vitesseMaxAr = 300;
-        positionControlLineaire.accelerationMaxAr = 300;
-        positionControlLineaire.decelerationMaxAr = 300;
-        positionControlLineaire.decelerationStopAr = 500;
-        positionControlLineaire.decelerationStopAv = 500;
-        positionControlLineaire.setPosition(1000);
+        positionControlLineaire.vitesseMaxAv.setRange(0,700);
+        positionControlLineaire.accelerationMaxAv.setRange(0,600);
+        positionControlLineaire.decelerationMaxAv.setRange(0,600);
+        positionControlLineaire.vitesseMaxAr.setRange(0,700);
+        positionControlLineaire.accelerationMaxAr.setRange(0,600);
+        positionControlLineaire.decelerationMaxAr.setRange(0,600);
+        positionControlLineaire.decelerationStopAv.setRange(0,1200);
+        positionControlLineaire.decelerationStopAr.setRange(0,1200);
+        positionControlLineaire.vitesseMaxAv.setMax();
+        positionControlLineaire.accelerationMaxAv.setMax();
+        positionControlLineaire.decelerationMaxAv.setMax();
+        positionControlLineaire.vitesseMaxAr.setMax();
+        positionControlLineaire.accelerationMaxAr.setMax();
+        positionControlLineaire.decelerationMaxAr.setMax();
+        positionControlLineaire.decelerationStopAv.setMax();
+        positionControlLineaire.decelerationStopAr.setMax();
+
+        positionControlLineaire.setPosition(300);
         positionControlLineaire.setConsigne(0);
-        positionControlLineaire.setMaxSpeedOut(150);
+        positionControlLineaire.setMaxSpeedOut(700);
 
         double current;
         int numCommande = 0;
@@ -34,11 +43,11 @@ extern "C" {
             current = positionControlLineaire.getPostion();
             vecData.push_back(current);
             vecTime.push_back(i*20);
-            if(i==50){
+            if(i>10 && numCommande == 0 && positionControlLineaire.getPostion()==0){
                 positionControlLineaire.stop();
-                // positionControlLineaire.setMaxSpeedOut(0);
-                // positionControlLineaire.setConsigne(-500);
-                // positionControlLineaire.vitesseMaxAr = 300;
+                positionControlLineaire.setPosition(300);
+                positionControlLineaire.setConsigne(0);
+                positionControlLineaire.setMaxSpeedOut(0);
                 numCommande ++;
             }
         }

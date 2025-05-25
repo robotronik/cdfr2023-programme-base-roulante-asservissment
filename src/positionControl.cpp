@@ -111,7 +111,7 @@ void positionControl::computeDT(double distance,double vitesseMax, double accele
 
 #ifndef SIMULATION_POSITION_CONTROL
     if(vitesseInitial>vitesseMax){
-        usartprintf("Error : initial speed greater than maximum speed \n");
+        usartprintf("Error : initial speed greater than maximum speed \n intial : %lf, max : %lf",vitesseInitial,vitesseMax);
         vitesseMax = vitesseInitial; //to avoid bigger problems
     }
 #endif
