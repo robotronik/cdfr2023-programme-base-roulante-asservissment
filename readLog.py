@@ -106,16 +106,41 @@ else:
 
 # === Traitement du fichier choisi ===
 coord_pattern = re.compile(r'get_coordinates\s*:\s*x\s*(-?\d+),\s*y\s*(-?\d+),')
-goto_pattern = re.compile(r'(go_to_point\s*:.*)')
-stop_pattern = re.compile(r'stop')
+
+event_patterns = [
+    {
+        "name": "go_to_point",
+        "pattern": re.compile(r'(go_to_point.*)'),
+        "color": "green",
+        "symbol": "cross"
+    },
+    {
+        "name": "stop",
+        "pattern": re.compile(r'(stop.*)'),
+        "color": "red",
+        "symbol": "circle"
+    },
+    {
+        "name": "pause",
+        "pattern": re.compile(r'(pause.*)'),
+        "color": "orange",
+        "symbol": "diamond"
+    },
+    {
+        "name": "resume",
+        "pattern": re.compile(r'(resume.*)'),
+        "color": "purple",
+        "symbol": "triangle-up"
+    },
+    # Ajoute ici d'autres patterns si besoin
+]
 
 # Variables pour stocker les données
+
 x_coords = []
 y_coords = []
 
-hover_texts = []
-goto_points = []
-stop_points = []
+event_points = {event["name"]: [] for event in event_patterns}
 
 last_position = None
 
@@ -127,14 +152,16 @@ with open(log_file_path, 'r') as f:
             last_position = (int(coord_match.group(1)), int(coord_match.group(2)))
             x_coords.append(last_position[0])
             y_coords.append(last_position[1])
+            continue
 
-        elif goto_pattern.search(line) and last_position:
-            match = goto_pattern.search(line)
-            label = match.group(1).strip()
-            goto_points.append((last_position[0], last_position[1], label))
+        for event in event_patterns:
+            match = event["pattern"].search(line)
+            if match and last_position:
+                label = match.group(1).strip()
+                event_points[event["name"]].append((last_position[0], last_position[1], label))
+                break  # évite qu'une ligne match plusieurs events
 
-        elif stop_pattern.search(line) and last_position:
-            stop_points.append((last_position[0], last_position[1]))
+# === Traces Plotly ===
 
 # Trace principale du chemin
 trace_path = go.Scatter(
@@ -145,27 +172,25 @@ trace_path = go.Scatter(
     line=dict(color='blue')
 )
 
-# Points go_to avec hover
-trace_goto = go.Scatter(
-    y=[p[0] for p in goto_points],
-    x=[p[1] for p in goto_points],
-    mode='markers',
-    name='go_to_point',
-    marker=dict(color='green', size=10, symbol='cross'),
-    text=[p[2] for p in goto_points],
-    hoverinfo='text'
-)
+# Traces dynamiques pour les événements
+event_traces = []
+for event in event_patterns:
+    points = event_points[event["name"]]
+    if not points:
+        continue
+    trace = go.Scatter(
+        y=[p[0] for p in points],
+        x=[p[1] for p in points],
+        mode='markers',
+        name=event["name"],
+        marker=dict(color=event["color"], size=10, symbol=event["symbol"]),
+        text=[p[2] for p in points],
+        hoverinfo='text'
+    )
+    event_traces.append(trace)
 
-# Points stop
-trace_stop = go.Scatter(
-    y=[p[0] for p in stop_points],
-    x=[p[1] for p in stop_points],
-    mode='markers',
-    name='stop',
-    marker=dict(color='red', size=10, symbol='circle'),
-    hoverinfo='text',
-    text=["stop"] * len(stop_points)
-)
+# Liste finale des traces à passer à go.Figure(data=...)
+all_traces = [trace_path] + event_traces
 
 
 image_path = "../../stategie/2025/Vinyl.svg"
@@ -199,5 +224,5 @@ layout = go.Layout(
         )
     ]
 )
-fig = go.Figure(data=[trace_path, trace_goto, trace_stop], layout=layout)
+fig = go.Figure(data=all_traces, layout=layout)
 fig.show()
