@@ -148,7 +148,7 @@ bool movement::setPosition(int x, int y, int theta){
 }
 
 bool movement::setConsigneStop(void){
-    commandBuffer.resetTail();
+    commandBuffer.resetHead();
     enableStop = true;
     return true;
 }
@@ -306,7 +306,7 @@ void movement::loop(void){
 
     if(enableStop == true){
         enableStop = false;
-        commandBuffer.resetHead();
+        commandBuffer.resetTail();
         Asservissement::setConsigneStop();
     }
 }

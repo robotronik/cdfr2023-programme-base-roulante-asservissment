@@ -4,36 +4,36 @@ template <typename T, int N>
 class CircularBuffer {
 private:
     T buffer[N+1];
-    int head = 0;
     int tail = 0;
+    int head = 0;
     bool headIsReset = false;
 
 public:
 
-    CircularBuffer() : head(0), tail(0) {}
+    CircularBuffer() : tail(0), head(0) {}
 
 //******************************************************
 // Interupt side
 //******************************************************
 
     void push(const T& item) {
-        buffer[tail] = item;
-        tail = (tail + 1) % (N+1);
+        buffer[head] = item;
+        head = (head + 1) % (N+1);
     }
 
-    void resetTail(){
-        tail = 0;
+    void resetHead(){
+        head = 0;
         headIsReset = true;
     }
 
     int getAvailableSpace() const {
         if(headIsReset){
-            return N - head;
+            return N - tail;
         }
-        else if (tail >= head) {
-            return N - (tail - head);
+        else if (head >= tail) {
+            return tail - head;
         } else {
-            return head - tail;
+            return N - (head - tail);
         }
     }
 
@@ -50,13 +50,13 @@ public:
 //******************************************************
 
     T pop() {
-        T item = buffer[head];
-        head = (head + 1) % (N+1);
+        T item = buffer[tail];
+        tail = (tail + 1) % (N+1);
         return item;
     }
 
-    void resetHead(){
-        head = 0;
+    void resetTail(){
+        tail = 0;
         headIsReset = false;
     }
 
@@ -70,7 +70,7 @@ public:
             return true;
         }
         else{
-            return (head == tail);
+            return (tail == head);
         }
     }
 
