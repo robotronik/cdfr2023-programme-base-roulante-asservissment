@@ -19,9 +19,8 @@ void CircularBufferOdo::init(void){
 
 //since the buffer is large and never full, there is no need to check the last 4 data with m_endbitCount and m_startbitCount
 bool CircularBufferOdo::isFull() const {
-    return ((m_startBuffer == m_endBuffer-1) || (m_startBuffer == 0 && m_endBuffer == m_size-1));
+    return ((m_startBuffer == m_endBuffer-1) || (m_endBuffer == 0 && m_startBuffer == m_size-1));
 }
-
 
 bool CircularBufferOdo::isEmpty() const {
 #ifdef OPTIMIZE_BUFFER
