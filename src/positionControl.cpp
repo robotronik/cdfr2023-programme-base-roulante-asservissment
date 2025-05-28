@@ -64,7 +64,9 @@ void positionControl::stop(void){
 }
 
 void positionControl::setPosition(double initialValue){
+#ifndef SIMULATION_POSITION_CONTROL
     usartprintf("setPostion : %lf\n",initialValue);
+#endif
     position = initialValue;
     computeStroke();
 }
