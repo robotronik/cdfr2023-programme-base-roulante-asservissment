@@ -306,6 +306,8 @@ void movement::loop(void){
 
     if(enableStop == true){
         enableStop = false;
+        pause = false;
+        enablePause = false;
         commandBuffer.resetHead();
         Asservissement::setConsigneStop();
     }
