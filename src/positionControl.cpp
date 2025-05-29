@@ -65,7 +65,7 @@ void positionControl::stop(void){
 
 void positionControl::setPosition(double initialValue){
 #ifndef SIMULATION_POSITION_CONTROL
-    usartprintf("setPostion : %lf\n",initialValue);
+    //usartprintf("setPostion : %lf\n",initialValue);
 #endif
     position = initialValue;
     computeStroke();
@@ -148,10 +148,14 @@ void positionControl::computeDT(double distance,double vitesseMax, double accele
 
 
 double positionControl::getPostion(){
-    updatePosition();
-    updateSpeed();
     return position;
 }
+
+void positionControl::updatePostion(){
+    updatePosition();
+    updateSpeed();
+}
+
 
 void positionControl::updatePosition(){
     double time = (double)(get_uptime_ms()-startTimeMs)/1000;

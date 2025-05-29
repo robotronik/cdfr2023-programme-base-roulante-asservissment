@@ -75,6 +75,8 @@ void Asservissement::asservissementLoop(){
     double realErrorLinear;
     double reduceErrorLinear;
     uint32_t timeLastPos = posRobot->getPosition_Time();
+    positionControlLineaire.updatePostion();
+    positionControlAngulaire.updatePostion();
 
     realErrorLinear = getLinearErrorReel();
     reduceErrorLinear = realErrorLinear-positionControlLineaire.getPostion();

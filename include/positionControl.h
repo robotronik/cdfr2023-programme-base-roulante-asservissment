@@ -56,6 +56,7 @@ public:
     void setConsigne(double setConsigne);
     void setMaxSpeedOut(double max);
 
+    void updatePostion();
     double getPostion();
     bool getMove();
     int getBrakingDistance();
