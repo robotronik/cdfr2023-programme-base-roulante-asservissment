@@ -83,11 +83,11 @@ void Asservissement::asservissementLoop(){
 
     if(realErrorLinear >= 200){
         reTargetAngle = true;
-        consigne.teta = mod_angle(targetAngle);
+        setConsigneAngulaire(targetAngle,Rotation::SHORTEST);
     }
     else if(realErrorLinear <= -200){
         reTargetAngle = true;
-        consigne.teta = mod_angle(targetAngle+180);
+        setConsigneAngulaire(targetAngle+180,Rotation::SHORTEST);
     }
 
     realErrorAngular = getAngularErrorReel();
@@ -161,7 +161,6 @@ void Asservissement::setConsigneLineaire(double x, double y){
     double errorBefor = getLinearErrorReel()-positionControlLineaire.getPostion();
     consigne.x = x;
     consigne.y = y;
-    currentState = Rotation::SHORTEST;
     positionControlLineaire.setPosition(getLinearErrorReel() - errorBefor);
     positionControlLineaire.setConsigne(0);
 }
