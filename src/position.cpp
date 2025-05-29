@@ -40,9 +40,9 @@ void updatePositionData(){
     }
 }
 
-void setPosition(position_t inCommingposition) {
-    newPosition = inCommingposition;
-    newPosition.a = mod_angle(inCommingposition.a);
+void setPosition(position_t incommingPos) {
+    newPosition = incommingPos;
+    newPosition.a = mod_angle(incommingPos.a);
     needChangePos = true;
 }
 void setPosition(double x, double y, double a) {

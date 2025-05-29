@@ -7,6 +7,6 @@ extern position_t acc;
 
 void updatePositionData();
 
-void setPosition(position_t inCommingposition);
+void setPosition(position_t incommingPos);
 void setPosition(double x, double y, double a);
 bool getPositionChanged();
