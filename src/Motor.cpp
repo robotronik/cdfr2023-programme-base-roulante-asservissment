@@ -192,7 +192,7 @@ double Motor::GetCurrent(){
 
 	// Convert ADC value to voltage
 	double voltage = (double)(adc_value) / 4095.0 * 3.3;
-	double CSOutVoltage = voltage * (4.7+2.2) / 2.2; // Voltage divider
+	double CSOutVoltage = voltage * (4.7+2.2) / 4.7; // Voltage divider
 
 	// VCSOUT ≈ (ILOAD × AV × RSENSE) + VOOS
 	double current = (CSOutVoltage - 0.320) / (19 * 0.018);
