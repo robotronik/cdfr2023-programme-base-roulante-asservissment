@@ -2,16 +2,19 @@
 #include "led.h"
 #include "Motor.h"
 
+typedef struct{
+    uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4
+} mytype;
+
 i2c_interface::i2c_interface(movement* inRobotAsservisement):
 robotAsserv(inRobotAsservisement) {
 
 }
 
 void i2c_interface::get_version(uint16_t &part1, uint16_t &part2, uint16_t &part3, uint16_t &part4) {
-    part1 = GIT_COMMIT_SHA_PART1;
-    part2 = GIT_COMMIT_SHA_PART2;
-    part3 = GIT_COMMIT_SHA_PART3;
-    part4 = GIT_COMMIT_SHA_PART4;
+    mytype mystruct;
+    memcpy()
+    i2c_send(mytype);
 }
 
 void i2c_interface::setReponseBuffer(uint8_t* data, int size) {
