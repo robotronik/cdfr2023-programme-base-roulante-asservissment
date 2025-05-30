@@ -105,10 +105,10 @@ void Asservissement::asservissementLoop(){
     //Calculate Linear commande
     if(positionControlLineaire.getPostion()==0){
         valPidLineaire = pidLineaireBlock.update(reduceErrorLinear,timeLastPos);
-        if(valPidLineaire > 20 || valPidLineaire < -20){
-            valPidLineaire = 0;
-            error = true;
-        }
+        // if(valPidLineaire > 40 || valPidLineaire < -40){
+        //     valPidLineaire = 0;
+        //     error = true;
+        // }
         pidLineaire.reset();
     }
     else{
@@ -119,10 +119,10 @@ void Asservissement::asservissementLoop(){
     //Calculate Angular commande
     if(positionControlAngulaire.getPostion()==0 || reTargetAngle){
         valPidAngulaire = pidAngulaireBlock.update(reduceErrorAngular,timeLastPos);
-        if(valPidAngulaire > 20 || valPidAngulaire < -20){
-            valPidAngulaire = 0;
-            error = true;
-        }
+        // if(valPidAngulaire > 40 || valPidAngulaire < -40){
+        //     valPidAngulaire = 0;
+        //     error = true;
+        // }
         pidAngulaire.reset();
     }
     else{
